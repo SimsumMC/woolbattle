@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="images/sheep.png" alt="logo" width="240"/>
+  <img src="images/sheep.png" alt="logo" width="160"/>
   <br>
   Woolbattle Plugin
   <br>
