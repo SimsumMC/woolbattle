@@ -43,4 +43,4 @@ quia. Quo neque error repudiandae fuga? Ipsa laudantium molestias eos sapiente o
 
 # License
 
-This project follows MIT-License. For more information click [here](https://choosealicense.com/licenses/mit/)
+This project uses the MIT-License. For more information click [here](https://choosealicense.com/licenses/mit/)
