@@ -1,6 +1,5 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="woolbattle">
-    <output-path>$USER_HOME$/Desktop/1.8.8 Server/plugins</output-path>
     <root id="archive" name="woolbattle.jar">
       <element id="module-output" name="woolbattle" />
     </root>
