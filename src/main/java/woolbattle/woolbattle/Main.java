@@ -8,8 +8,11 @@ public final class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
+
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
         instance = this;
+
+        Bukkit.getPluginManager().registerEvents(new Listener(),this);
     }
 
     @Override
