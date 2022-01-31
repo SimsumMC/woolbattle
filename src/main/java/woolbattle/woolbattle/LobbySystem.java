@@ -80,7 +80,7 @@ public class LobbySystem implements Listener {
                     Collection<? extends Player> players = Bukkit.getOnlinePlayers();
                     int playerAmount = players.size();
                     int maxPlayers = Bukkit.getServer().getMaxPlayers();
-                    if(playerAmount >= (maxPlayers / 2)){
+                    if(playerAmount >= (maxPlayers / 2) && playerAmount != 1){
                         if(cooldown == 0){
                             startGame();
                         }
