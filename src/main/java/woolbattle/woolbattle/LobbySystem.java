@@ -26,8 +26,8 @@ public class LobbySystem implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        event.setQuitMessage(ChatColor.GRAY + "Der Spieler " + ChatColor.GREEN + player.getDisplayName()
-                + ChatColor.GRAY + " hat das Spiel verlassen.");
+        event.setQuitMessage(ChatColor.GRAY + "The player " + ChatColor.GREEN + player.getDisplayName()
+                + ChatColor.GRAY + " left the game.");
         //TODO: implement Logic if a player who is in a game leaves
         if(Bukkit.getServer().getOnlinePlayers().size() >= 1){
             endGame();
@@ -38,12 +38,12 @@ public class LobbySystem implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        event.setJoinMessage(ChatColor.GRAY + "Der Spieler " + ChatColor.GREEN + player.getDisplayName()
-                + ChatColor.GRAY + " ist dem Spiel beigetreten.");
+        event.setJoinMessage(ChatColor.GRAY + "The player " + ChatColor.GREEN + player.getDisplayName()
+                + ChatColor.GRAY + " joined the game.");
 
         if(gameStarted){
             player.setGameMode(GameMode.SPECTATOR);
-            player.sendMessage(ChatColor.RED + "Es läuft bereits ein Spiel!");
+            player.sendMessage(ChatColor.RED + "There is already a running game!");
         }
 
         setPlayerScoreBoard(player);
@@ -59,13 +59,13 @@ public class LobbySystem implements Listener {
     }
 
     public static void startGame(){
-        //TODO: basic whole functions
+        //TODO: basic whole method
         gameStarted = true;
         Bukkit.broadcastMessage(ChatColor.GREEN + "Game Starting...");
     }
 
     public static void endGame(){
-        //TODO: basic whole functions
+        //TODO: basic whole method
         gameStarted = false;
         Bukkit.broadcastMessage(ChatColor.RED + "Game Ending...");
     }
@@ -80,7 +80,7 @@ public class LobbySystem implements Listener {
                     Collection<? extends Player> players = Bukkit.getOnlinePlayers();
                     int playerAmount = players.size();
                     int maxPlayers = Bukkit.getServer().getMaxPlayers();
-                    if(playerAmount >= (maxPlayers / 2) && playerAmount != 1){
+                    if(playerAmount >= (maxPlayers / 2)){ // TODO: && playerAmount != 1
                         if(cooldown == 0){
                             startGame();
                         }
@@ -93,11 +93,9 @@ public class LobbySystem implements Listener {
                         cooldown = 60;
                     }
                     for(Player player: players){
-                        if(player.getGameMode() != GameMode.SPECTATOR) {
+
+                        if(player.getGameMode() == GameMode.SURVIVAL) {
                             setPlayerCooldown(player, cooldown);
-                        }
-                        else{
-                            System.out.println("spec detected");
                         }
 
                     }
@@ -171,7 +169,6 @@ public class LobbySystem implements Listener {
 
         map.addEntry("§d");
         map.setPrefix("§d" + dummyMap);
-
         players.addEntry("§b");
         players.setPrefix("§b" + actualPlayers + "/" + maxPlayers);
 
@@ -191,7 +188,6 @@ public class LobbySystem implements Listener {
         team.setPrefix("§c" + dummyTeam);
         map.setPrefix("§d" + dummyMap);
         players.setPrefix("§b" + actualPlayers + "/" + maxPlayers);
-
 
     }
 
