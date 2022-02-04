@@ -11,6 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
 import org.bukkit.scheduler.BukkitRunnable;
+import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 
 import java.util.ArrayList;
 
@@ -26,18 +27,21 @@ public class Listener implements org.bukkit.event.Listener {
             mainHand.setDurability((short) (mainHand.getDurability() -1));
         }else{}
 
-        DyeColor teamColor = DyeColor.GREEN;
+        //Internal variables of the plugin, not meant to be modifiable by the end-user
+        DyeColor teamColor = DyeColor.GREEN;//Is to be implemented in the team-system, being created
         Inventory inventory = player.getInventory();
         Block block = event.getBlock();
         ItemStack itemStack = new ItemStack(Material.WOOL, 0, (byte) teamColor.getWoolData()){};
         Material type = block.getType();
-
-        int amount = 1; //Is to be changed, to be modifiable by the user
         int itemAmount = 0;
-        int maxStacks = 3;//Too has to be embedded in a command to database system, to be able to customize it through mere minecraft chat
-        int delayInTicks = 10;
-        boolean blockIsMap = false; //Is going to be changed, to actually check, whether the block broken is part of the map
 
+        //Variables that are about to be able to be modified by the end-user
+        int givenWoolAmount = 1; //Is to be changed, to be modifiable by the user
+        int maxStacks = 3;//Too has to be embedded in a command to database system, to be able to customize it through mere minecraft chat
+        int delayInTicks= 10;
+        boolean blockIsMap = false;
+
+        //Checks
         for(Block iterBlock : BlockBreakingSystem.getMapBlocks()){
             if(iterBlock.getLocation().equals(block.getLocation())){
                 blockIsMap = true;
@@ -57,12 +61,13 @@ public class Listener implements org.bukkit.event.Listener {
             itemStack.setType(type); // The wool, additionally to this, is to be coloured according to the team colour of the player, breaking the block
 
             if(itemAmount < maxStacks*64){
-                itemStack.setAmount(amount);
+                itemStack.setAmount(givenWoolAmount);
                 inventory.addItem(itemStack);
             }else{}
 
             Colorable data = (Colorable) block.getState().getData();
             block.setType(Material.AIR);
+
             if(blockIsMap){
 
                 new BukkitRunnable(){
@@ -71,7 +76,7 @@ public class Listener implements org.bukkit.event.Listener {
                         block.setType(Material.WOOL);
                         block.setData(data.getColor().getWoolData());
                     }
-                }.runTaskLater(Main.getInstance(), 10);
+                }.runTaskLater(Main.getInstance(), delayInTicks);
             }
         }
     }

@@ -1,7 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="woolbattle">
-    <root id="archive" name="woolbattle.jar">
-      <element id="module-output" name="woolbattle" />
-    </root>
-  </artifact>
-</component>

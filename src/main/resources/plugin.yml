@@ -8,3 +8,5 @@ commands:
     aliases: bgnBlReg
   terminateBlockRegistration:
     aliases: termBlReg
+  listDatabases:
+    aliases: lsDbs
