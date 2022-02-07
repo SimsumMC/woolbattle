@@ -1,12 +1,12 @@
 package woolbattle.woolbattle;
 
 import org.bukkit.DyeColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
@@ -19,7 +19,6 @@ public class Listener implements org.bukkit.event.Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-
         Player player = event.getPlayer();
         ItemStack mainHand = player.getItemInHand();
         if(mainHand.getType().equals(Material.SHEARS)){
@@ -42,41 +41,51 @@ public class Listener implements org.bukkit.event.Listener {
         boolean blockIsMap = false;
 
         //Checks
-        for(Block iterBlock : BlockBreakingSystem.getMapBlocks()){
-            if(iterBlock.getLocation().equals(block.getLocation())){
+        for(Location iterBlock : BlockBreakingSystem.getMapBlocks()){
+            if(iterBlock.equals(block.getLocation())){
                 blockIsMap = true;
                 break;
             }
         }
-        event.setCancelled(true);
 
-        if(type.equals(Material.WOOL)){
 
-            for(ItemStack is : inventory){
-                if(is != null){
-                    itemAmount = is.getType().equals(Material.WOOL)? itemAmount+is.getAmount() : itemAmount;
+        if(BlockBreakingSystem.isCollectBrokenBlocks()){
+            ArrayList<Location> mapBlocks = BlockBreakingSystem.getMapBlocks();
+            for(Location iterBlock : BlockBreakingSystem.getMapBlocks()){
+                if(event.getBlock().getLocation().equals(iterBlock)){
+                    mapBlocks.remove(iterBlock);
                 }
             }
+        }else{
+            event.setCancelled(true);
+            if(type.equals(Material.WOOL)){
 
-            itemStack.setType(type); // The wool, additionally to this, is to be coloured according to the team colour of the player, breaking the block
-
-            if(itemAmount < maxStacks*64){
-                itemStack.setAmount(givenWoolAmount);
-                inventory.addItem(itemStack);
-            }else{}
-
-            Colorable data = (Colorable) block.getState().getData();
-            block.setType(Material.AIR);
-
-            if(blockIsMap){
-
-                new BukkitRunnable(){
-                    @Override
-                    public void run() {
-                        block.setType(Material.WOOL);
-                        block.setData(data.getColor().getWoolData());
+                for(ItemStack is : inventory){
+                    if(is != null){
+                        itemAmount = is.getType().equals(Material.WOOL)? itemAmount+is.getAmount() : itemAmount;
                     }
-                }.runTaskLater(Main.getInstance(), delayInTicks);
+                }
+
+                itemStack.setType(type); // The wool, additionally to this, is to be coloured according to the team colour of the player, breaking the block
+
+                if(itemAmount < maxStacks*64){
+                    itemStack.setAmount(givenWoolAmount);
+                    inventory.addItem(itemStack);
+                }else{}
+
+                Colorable data = (Colorable) block.getState().getData();
+                block.setType(Material.AIR);
+
+                if(blockIsMap){
+
+                    new BukkitRunnable(){
+                        @Override
+                        public void run() {
+                            block.setType(Material.WOOL);
+                            block.setData(data.getColor().getWoolData());
+                        }
+                    }.runTaskLater(Main.getInstance(), delayInTicks);
+                }
             }
         }
     }
@@ -84,9 +93,9 @@ public class Listener implements org.bukkit.event.Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
 
-        if(BlockBreakingSystem.isCollectBrokeBlocks()){
-            ArrayList<Block> mapBlocks = BlockBreakingSystem.getMapBlocks();
-            mapBlocks.add(event.getBlockPlaced());
+        if(BlockBreakingSystem.isCollectBrokenBlocks()){
+            ArrayList<Location> mapBlocks = BlockBreakingSystem.getMapBlocks();
+            mapBlocks.add(event.getBlockPlaced().getLocation());
             BlockBreakingSystem.setMapBlocks(mapBlocks);
         }
     }

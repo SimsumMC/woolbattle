@@ -10,7 +10,7 @@ import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 public class TerminateBlockRegistrationCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        if(BlockBreakingSystem.isCollectBrokeBlocks()){
+        if(BlockBreakingSystem.isCollectBrokenBlocks()){
             BlockBreakingSystem.setCollectBrokenBlocks(false);
             Bukkit.broadcastMessage(ChatColor.GREEN + "The block-scanning-process was successfully terminated.");
             return false;
