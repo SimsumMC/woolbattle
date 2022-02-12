@@ -1,9 +1,10 @@
 package woolbattle.woolbattle.woolsystem;
 
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.UpdateOptions;
 import org.bson.BsonArray;
 import org.bson.BsonDouble;
+import org.bson.BsonValue;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -13,13 +14,17 @@ import java.util.ArrayList;
 
 
 public class BlockBreakingSystem {
-
     private static ArrayList<Location> mapBlocks = new ArrayList<Location>();
+    private static BsonArray mapBlocksB = new BsonArray();
     private static boolean collectBrokenBlocks = false;
 
     public static void fetchMapBlocks() {
         //Is supposed to fetch the Blocks, about to become the map from a database
+
         MongoDatabase db = Main.getMongoClient().getDatabase("woolbattle");
+        MongoCollection<Document> blockBreaking = db.getCollection("mapBlocks");
+
+        /*MongoDatabase db = Main.getMongoClient().getDatabase("woolbattle");
 
         if(db.getCollection("blockBreaking").count() == 0||db.getCollection("blockBreaking").find(new Document("mapBlocks", new BsonArray())).first() == null){
 
@@ -41,39 +46,43 @@ public class BlockBreakingSystem {
                 }
             }
             setMapBlocks(locMapBlocks);
-        }
+        }*/
     }
 
 
     public static void pushMapBlocks(){
         MongoDatabase db = Main.getMongoClient().getDatabase("woolbattle");
-        BsonArray blocksToPush = new BsonArray();
+        boolean hasWoolbattle = false;
+        boolean hasBlockBreaking;
+        MongoCollection<Document> collection;
 
-        if(db.getCollection("mapBlocks").find(new Document("mapBlocks", new BsonArray())).first() == null||db.getCollection("blockBreaking").count() == 0){
-            db.getCollection("mapBlocks").insertOne(new Document("mapBlocks", new BsonArray()));
+        if(!db.listCollectionNames().into(new ArrayList<String>()).contains("woolbattle")){
+            db.createCollection("woolbattle");
+        }else{}
+
+        collection = db.getCollection("woolbattle");
+
+        if(!collection.listIndexes().into(new ArrayList<Document>()).contains(new Document("mapBlocks", new BsonArray()))){
+          collection.createIndex(new Document("mapBlocks", new BsonArray()));
+        }else{}
+
+        BsonArray update = new BsonArray(){
+        };
+
+        for(BsonValue value : (BsonArray) (collection.find(new Document("mapBlocks", new BsonArray())).first().get("mapBlocks"))){
+            BsonArray varArray = (BsonArray) value;
+            update.add(varArray);
         }
-        blocksToPush.addAll((ArrayList<BsonArray>) db.getCollection("mapBlocks").find(new Document("mapBlocks", new BsonArray())).first().get("mapBlocks"));
-
-        for(Location iterBlock : mapBlocks){
-            BsonArray arr = new BsonArray(){
+        for(Location loc : mapBlocks){
+            update.add(new BsonArray(){
                 {
-                    add(new BsonDouble(iterBlock.getBlockX()));
-                    add(new BsonDouble(iterBlock.getBlockY()));
-                    add(new BsonDouble(iterBlock.getBlockZ()));
+                    add(0, new BsonDouble(loc.getX()));
+                    add(1, new BsonDouble(loc.getY()));
+                    add(2, new BsonDouble(loc.getZ()));
                 }
-            };
-            blocksToPush.add(arr);
-
+            });
         }
-
-        Document formerMapBlocksDoc = db.getCollection("blockBreaking").find(new Document("mapBlocks", new BsonArray())).first();
-        Document mapBlocksDoc = new Document();
-        /*for(BsonArray iterArray : blocksToPush){
-            List<BsonArray> formerMapBlocksIter = (List<BsonArray>) formerMapBlocksDoc.get("mapBlocks");
-            formerMapBlocksIter.add(iterArray);
-        }*/
-
-        db.getCollection("woolbattle").updateOne(new Document("mapBlocks", new BsonArray()), new Document("mapBlocks", blocksToPush), new UpdateOptions());
+        db.getCollection("woolbattle").updateOne(new Document("mapBlocks", new BsonArray()), new Document("mapBlocks", update));
     }
 
     public static boolean isCollectBrokenBlocks() {
@@ -85,9 +94,27 @@ public class BlockBreakingSystem {
     }
 
     public static void setMapBlocks(ArrayList<Location> mapBlocksArg) {
-        mapBlocks = mapBlocksArg;
+        BsonArray locArray = new BsonArray();
+
+        for(Location locArg : mapBlocksArg){
+            locArray.add(new BsonArray(){
+                {
+                    add(0, new BsonDouble(locArg.getX()));
+                    add(1, new BsonDouble(locArg.getY()));
+                    add(2, new BsonDouble(locArg.getZ()));
+                }
+            });
+
+        }
+
+        mapBlocksB = locArray;
     }
     public static ArrayList<Location> getMapBlocks() {
-        return mapBlocks;
+       ArrayList<Location> ret = new ArrayList<Location>();
+        for(BsonValue argArray : mapBlocksB){
+            BsonArray argArrayNest = (BsonArray) argArray;
+            ret.add(new Location(Bukkit.getWorlds().get(0),argArrayNest.get(0).asDouble().doubleValue(), argArrayNest.get(1).asDouble().doubleValue(), argArrayNest.get(2).asDouble().doubleValue()));
+        }
+        return ret;
     }
 }

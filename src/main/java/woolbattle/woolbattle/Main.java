@@ -1,6 +1,8 @@
 package woolbattle.woolbattle;
 
 import com.mongodb.MongoClient;
+import org.bson.BsonDocumentWrapper;
+import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,7 +21,6 @@ public final class Main extends JavaPlugin {
     private static Main instance;
     private static final MongoClient mongoClient = new MongoClient("localhost");
 
-
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -32,6 +33,7 @@ public final class Main extends JavaPlugin {
         getCommand("terminateBlockRegistration").setExecutor(new TerminateBlockRegistrationCommand());
         getCommand("listDatabases").setExecutor(new DatabaseCommand());
         BlockBreakingSystem.fetchMapBlocks();
+        Document doc = new Document("key", "{ddbs}");
 
     }
 
