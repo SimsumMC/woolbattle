@@ -115,7 +115,7 @@ public class LobbySystem implements Listener {
 
     }
 
-    public void updateScoreBoard(){
+    public static void updateScoreBoard(){
         runScoreBoardTask = true;
         new BukkitRunnable() {
             @Override
@@ -176,7 +176,7 @@ public class LobbySystem implements Listener {
 
     }
 
-    public void updatePlayerScoreBoard(Player player){
+    public static void updatePlayerScoreBoard(Player player){
         int maxPlayers = Bukkit.getServer().getMaxPlayers();
         int actualPlayers = Bukkit.getServer().getOnlinePlayers().size();
         Scoreboard board = player.getScoreboard();
