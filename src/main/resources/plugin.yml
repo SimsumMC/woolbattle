@@ -4,10 +4,6 @@ main: woolbattle.woolbattle.Main
 authors: [ SimsumMC, Servaturus, Beelzebub ]
 description: A Woolbattle Plugin
 commands:
-  initBlockRegistration:
-    aliases: bgnBlReg
-  terminateBlockRegistration:
-    aliases: termBlReg
   mapblocks:
     aliases: [mb]
   test:
