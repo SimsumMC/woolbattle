@@ -1,15 +1,10 @@
 package woolbattle.woolbattle;
 
 import com.mongodb.MongoClient;
-import org.bson.BsonDocumentWrapper;
-import org.bson.Document;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
-import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
-import woolbattle.woolbattle.woolsystem.DatabaseCommand;
-import woolbattle.woolbattle.woolsystem.InitiateBlockRegistrationCommand;
-import woolbattle.woolbattle.woolsystem.TerminateBlockRegistrationCommand;
+import woolbattle.woolbattle.woolsystem.*;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -24,23 +19,20 @@ public final class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
+        instance = this;
+        BlockBreakingSystem.setCollectBrokenBlocks(false);
+        BlockBreakingSystem.fetchMapBlocks();
 
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
-        instance = this;
-
-        Bukkit.getPluginManager().registerEvents(new Listener(),this);
-        getCommand("initBlockRegistration").setExecutor(new InitiateBlockRegistrationCommand());
-        getCommand("terminateBlockRegistration").setExecutor(new TerminateBlockRegistrationCommand());
-        getCommand("listDatabases").setExecutor(new DatabaseCommand());
-        BlockBreakingSystem.fetchMapBlocks();
-        Document doc = new Document("key", "{ddbs}");
-
+        getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
+        getCommand("mapblocks").setExecutor(new MapBlocksCommand());
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
         BlockBreakingSystem.pushMapBlocks();
+        HandlerList.unregisterAll();
     }
 
     public static Main getInstance(){

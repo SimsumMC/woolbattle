@@ -1,5 +1,6 @@
 package woolbattle.woolbattle;
 
+import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,7 +17,6 @@ import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 import java.util.ArrayList;
 
 public class Listener implements org.bukkit.event.Listener {
-
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
@@ -51,11 +51,21 @@ public class Listener implements org.bukkit.event.Listener {
 
         if(BlockBreakingSystem.isCollectBrokenBlocks()){
             ArrayList<Location> mapBlocks = BlockBreakingSystem.getMapBlocks();
-            for(Location iterBlock : BlockBreakingSystem.getMapBlocks()){
+            ArrayList<Location> removedBlocks = BlockBreakingSystem.getRemovedBlocks();
+
+            if(mapBlocks.contains(block.getLocation())){
+                mapBlocks.remove(block.getLocation());
+                BlockBreakingSystem.setMapBlocks(mapBlocks);
+
+                removedBlocks.add(block.getLocation());
+                BlockBreakingSystem.setRemovedBlocks(removedBlocks);
+                Bukkit.broadcastMessage("Removed Blocks: " + BlockBreakingSystem.locArrayToString(BlockBreakingSystem.getRemovedBlocks()));
+            }
+            /*for(Location iterBlock : BlockBreakingSystem.getMapBlocks()){
                 if(event.getBlock().getLocation().equals(iterBlock)){
                     mapBlocks.remove(iterBlock);
                 }
-            }
+            }*/
         }else{
             event.setCancelled(true);
             if(type.equals(Material.WOOL)){
@@ -89,7 +99,6 @@ public class Listener implements org.bukkit.event.Listener {
             }
         }
     }
-
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
 

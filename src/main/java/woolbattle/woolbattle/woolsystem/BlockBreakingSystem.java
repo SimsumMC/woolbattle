@@ -2,119 +2,162 @@ package woolbattle.woolbattle.woolsystem;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.UpdateOptions;
 import org.bson.BsonArray;
-import org.bson.BsonDouble;
-import org.bson.BsonValue;
 import org.bson.Document;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import woolbattle.woolbattle.Main;
 
 import java.util.ArrayList;
 
+import static com.mongodb.client.model.Filters.exists;
 
 public class BlockBreakingSystem {
+
     private static ArrayList<Location> mapBlocks = new ArrayList<Location>();
-    private static BsonArray mapBlocksB = new BsonArray();
     private static boolean collectBrokenBlocks = false;
+    private static ArrayList<Location> removedBlocks = new ArrayList<Location>();
+
+    //Setter and getter, concerning the previously defined private variables
+
+    public static boolean isCollectBrokenBlocks() {return collectBrokenBlocks;}
+    public static void setCollectBrokenBlocks(boolean collectBrokenBlocksArg) {collectBrokenBlocks = collectBrokenBlocksArg;}
+
+    public static ArrayList<Location> getMapBlocks() {return mapBlocks;}
+    public static void setMapBlocks(ArrayList<Location> mapBlocksArg) {mapBlocks = mapBlocksArg;}
+
+    public static ArrayList<Location> getRemovedBlocks() {return removedBlocks;}
+    public static void setRemovedBlocks(ArrayList<Location> removedBlocks) {BlockBreakingSystem.removedBlocks = removedBlocks;}
+
+    public static void clearDbMapBlocks(){
+
+        //Clears the mapBlocks, stored in the db.
+
+        MongoDatabase db = Main.getMongoClient().getDatabase("woolbattle");
+        db.getCollection("blockBreaking").replaceOne(exists("mapBlocks"), new Document("mapBlocks", new ArrayList<ArrayList<Double>>()));
+    }
 
     public static void fetchMapBlocks() {
-        //Is supposed to fetch the Blocks, about to become the map from a database
+
+        //Fetches stored mapBlocks from the db into the cached blocks array.
 
         MongoDatabase db = Main.getMongoClient().getDatabase("woolbattle");
-        MongoCollection<Document> blockBreaking = db.getCollection("mapBlocks");
+        MongoCollection<Document> blockBreaking;
+        ArrayList<Location> updatedMapBlocks = mapBlocks;
 
-        /*MongoDatabase db = Main.getMongoClient().getDatabase("woolbattle");
+        //Checks, whether the "blockBreaking" collection and the "mapBlocks" documents exist in the db, creates them, if this is not the case.
 
-        if(db.getCollection("blockBreaking").count() == 0||db.getCollection("blockBreaking").find(new Document("mapBlocks", new BsonArray())).first() == null){
-
+        if(!db.listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking")){
             db.createCollection("blockBreaking");
-            db.getCollection("blockBreaking").insertOne(new Document("mapBlocks", new BsonArray()));
-        }else{
+        }else{}
 
-            ArrayList<Location> locMapBlocks = new ArrayList<Location>();
-            Document locMapBlocksDoc = db.getCollection("blockBreaking").find(new Document("mapBlocks", new BsonArray())).first();
+        if(!db.getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(new Document("mapBlocks",new BsonArray()))){
+            db.getCollection("blockBreaking").insertOne(new Document("mapBlocks", new ArrayList<ArrayList<Double>>()));
+        }else{}
+        
+        //Iterates over the mapBlocks, present in the db, converts the into valid locations and ultimately add them to a previously created array.
 
-            ArrayList<BsonArray> currentMapBlocks = (ArrayList<BsonArray>) locMapBlocksDoc.get("mapBlocks");
+        for(ArrayList<Double> argArray: (ArrayList<ArrayList<Double>>) db.getCollection("blockBreaking").find(exists("mapBlocks")).first().get("mapBlocks")){
+            if(argArray.size() == 0){
+                break;
+            }else {
+                Location location = new Location(
+                        Bukkit.getWorlds().get(0),
+                        argArray.get(0),
+                        argArray.get(1),
+                        argArray.get(0)
+                );
 
-            for(int i = 0; i<currentMapBlocks.size();i++){
-                BsonArray iterValue = currentMapBlocks.get(i);
-                Location fetchedLoc = new Location(Bukkit.getWorlds().get(0), iterValue.get(0).asDouble().doubleValue(), iterValue.get(1).asDouble().doubleValue(), iterValue.get(2).asDouble().doubleValue());
-
-                if(iterValue != null){
-                    locMapBlocks.add(fetchedLoc);
-                }
+                updatedMapBlocks.add(location);
             }
-            setMapBlocks(locMapBlocks);
-        }*/
-    }
+        }
 
+        //Replaces the currently cached blocks with the previously prepared updated mapBlocks array.
+
+        BlockBreakingSystem.setMapBlocks(updatedMapBlocks);
+    }
 
     public static void pushMapBlocks(){
+
+        //Pushes the currently present cached blocks into the database.
+
+        if(mapBlocks.size() == 0){
+
+            return;
+        }
+
         MongoDatabase db = Main.getMongoClient().getDatabase("woolbattle");
-        boolean hasWoolbattle = false;
-        boolean hasBlockBreaking;
-        MongoCollection<Document> collection;
 
-        if(!db.listCollectionNames().into(new ArrayList<String>()).contains("woolbattle")){
-            db.createCollection("woolbattle");
+        //Checks, whether the "blockBreaking" collection and the "mapBlocks" documents exist in the db, creates them, if this is not the case.
+
+        if(!db.listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking")){
+            db.createCollection("blockBreaking");
         }else{}
 
-        collection = db.getCollection("woolbattle");
-
-        if(!collection.listIndexes().into(new ArrayList<Document>()).contains(new Document("mapBlocks", new BsonArray()))){
-          collection.createIndex(new Document("mapBlocks", new BsonArray()));
+        if(!db.getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(new Document("mapBlocks", new ArrayList<ArrayList<Double>>()))){
+           db.getCollection("blockBreaking").insertOne(new Document("mapBlocks", new BsonArray()));
         }else{}
 
-        BsonArray update = new BsonArray(){
-        };
+        //Fetches the stored mapBlocks from the db into a new array (update).
 
-        for(BsonValue value : (BsonArray) (collection.find(new Document("mapBlocks", new BsonArray())).first().get("mapBlocks"))){
-            BsonArray varArray = (BsonArray) value;
-            update.add(varArray);
-        }
+        ArrayList<ArrayList<Double>> update = (ArrayList<ArrayList<Double>>) db.getCollection("blockBreaking").find(exists("mapBlocks")).first().get("mapBlocks");
+
+        //Adds the cached blocks to the updated array, in case they are not already present in said collection.
+
         for(Location loc : mapBlocks){
-            update.add(new BsonArray(){
+            ArrayList<Double> locArray = new ArrayList<Double>(){
                 {
-                    add(0, new BsonDouble(loc.getX()));
-                    add(1, new BsonDouble(loc.getY()));
-                    add(2, new BsonDouble(loc.getZ()));
+                    add(loc.getX());
+                    add(loc.getY());
+                    add(loc.getZ());
                 }
-            });
+            };
+
+            if(!update.contains(locArray)){
+                update.add(locArray);
+            }
+
         }
-        db.getCollection("woolbattle").updateOne(new Document("mapBlocks", new BsonArray()), new Document("mapBlocks", update));
+
+        //Searches for blocks in the array, about to replace the mapBlocks-array in the db, that are present in the removed-blocks-array and deletes them.
+
+        for(ArrayList<Double> locArray : update/*((ArrayList<ArrayList<Double>>)db.getCollection("blockBreaking").find(exists("mapBlocks")).first().get("mapBlocks"))*/){
+            Location loc = new Location(Bukkit.getWorlds().get(0), locArray.get(0), locArray.get(1), locArray.get(2));
+            if(removedBlocks.contains(loc)){
+                update.remove(locArray);
+            }
+        }
+
+        //Replaces the mapBlocksArray in the db with the previously-prepared one (update).
+
+        db.getCollection("blockBreaking").replaceOne(db.getCollection("blockBreaking").find(exists("mapBlocks")).first(), new Document("mapBlocks", update), new UpdateOptions().upsert(true));
     }
 
-    public static boolean isCollectBrokenBlocks() {
-        return collectBrokenBlocks;
-    }
+    public static String locArrayToString(ArrayList<Location> locs){
 
-    public static void setCollectBrokenBlocks(boolean collectBrokenBlocks) {
-        BlockBreakingSystem.collectBrokenBlocks = collectBrokenBlocks;
-    }
+        //Method, meant to convert an array of locations towards an appropriately coloured string, representing it.
 
-    public static void setMapBlocks(ArrayList<Location> mapBlocksArg) {
-        BsonArray locArray = new BsonArray();
+        StringBuilder result = new StringBuilder(ChatColor.DARK_PURPLE + "[");
 
-        for(Location locArg : mapBlocksArg){
-            locArray.add(new BsonArray(){
-                {
-                    add(0, new BsonDouble(locArg.getX()));
-                    add(1, new BsonDouble(locArg.getY()));
-                    add(2, new BsonDouble(locArg.getZ()));
+        if(locs.size() == 0){
+            result.append(ChatColor.DARK_PURPLE + "]");
+            return result.toString();
+        }
+        else{
+            for(int i = 0; i<locs.size(); i++){
+
+                result.append("\n" + ChatColor.GREEN + "[" + ChatColor.RED + locs.get(i).getX() +", " + locs.get(i).getY() +", " +locs.get(i).getZ() + ChatColor.GREEN + "]");
+
+                if(i == (locs.size() -1)){
+                    result.append(ChatColor.DARK_PURPLE + "\n]");
+                }else{
+                    result.append(ChatColor.AQUA + ", ");
                 }
-            });
-
+            }
         }
 
-        mapBlocksB = locArray;
-    }
-    public static ArrayList<Location> getMapBlocks() {
-       ArrayList<Location> ret = new ArrayList<Location>();
-        for(BsonValue argArray : mapBlocksB){
-            BsonArray argArrayNest = (BsonArray) argArray;
-            ret.add(new Location(Bukkit.getWorlds().get(0),argArrayNest.get(0).asDouble().doubleValue(), argArrayNest.get(1).asDouble().doubleValue(), argArrayNest.get(2).asDouble().doubleValue()));
-        }
-        return ret;
+        return result.toString();
     }
 }
