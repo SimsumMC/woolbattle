@@ -17,6 +17,7 @@ import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 import java.util.ArrayList;
 
 public class Listener implements org.bukkit.event.Listener {
+
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
@@ -106,6 +107,12 @@ public class Listener implements org.bukkit.event.Listener {
             ArrayList<Location> mapBlocks = BlockBreakingSystem.getMapBlocks();
             mapBlocks.add(event.getBlockPlaced().getLocation());
             BlockBreakingSystem.setMapBlocks(mapBlocks);
+            ArrayList<Location> removedBlocks = BlockBreakingSystem.getRemovedBlocks();
+            if(removedBlocks.contains(event.getBlock().getLocation())){
+                removedBlocks.remove(event.getBlock().getLocation());
+            }
+            Bukkit.broadcastMessage(BlockBreakingSystem.locArrayToString(mapBlocks) + "\n" + BlockBreakingSystem.locArrayToString(removedBlocks));
+
         }
     }
 }

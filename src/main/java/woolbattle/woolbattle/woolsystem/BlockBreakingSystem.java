@@ -2,8 +2,6 @@ package woolbattle.woolbattle.woolsystem;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.UpdateOptions;
-import org.bson.BsonArray;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -12,7 +10,9 @@ import woolbattle.woolbattle.Main;
 
 import java.util.ArrayList;
 
+import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
+
 
 public class BlockBreakingSystem {
 
@@ -53,13 +53,14 @@ public class BlockBreakingSystem {
             db.createCollection("blockBreaking");
         }else{}
 
-        if(!db.getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(new Document("mapBlocks",new BsonArray()))){
+        if(!db.getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(eq("_id", Main.getObjectId()))){
             db.getCollection("blockBreaking").insertOne(new Document("mapBlocks", new ArrayList<ArrayList<Double>>()));
+            Main.setObjectId(db.getCollection("blockBreaking").find(exists("mapBlocks")).first().getObjectId("_id"));
         }else{}
         
         //Iterates over the mapBlocks, present in the db, converts the into valid locations and ultimately add them to a previously created array.
 
-        for(ArrayList<Double> argArray: (ArrayList<ArrayList<Double>>) db.getCollection("blockBreaking").find(exists("mapBlocks")).first().get("mapBlocks")){
+        for(ArrayList<Double> argArray: (ArrayList<ArrayList<Double>>) db.getCollection("blockBreaking").find(eq("_id", Main.getObjectId())).first().get("mapBlocks")){
             if(argArray.size() == 0){
                 break;
             }else {
@@ -67,7 +68,7 @@ public class BlockBreakingSystem {
                         Bukkit.getWorlds().get(0),
                         argArray.get(0),
                         argArray.get(1),
-                        argArray.get(0)
+                        argArray.get(2)
                 );
 
                 updatedMapBlocks.add(location);
@@ -96,8 +97,9 @@ public class BlockBreakingSystem {
             db.createCollection("blockBreaking");
         }else{}
 
-        if(!db.getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(new Document("mapBlocks", new ArrayList<ArrayList<Double>>()))){
-           db.getCollection("blockBreaking").insertOne(new Document("mapBlocks", new BsonArray()));
+        if(!db.getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(eq("_id", Main.getObjectId()))){
+           db.getCollection("blockBreaking").insertOne(new Document("mapBlocks", new ArrayList<ArrayList<Double>>()));
+           Main.setObjectId(db.getCollection("blockBreaking").find(exists("mapBlocks")).first().getObjectId("_id"));
         }else{}
 
         //Fetches the stored mapBlocks from the db into a new array (update).
@@ -132,7 +134,13 @@ public class BlockBreakingSystem {
 
         //Replaces the mapBlocksArray in the db with the previously-prepared one (update).
 
-        db.getCollection("blockBreaking").replaceOne(db.getCollection("blockBreaking").find(exists("mapBlocks")).first(), new Document("mapBlocks", update), new UpdateOptions().upsert(true));
+        db.getCollection("blockBreaking").replaceOne(
+                        db.getCollection("blockBreaking").
+                                find(exists("mapBlocks")).
+                                first(),
+                        new Document("mapBlocks", update)
+                        //,new UpdateOptions().upsert(true)
+        );
     }
 
     public static String locArrayToString(ArrayList<Location> locs){
@@ -155,9 +163,54 @@ public class BlockBreakingSystem {
                 }else{
                     result.append(ChatColor.AQUA + ", ");
                 }
+
             }
         }
 
         return result.toString();
+    }
+    public static String doubleArrArrToString(ArrayList<ArrayList<Double>> locs){
+
+        //Method, meant to convert an array of locations towards an appropriately coloured string, representing it.
+
+        StringBuilder result = new StringBuilder(ChatColor.DARK_PURPLE + "[");
+
+        if(locs.size() == 0){
+            result.append(ChatColor.DARK_PURPLE + "]");
+            return result.toString();
+        }
+        else{
+            for(int i = 0; i<locs.size(); i++){
+
+                result.append("\n" + ChatColor.GREEN + "[" + ChatColor.RED + locs.get(i).get(0) +", " + locs.get(i).get(1) +", " +locs.get(i).get(2) + ChatColor.GREEN + "]");
+
+                if(i == (locs.size() -1)){
+                    result.append(ChatColor.DARK_PURPLE + "\n]");
+                }else{
+                    result.append(ChatColor.AQUA + ", ");
+                }
+
+            }
+        }
+
+        return result.toString();
+    }
+
+    public static ArrayList<Location> doubleArrArrToLocArr(ArrayList<ArrayList<Double>> input){
+
+        ArrayList<Location> result = new ArrayList<Location>();
+
+        for(ArrayList<Double> doubleArray: input){
+            result.add(
+                    new Location(
+                            Bukkit.getWorlds().get(0),
+                            doubleArray.get(0),
+                            doubleArray.get(1),
+                            doubleArray.get(2)
+                    )
+            );
+        }
+
+        return result;
     }
 }

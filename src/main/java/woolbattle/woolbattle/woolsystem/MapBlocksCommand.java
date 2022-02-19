@@ -1,5 +1,6 @@
 package woolbattle.woolbattle.woolsystem;
 
+import com.mongodb.client.MongoDatabase;
 import org.bson.BsonArray;
 import org.bson.BsonValue;
 import org.bson.Document;
@@ -13,10 +14,13 @@ import woolbattle.woolbattle.Main;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
 
 public class MapBlocksCommand implements CommandExecutor {
+
     private final String syntax = ChatColor.GREEN + "Proper syntax:\n/mapblocks <fetch/push/ls/ || clear> <[] || db/local";
+
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
         if(args.length <1){
@@ -58,20 +62,29 @@ public class MapBlocksCommand implements CommandExecutor {
 
                     case "push":
                         int previousSizeCached = BlockBreakingSystem.getMapBlocks().size();
-                        int previousSizeDb = ((ArrayList<BsonValue>) Main.getMongoClient().
-                                getDatabase("woolbattle").
-                                getCollection("blockBreaking").
-                                find(exists("mapBlocks")).
-                                first().
-                                get("mapBlocks"))
-                                .size();
+                        int previousSizeDb;
+                        if(!Main.getMongoClient().listDatabaseNames().into(new ArrayList<String>()).contains("woolbattle")||
+                                !Main.getMongoClient().getDatabase("woolbattle").listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking") ||
+                                !Main.getMongoClient().getDatabase("woolbattle").getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(new Document("_id", Main.getObjectId())
+                        )){
+                           previousSizeDb = 0;
+                        }
+                        else{
+                            previousSizeDb = ((ArrayList<BsonValue>) Main.getMongoClient().
+                                    getDatabase("woolbattle").
+                                    getCollection("blockBreaking").
+                                    find(eq("_id", Main.getObjectId())).
+                                    first().
+                                    get("mapBlocks"))
+                                    .size();
+                        }
 
                         BlockBreakingSystem.pushMapBlocks();
 
-                        int currentSize= ((ArrayList<BsonValue>) Main.getMongoClient().
+                        int currentSize= ((ArrayList<ArrayList<Double>>) Main.getMongoClient().
                                 getDatabase("woolbattle").
                                 getCollection("blockBreaking").
-                                find(new Document("mapBlocks", new BsonArray())).
+                                find(eq("_id", Main.getObjectId())).
                                 first().
                                 get("mapBlocks")).size();
 
@@ -93,7 +106,26 @@ public class MapBlocksCommand implements CommandExecutor {
                         break;
 
                     case "ls":
-                        commandSender.sendMessage(ChatColor.GREEN + "The following array-like string is standing on behalf of the blocks, currently present in the blockBreakingSystem's Cache:\n" + BlockBreakingSystem.locArrayToString(BlockBreakingSystem.getMapBlocks()));
+                        switch(args[1].toLowerCase(Locale.ROOT)){
+                            case "db":
+                                commandSender.sendMessage(ChatColor.GREEN + "The following array-like string is standing on behalf of the blocks, currently present in the mapBlocks collection of the db:\n" +
+                                        BlockBreakingSystem.doubleArrArrToString((ArrayList<ArrayList<Double>>) Main.
+                                        getMongoClient().
+                                        getDatabase("woolbattle").
+                                        getCollection("blockBreaking").
+                                        find(eq(
+                                                "_id",
+                                                Main.getObjectId())
+                                        ).
+                                        first().
+                                        get("mapBlocks"))
+                                );
+                                break;
+                            case "local":
+                                commandSender.sendMessage(ChatColor.GREEN + "The following array-like string is standing on behalf of the blocks, currently present in the blockBreakingSystem's Cache:\n" + BlockBreakingSystem.locArrayToString(BlockBreakingSystem.getMapBlocks()));
+                                break;
+                        }
+                        //commandSender.sendMessage(ChatColor.GREEN + "The following array-like string is standing on behalf of the blocks, currently present in the blockBreakingSystem's Cache:\n" + BlockBreakingSystem.locArrayToString(BlockBreakingSystem.getMapBlocks()));
                         break;
 
                     case "clear":
@@ -102,15 +134,17 @@ public class MapBlocksCommand implements CommandExecutor {
                                     "the amount of information, needed in order for the command\n" +
                                     "to work.\n"+
                                     syntax);
-                        }else{
+                        }
+                        else{
                             switch(args[1].toLowerCase(Locale.ROOT)){
                                 case "db":
                                     commandSender.sendMessage(ChatColor.GREEN + "Clearing the mapBlocks, stored in the db...");
                                     BlockBreakingSystem.clearDbMapBlocks();
                                     break;
                                 case "local":
-                                    commandSender.sendMessage("Clearing the cached mapBlocks array...");
+                                    commandSender.sendMessage(ChatColor.GREEN + "Clearing the cached mapBlocks and removedBlocks array...");
                                     BlockBreakingSystem.setMapBlocks(new ArrayList<Location>());
+                                    BlockBreakingSystem.setRemovedBlocks(new ArrayList<Location>());
                                     break;
                             }
                         }
