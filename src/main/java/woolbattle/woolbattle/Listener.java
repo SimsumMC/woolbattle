@@ -1,13 +1,11 @@
 package woolbattle.woolbattle;
 
-import org.bukkit.Bukkit;
-import org.bukkit.DyeColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.*;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
@@ -115,4 +113,43 @@ public class Listener implements org.bukkit.event.Listener {
 
         }
     }
+
+    @EventHandler
+    public void onBlockForm(BlockFormEvent event) {
+        if(BlockBreakingSystem.isCollectBrokenBlocks()){
+            ArrayList<Location> mapBlocks = BlockBreakingSystem.getMapBlocks();
+            mapBlocks.add(event.getBlock().getLocation());
+            BlockBreakingSystem.setMapBlocks(mapBlocks);
+            ArrayList<Location> removedBlocks = BlockBreakingSystem.getRemovedBlocks();
+            if(removedBlocks.contains(event.getBlock().getLocation())){
+                removedBlocks.remove(event.getBlock().getLocation());
+            }
+            Bukkit.broadcastMessage(BlockBreakingSystem.locArrayToString(mapBlocks) + "\n" + BlockBreakingSystem.locArrayToString(removedBlocks));
+
+        }
+    }
+
+    @EventHandler
+    public void onChunk(ChunkLoadEvent event) {
+        Bukkit.broadcastMessage(event.getEventName());
+        if(BlockBreakingSystem.isCollectBlocksTroughDiff()){
+            Chunk chunk = event.getChunk();
+            World world = Bukkit.getWorlds().get(0);
+            ArrayList<Location> updateMapBlocks = BlockBreakingSystem.getMapBlocks();
+
+            for(int x = 0;x<16;x++){
+                for(int y = 0;y<=256;y++){
+                    for(int z = 0;z<16;z++){
+                        Bukkit.broadcastMessage(ChatColor.AQUA + "" + x +", " + y + ", " + z);
+                        Block block = chunk.getBlock(x, y ,z);
+                        if(!block.getType().equals(Material.WOOL)){
+                            break;
+                        }
+                        updateMapBlocks.add(chunk.getBlock(x, y, z).getLocation());
+                    }
+                }
+            }
+        }
+    }
+
 }
