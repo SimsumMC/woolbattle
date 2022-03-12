@@ -9,17 +9,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class BlockRegistrationCommand implements CommandExecutor {
-    private String syntax = ChatColor.GREEN + "Proper syntax: /<blockregistration/blckreg> <init/terminate>";
+    private String syntax = ChatColor.GREEN + "Proper syntax: <blockregistration> <<init/terminate>||range> < || 6*<int> ";
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
-        if (args.length < 1) {
-            sender.sendMessage(ChatColor.RED + "The number of arguments, given in order to issue this command, was to low, to do said thing.\n" + this.syntax);
-        }
-        else if (args.length > 1) {
-            sender.sendMessage(ChatColor.RED + "The number of arguments, given in order to issue this command, was to great, to do said thing.\n" + this.syntax);
-        }
-        else {
 
             switch (args[0].toLowerCase(Locale.ROOT)) {
                 case "init":
@@ -44,9 +36,12 @@ public class BlockRegistrationCommand implements CommandExecutor {
                     }
                     return false;
 
-                case "diff":
+                case "range":
+                    if(args.length < 7){
 
+                    }
                     if(args[1].toLowerCase(Locale.ROOT) == null || args[2].toLowerCase(Locale.ROOT) == null || args[3] == null || args[4].toLowerCase(Locale.ROOT) == null || args[5].toLowerCase(Locale.ROOT) == null || args[6] == null){
+                        sender.sendMessage(ChatColor.RED + "At least one of the given coordinate-arguments hasn't had a form of a parsable integer. To use this command, all of them have to fulfill this requirement." + syntax);
                         return false;
                     }
                     else{
@@ -71,7 +66,7 @@ public class BlockRegistrationCommand implements CommandExecutor {
                     }
                     return false;
 
-            }
+            //}
         }
         return false;
     }

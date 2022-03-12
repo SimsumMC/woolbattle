@@ -22,9 +22,9 @@ public class MapBlocksCommand implements CommandExecutor {
     private final String syntax = ChatColor.GREEN + "Proper syntax:\n/mapblocks <fetch/push/ls/ || clear> <[] || db/local";
 
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
+    public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
         if(args.length <1){
-            commandSender.sendMessage(ChatColor.RED
+            sender.sendMessage(ChatColor.RED
                     +
                     "The arguments, added to the command are not portraying\nthe amount of information, needed in order for the command\nto work.\n" +
                     syntax
@@ -33,7 +33,7 @@ public class MapBlocksCommand implements CommandExecutor {
         }
 
         else if(args.length>2){
-            commandSender.sendMessage(ChatColor.RED+
+            sender.sendMessage(ChatColor.RED+
                     "The amount of arguments, sent to use this command\nhas been to high.\n"+
                     syntax
             );
@@ -43,11 +43,11 @@ public class MapBlocksCommand implements CommandExecutor {
         else{
             switch(args[0].toLowerCase(Locale.ROOT)){
                 case "fetch":
-                    commandSender.sendMessage(ChatColor.GREEN + "Initiating fetching process...");
+                    sender.sendMessage(ChatColor.GREEN + "Initiating fetching process...");
                     int previousSize = BlockBreakingSystem.getMapBlocks().size();
                     BlockBreakingSystem.fetchMapBlocks();
 
-                    commandSender.sendMessage(ChatColor.GREEN +
+                    sender.sendMessage(ChatColor.GREEN +
                             "In advance of the fetching process, there were " +
                             ChatColor.BLUE+
                             previousSize+
@@ -88,7 +88,7 @@ public class MapBlocksCommand implements CommandExecutor {
                                 first().
                                 get("mapBlocks")).size();
 
-                        commandSender.sendMessage(ChatColor.GREEN +
+                        sender.sendMessage(ChatColor.GREEN +
                                 "The blocks having been pushed are equal to "+
                                 ChatColor.BLUE+
                                 previousSizeCached+
@@ -106,9 +106,12 @@ public class MapBlocksCommand implements CommandExecutor {
                         break;
 
                     case "ls":
+                        if(args.length !=2){
+                            sender.sendMessage(ChatColor.RED + "The amount of arguments specified is not congruent with the one needed. " + syntax);
+                        }
                         switch(args[1].toLowerCase(Locale.ROOT)){
                             case "db":
-                                commandSender.sendMessage(ChatColor.GREEN + "The following array-like string is standing on behalf of the blocks, currently present in the mapBlocks collection of the db:\n" +
+                                sender.sendMessage(ChatColor.GREEN + "The following array-like string is standing on behalf of the blocks, currently present in the mapBlocks collection of the db:\n" +
                                         BlockBreakingSystem.doubleArrArrToString((ArrayList<ArrayList<Double>>) Main.
                                         getMongoClient().
                                         getDatabase("woolbattle").
@@ -122,15 +125,15 @@ public class MapBlocksCommand implements CommandExecutor {
                                 );
                                 break;
                             case "local":
-                                commandSender.sendMessage(ChatColor.GREEN + "The following array-like string is standing on behalf of the blocks, currently present in the blockBreakingSystem's Cache:\n" + BlockBreakingSystem.locArrayToString(BlockBreakingSystem.getMapBlocks()));
+                                sender.sendMessage(ChatColor.GREEN + "The following array-like string is standing on behalf of the blocks, currently present in the blockBreakingSystem's Cache:\n" + BlockBreakingSystem.locArrayToString(BlockBreakingSystem.getMapBlocks()));
                                 break;
                         }
-                        //commandSender.sendMessage(ChatColor.GREEN + "The following array-like string is standing on behalf of the blocks, currently present in the blockBreakingSystem's Cache:\n" + BlockBreakingSystem.locArrayToString(BlockBreakingSystem.getMapBlocks()));
+                        //sender.sendMessage(ChatColor.GREEN + "The following array-like string is standing on behalf of the blocks, currently present in the blockBreakingSystem's Cache:\n" + BlockBreakingSystem.locArrayToString(BlockBreakingSystem.getMapBlocks()));
                         break;
 
                     case "clear":
                         if(args.length < 2) {
-                            commandSender.sendMessage(ChatColor.RED + "The arguments, added to the command are not portraying\n" +
+                            sender.sendMessage(ChatColor.RED + "The arguments, added to the command are not portraying\n" +
                                     "the amount of information, needed in order for the command\n" +
                                     "to work.\n"+
                                     syntax);
@@ -138,11 +141,11 @@ public class MapBlocksCommand implements CommandExecutor {
                         else{
                             switch(args[1].toLowerCase(Locale.ROOT)){
                                 case "db":
-                                    commandSender.sendMessage(ChatColor.GREEN + "Clearing the mapBlocks, stored in the db...");
+                                    sender.sendMessage(ChatColor.GREEN + "Clearing the mapBlocks, stored in the db...");
                                     BlockBreakingSystem.clearDbMapBlocks();
                                     break;
                                 case "local":
-                                    commandSender.sendMessage(ChatColor.GREEN + "Clearing the cached mapBlocks and removedBlocks array...");
+                                    sender.sendMessage(ChatColor.GREEN + "Clearing the cached mapBlocks and removedBlocks array...");
                                     BlockBreakingSystem.setMapBlocks(new ArrayList<Location>());
                                     BlockBreakingSystem.setRemovedBlocks(new ArrayList<Location>());
                                     break;

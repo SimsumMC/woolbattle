@@ -3,11 +3,25 @@ package woolbattle.woolbattle.woolsystem;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import org.bukkit.*;
+import org.bukkit.block.PistonMoveReaction;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.material.MaterialData;
+import org.bukkit.metadata.MetadataValue;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Vector;
 import woolbattle.woolbattle.Main;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
 
@@ -187,7 +201,6 @@ public class BlockBreakingSystem {
             result.append(ChatColor.DARK_PURPLE + "]");
             return result.toString();
         }
-        else{
             for(int i = 0; i<locs.size(); i++){
 
                 result.append("\n" + ChatColor.GREEN + "[" + ChatColor.RED + locs.get(i).get(0) +", " + locs.get(i).get(1) +", " +locs.get(i).get(2) + ChatColor.GREEN + "]");
@@ -199,68 +212,63 @@ public class BlockBreakingSystem {
                 }
 
             }
-        }
-
         return result.toString();
     }
 
-    public static ArrayList<Location> doubleArrArrToLocArr(ArrayList<ArrayList<Double>> input){
-        ArrayList<Location> result = new ArrayList<Location>();
-        if(input.size() == 0){
+    public static void addBlocksByRange(Location a, Location b) {
 
-        }else {
-            for(ArrayList<Double> doubleArray: input){
-                result.add(
-                        new Location(
-                                Bukkit.getWorlds().get(0),
-                                doubleArray.get(0),
-                                doubleArray.get(1),
-                                doubleArray.get(2)
-                        )
-                );
+        World standard = Bukkit.getWorlds().get(0);
+
+        int xdiff = (int) a.getX() - (int) b.getX();
+        int ydiff = (int) a.getY() - (int) b.getY();
+        int zdiff = (int) a.getZ() - (int) b.getZ();
+        ArrayList<Location> locs = new ArrayList<>();
+        ArrayList<Integer>
+                xs = new ArrayList<Integer>(),
+                ys = new ArrayList<Integer>(),
+                zs = new ArrayList<Integer>();
+
+
+        if(Integer.signum(xdiff) == 0){
+            xs.add((int) b.getX());
+        }else{
+            for(int i = (int) b.getX(); ((Integer.signum(xdiff)) == -1)? (i>a.getX()) : (i<a.getX()); i += Integer.signum(xdiff)){
+                xs.add(i);
             }
         }
-        return result;
-    }
 
-    public static void addBlocksByRange(Location start, Location end) {
-        int xDiff = diff(start.getX(), end.getX());
-        int yDiff = diff(start.getY(), end.getY());
-        int zDiff = diff(start.getZ(), end.getZ());
-
-        if(!start.getWorld().equals(end.getWorld())){
-            return;
-        }
-
-        ArrayList<Location> updateMapBlocks = mapBlocks;
-
-        if(start.getX() >= end.getX()){
-            for(double x=0;x<xDiff;x++){
-                for(double y = 0;y<yDiff;y++){
-                    for(double z = 0;z<zDiff;z++){
-                        Location locResult = new Location(start.getWorld(), end.getX()+x, end.getY()+y,end.getZ()+z);
-                        updateMapBlocks.add(locResult);
-                    }
-                }
+        if(Integer.signum(ydiff) == 0){
+            xs.add((int) b.getX());
+        }else{
+            for(int i = (int) b.getY();((Integer.signum(ydiff)) == -1)? (i>a.getY()) : (i<a.getY()); i += Integer.signum(ydiff)){
+                ys.add(i);
             }
         }
-        else{
-            for(double x=0;x<xDiff;x++){
-                for(double y = 0;y<yDiff;y++){
-                    for(double z = 0;z<zDiff;z++){
-                        Location locResult = new Location(start.getWorld(), start.getX()+x, start.getY()+y,start.getZ()+z);
-                        updateMapBlocks.add(locResult);
-                    }
-                }
+
+        if(Integer.signum(zdiff) == 0){
+            zs.add((int) b.getZ());
+        }else{
+            for(int i = (int) b.getZ();((Integer.signum(zdiff)) == -1)? (i>a.getZ()) : (i<a.getZ()); i += Integer.signum(zdiff)){
+                zs.add(i);
             }
         }
-        Bukkit.broadcastMessage(ChatColor.GREEN + BlockBreakingSystem.locArrayToString(updateMapBlocks));
-        mapBlocks = updateMapBlocks;
 
-    }
-    public static int diff(double a, double b){
+        for(int x : xs){
+           for(int y : ys){
+               for(int z : zs){
+                   if(new Location(standard, x, y, z).getBlock().getType().equals(Material.WOOL)){
+                       locs.add(new Location(standard, x, y, z));
+                   }
+               }
+           }
+        }
+        for(Location l : locs){
+            if(mapBlocks.contains(l)){
+                break;
+            }
+            mapBlocks.add(l);
+        }
 
-        int diff = (((int) a)> ((int) b))? ((((int) a) - (int) (b))) : ((((int) b) - (int) (a)));
-        return diff;
+
     }
 }
