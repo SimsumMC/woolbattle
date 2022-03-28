@@ -4,24 +4,10 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bukkit.*;
-import org.bukkit.block.PistonMoveReaction;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.material.MaterialData;
-import org.bukkit.metadata.MetadataValue;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionAttachment;
-import org.bukkit.permissions.PermissionAttachmentInfo;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import woolbattle.woolbattle.Main;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
 
@@ -256,19 +242,18 @@ public class BlockBreakingSystem {
         for(int x : xs){
            for(int y : ys){
                for(int z : zs){
+
                    if(new Location(standard, x, y, z).getBlock().getType().equals(Material.WOOL)){
                        locs.add(new Location(standard, x, y, z));
                    }
                }
            }
         }
+
         for(Location l : locs){
-            if(mapBlocks.contains(l)){
-                break;
+            if(!mapBlocks.contains(l)){
+                mapBlocks.add(l);
             }
-            mapBlocks.add(l);
         }
-
-
     }
 }

@@ -1,7 +1,4 @@
 package woolbattle.woolbattle.woolsystem;
-
-import com.mongodb.client.MongoDatabase;
-import org.bson.BsonArray;
 import org.bson.BsonValue;
 import org.bson.Document;
 import org.bukkit.ChatColor;
@@ -10,12 +7,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import woolbattle.woolbattle.Main;
-
 import java.util.ArrayList;
 import java.util.Locale;
-
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.exists;
 
 public class MapBlocksCommand implements CommandExecutor {
 
