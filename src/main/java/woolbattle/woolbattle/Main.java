@@ -8,6 +8,7 @@ public final class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);
+        getCommand("teamVote").setExecutor(new TeamSystem());
     }
 
     @Override

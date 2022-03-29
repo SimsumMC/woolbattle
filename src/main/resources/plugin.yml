@@ -3,3 +3,6 @@ version: '${project.version}'
 main: woolbattle.woolbattle.Main
 authors: [ SimsumMC, Servaturus, Beelzebub ]
 description: A Woolbattle Plugin
+commands:
+  teamVote:
+    description: Opens a GUI to select your team
