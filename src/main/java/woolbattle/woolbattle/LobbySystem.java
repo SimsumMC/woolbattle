@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class LobbySystem implements Listener {
+public class LobbySystem implements Listener{
 
     static boolean gameStarted = false;
     static boolean runCooldownTask = false;
@@ -115,15 +115,14 @@ public class LobbySystem implements Listener {
                 + ChatColor.GRAY + " joined the game.");
 
         if(gameStarted){
+            setGameScoreBoard(player);
             player.setGameMode(GameMode.SPECTATOR);
             player.sendMessage(ChatColor.RED + "There is already a running game!");
         }
         else{
+            setLobbyScoreBoard(player);
             giveLobbyItems(player);
         }
-
-        setPlayerLobbyScoreBoard(player);
-
         if(!runCooldownTask){
             updatePlayerCooldown();
         }
@@ -138,21 +137,48 @@ public class LobbySystem implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event){
         if (event.getItem() != null){
             if (event.getItem().getItemMeta().getDisplayName().equals("§c§lLeave")){
-                event.getPlayer().kickPlayer("§c§lYou left the game.");
+                startGame();
+                //event.getPlayer().kickPlayer("§c§lYou left the game.");
             }
         }
     }
 
-    public static void startGame(){
+    public static boolean startGame(){
         //TODO: basic whole method
+        if(gameStarted){
+            return false;
+        }
         gameStarted = true;
+
+        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+
+        for(Player player: players){
+            setGameScoreBoard(player);
+        }
+
         Bukkit.broadcastMessage(ChatColor.GREEN + "Game Starting...");
+
+        return true;
     }
 
-    public static void endGame(){
-        //TODO: basic whole method
+    public static boolean endGame(){
+        //TODO: basic whole method -> winner, lobby tp
+        if(!gameStarted){
+            return false;
+        }
         gameStarted = false;
+
+        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+
+        for(Player player: players){
+            setLobbyScoreBoard(player);
+            if(player.getGameMode() == GameMode.SPECTATOR){
+                player.setGameMode(GameMode.SURVIVAL);
+            }
+        }
+
         Bukkit.broadcastMessage(ChatColor.RED + "Game Ending...");
+        return true;
     }
 
 
@@ -248,25 +274,22 @@ public class LobbySystem implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if(!gameStarted){
+                Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
 
-                    Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
-
-                    for(Player player : players){
+                for(Player player : players) {
+                    if (!gameStarted) {
                         updateLobbyScoreBoard(player);
+                    } else {
+                        updateGameScoreBoard(player);
 
                     }
-                }
-                else{
-                    // TODO: add Game Scoreboard method here
-                }
-
-            }
+                }            }
         }.runTaskTimer(Main.getInstance(), 0, 20);
 
     }
 
-    public static void setPlayerLobbyScoreBoard(Player player){
+
+    public static void setLobbyScoreBoard(Player player){
         int maxPlayers = Bukkit.getServer().getMaxPlayers();
         int actualPlayers = Bukkit.getServer().getOnlinePlayers().size();
 
@@ -332,4 +355,33 @@ public class LobbySystem implements Listener {
 
     }
 
+    public static void setGameScoreBoard(Player player){
+        ScoreboardManager manager = Bukkit.getScoreboardManager();
+        Scoreboard board = manager.getNewScoreboard();
+        Objective obj = board.registerNewObjective("Woolbattle", "dummy");
+        obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+        obj.setDisplayName("§a§lWoolbattle");
+
+        Team team = board.registerNewTeam("team");
+
+        obj.getScore("\u1CBC\u1CBC\u1CBC\u1CBC").setScore(11);
+
+        obj.getScore("§7»Team").setScore(1);
+        obj.getScore("§c").setScore(0);
+
+        team.addEntry("§c");
+        team.setPrefix("§c" + dummyTeam);
+
+        player.setScoreboard(board);
+
+    }
+
+    public static void updateGameScoreBoard(Player player){
+        Scoreboard board = player.getScoreboard();
+
+        Team team = board.getTeam("team");
+
+        team.setPrefix("§c" + dummyTeam);
+
+    }
 }

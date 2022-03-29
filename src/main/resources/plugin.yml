@@ -3,3 +3,10 @@ version: '${project.version}'
 main: woolbattle.woolbattle.Main
 authors: [ SimsumMC, Servaturus, Beelzebub ]
 description: A Woolbattle Plugin
+commands:
+  start:
+    description: Start the game instantly.
+    usage: /start
+  stop:
+    description: Stop the game instantly.
+    usage: /stop

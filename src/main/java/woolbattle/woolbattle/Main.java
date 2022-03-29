@@ -11,7 +11,10 @@ public final class Main extends JavaPlugin {
     public void onEnable() {
         // Plugin startup login
         Bukkit.getPluginManager().registerEvents(new LobbySystem(), this);
+        this.getCommand("start").setExecutor(new StartCommand());
+        this.getCommand("stop").setExecutor(new StopCommand());
         instance = this;
+
 
     }
 

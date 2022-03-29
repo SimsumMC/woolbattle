@@ -6,6 +6,7 @@
   "teamAmount": 4,
   "teamSize": 1,
   "spawns": [[1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4]],
+  "lobbyCoordinates": [1,1,1],
   "givenWoolAmount": 1,
   "maxStacks": 3,
   "delayInTicks": 10,
