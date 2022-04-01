@@ -1,27 +1,34 @@
 package woolbattle.woolbattle;
 
-import org.bukkit.Bukkit;
-import org.bukkit.DyeColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
 import org.bukkit.scheduler.BukkitRunnable;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class Listener implements org.bukkit.event.Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
+
         Player player = event.getPlayer();
+        if(player.getGameMode().equals(GameMode.CREATIVE) || player.getGameMode().equals(GameMode.SPECTATOR)){
+
+        }
         ItemStack mainHand = player.getItemInHand();
         if(mainHand.getType().equals(Material.SHEARS)){
             mainHand.setDurability((short) (mainHand.getDurability() -1));
@@ -115,5 +122,64 @@ public class Listener implements org.bukkit.event.Listener {
             }
             Bukkit.broadcastMessage(BlockBreakingSystem.locArrayToString(mapBlocks) + "\n" + BlockBreakingSystem.locArrayToString(removedBlocks));
         }
+    }
+
+    @EventHandler
+    public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
+
+        int defaultJumpDelay = 2000;
+        Player p = event.getPlayer();
+        Bukkit.broadcastMessage("Listener is called");
+        if(p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR || p.isFlying()){
+            event.setCancelled(false);
+            return;
+
+        } else {
+            event.setCancelled(true);
+            p.setFlying(false);
+
+            if(Cache.getJumpCooldown().containsKey(p.getUniqueId())){
+                if(new Date().getTime()-Cache.getJumpCooldown().get(p.getUniqueId())<defaultJumpDelay){
+                    p.sendMessage(ChatColor.RED + "You are not allowed to use the double jump yet...");
+                    p.setAllowFlight(true);
+                    p.setFlying(false);
+                    return;
+                }
+                else{
+
+                }
+            }else {
+
+            }
+            Bukkit.broadcastMessage("Actual double jump fragment");
+            p.setVelocity(event.getPlayer().getLocation().getDirection().multiply(1.1).setY(1));
+                new BukkitRunnable(){
+                    @Override
+                    public void run() {
+                        p.setAllowFlight(true);
+                    }
+                }.runTaskLater(Main.getInstance(), 20);
+                HashMap<UUID, Long> jumpCooldown = Cache.getJumpCooldown();
+
+
+                if(jumpCooldown.containsKey(p.getUniqueId())){
+                    jumpCooldown.remove(p.getUniqueId());
+
+                }else{
+
+                }
+                jumpCooldown.put(p.getUniqueId(), new Date().getTime());
+                Cache.setJumpCooldown(jumpCooldown);
+            //p.setAllowFlight(true);
+            //p.setFlying(false);
+            }
+
+        }
+
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        event.getPlayer().setAllowFlight(true);
+        event.getPlayer().setFlying(false);
     }
 }

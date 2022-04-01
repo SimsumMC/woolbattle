@@ -4,10 +4,10 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bukkit.*;
-import org.bukkit.entity.EntityType;
-import org.bukkit.util.Vector;
 import woolbattle.woolbattle.Main;
+
 import java.util.ArrayList;
+
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
 

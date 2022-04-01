@@ -6,6 +6,7 @@ import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import woolbattle.woolbattle.woolsystem.*;
@@ -52,8 +53,10 @@ public final class Main extends JavaPlugin {
         getCommand("mapblocks").setExecutor(new MapBlocksCommand());
         BlockBreakingSystem.setCollectBrokenBlocks(false);
         BlockBreakingSystem.fetchMapBlocks();
-
-
+        for(Player p : Bukkit.getOnlinePlayers()){
+            p.setAllowFlight(true);
+            p.setFlying(false);
+        }
     }
 
     @Override
