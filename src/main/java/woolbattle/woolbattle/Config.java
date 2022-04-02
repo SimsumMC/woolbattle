@@ -21,52 +21,52 @@ public class Config {
     public static final int maxHeight = (int) (long) Config.getValue("maxHeight");
     public static final int teamSize = (int) (long) Config.getValue("teamSize");
 
-    public static final ArrayList<Integer> lobbyCoordinates = (ArrayList<Integer>) Config.getValue("lobbySpawn");
-    public static final ArrayList<Integer> midCoordinates = (ArrayList<Integer>) Config.getValue("mapSpawn");
-    public static final ArrayList<ArrayList<Integer>> teamCoordinates = (ArrayList<ArrayList<Integer>>) Config.getValue("teamSpawns");
+    public static final ArrayList<Long> lobbyCoordinates = (ArrayList<Long>) Config.getValue("lobbySpawn");
+    public static final ArrayList<Long> midCoordinates = (ArrayList<Long>) Config.getValue("mapSpawn");
+    public static final ArrayList<ArrayList<Long>> teamCoordinates = (ArrayList<ArrayList<Long>>) Config.getValue("teamSpawns");
 
-    public static final ArrayList<Integer> blueCoordinates = teamCoordinates.get(0);
-    public static final ArrayList<Integer> redCoordinates = teamCoordinates.get(1);
-    public static final ArrayList<Integer> greenCoordinates = teamCoordinates.get(2);
-    public static final ArrayList<Integer> yellowCoordinates = teamCoordinates.get(3);
+    public static final ArrayList<Long> blueCoordinates = teamCoordinates.get(0);
+    public static final ArrayList<Long> redCoordinates = teamCoordinates.get(1);
+    public static final ArrayList<Long> greenCoordinates = teamCoordinates.get(2);
+    public static final ArrayList<Long> yellowCoordinates = teamCoordinates.get(3);
 
     public static final Location lobbyLocation = new Location(
             Bukkit.getServer().getWorlds().get(0),
+            (double) lobbyCoordinates.get(0),
             (double) lobbyCoordinates.get(1),
-            (double) lobbyCoordinates.get(2),
-            (double) lobbyCoordinates.get(3)
+            (double) lobbyCoordinates.get(2)
     );
 
     public static final Location midLocation = new Location(
             Bukkit.getServer().getWorlds().get(0),
+            (double) midCoordinates.get(0),
             (double) midCoordinates.get(1),
-            (double) midCoordinates.get(2),
-            (double) midCoordinates.get(3)
+            (double) midCoordinates.get(2)
     );
 
     public static final Location blueLocation = new Location(
             Bukkit.getServer().getWorlds().get(0),
+            (double) blueCoordinates.get(0),
             (double) blueCoordinates.get(1),
-            (double) blueCoordinates.get(2),
-            (double) blueCoordinates.get(3)
+            (double) blueCoordinates.get(2)
     );
     public static final Location redLocation = new Location(
             Bukkit.getServer().getWorlds().get(0),
+            (double) redCoordinates.get(0),
             (double) redCoordinates.get(1),
-            (double) redCoordinates.get(2),
-            (double) redCoordinates.get(3)
+            (double) redCoordinates.get(2)
     );
     public static final Location greenLocation = new Location(
             Bukkit.getServer().getWorlds().get(0),
+            (double) greenCoordinates.get(0),
             (double) greenCoordinates.get(1),
-            (double) greenCoordinates.get(2),
-            (double) greenCoordinates.get(3)
+            (double) greenCoordinates.get(2)
     );
     public static final Location yellowLocation = new Location(
             Bukkit.getServer().getWorlds().get(0),
+            (double) yellowCoordinates.get(0),
             (double) yellowCoordinates.get(1),
-            (double) yellowCoordinates.get(2),
-            (double) yellowCoordinates.get(3)
+            (double) yellowCoordinates.get(2)
     );
 
     /**
