@@ -153,7 +153,7 @@ public class LobbySystem implements Listener {
             }
         }
 
-        if(event.getClickedInventory().getName() == null) {
+        if(event.getClickedInventory().getName() == null || !event.getCurrentItem().hasItemMeta()) {
             return;
         }
         if (event.getClickedInventory().getName().substring(2).equals("Voting for the Amount of Lives")) {
@@ -188,19 +188,16 @@ public class LobbySystem implements Listener {
             if (event.getView().getTitle().equals(ChatColor.RED + "Team Selecting")) {
                 Player playerRed = (Player)event.getWhoClicked();
                 if ((Cache.getTeamMembers().get("Red")).contains(playerRed)) {
-                    playerRed.sendMessage(ChatColor.DARK_RED + "You have already entered this Team!");
-                    event.setCancelled(true);
+                    playerRed.sendMessage(ChatColor.DARK_PURPLE + "You have already entered this Team!");
                 }
                 else if ((Cache.getTeamMembers().get("Red")).size() >= teamLimit){
                     playerRed.sendMessage(ChatColor.RED + "The Team already has " + teamLimit + " Members.");
-                    event.setCancelled(true);
                 }
-                else if(!event.isCancelled()){
+                else {
                     TeamSystem.removePlayerTeam(playerRed);
                     (Cache.getTeamMembers().get("Red")).add(playerRed);
                     playerRed.sendMessage("§7You have entered Team §4Red§7.");
                 }
-                event.setCancelled(true);
                 TeamSystem.loadSelection((Player) event.getWhoClicked());
             }
         }
@@ -209,18 +206,15 @@ public class LobbySystem implements Listener {
                 Player playerBlue = (Player) event.getWhoClicked();
                 if ((Cache.getTeamMembers().get("Blue")).contains(playerBlue)) {
                     playerBlue.sendMessage(ChatColor.DARK_RED + "You have already entered this Team!");
-                    event.setCancelled(true);
                 }
                 else if ((Cache.getTeamMembers().get("Blue")).size() >= teamLimit) {
                     playerBlue.sendMessage(ChatColor.RED + "The Team already has " + teamLimit + " Members.");
-                    event.setCancelled(true);
                 }
-                else if(!event.isCancelled()) {
+                else {
                     TeamSystem.removePlayerTeam(playerBlue);
                     (Cache.getTeamMembers().get("Blue")).add(playerBlue);
                     playerBlue.sendMessage("§7You have entered Team §1Blue§7.");
                 }
-                event.setCancelled(true);
                 TeamSystem.loadSelection((Player) event.getWhoClicked());
             }
         }
@@ -229,18 +223,15 @@ public class LobbySystem implements Listener {
                 Player playerGreen = (Player) event.getWhoClicked();
                 if ((Cache.getTeamMembers().get("Green")).contains(playerGreen)) {
                     playerGreen.sendMessage(ChatColor.DARK_RED + "You have already entered this Team!");
-                    event.setCancelled(true);
                 }
                 else if ((Cache.getTeamMembers().get("Green")).size() >= teamLimit) {
                     playerGreen.sendMessage(ChatColor.RED + "The Team already has " + teamLimit + " Members.");
-                    event.setCancelled(true);
                 }
-                else if(!event.isCancelled()) {
+                else {
                     TeamSystem.removePlayerTeam(playerGreen);
                     (Cache.getTeamMembers().get("Green")).add(playerGreen);
                     playerGreen.sendMessage("§7You have entered Team §2Green§7.");
                 }
-                event.setCancelled(true);
                 TeamSystem.loadSelection((Player) event.getWhoClicked());
             }
         }
@@ -249,23 +240,19 @@ public class LobbySystem implements Listener {
                 Player playerYellow = (Player) event.getWhoClicked();
                 if ((Cache.getTeamMembers().get("Yellow")).contains(playerYellow)) {
                     playerYellow.sendMessage(ChatColor.DARK_RED + "You have already entered this Team!");
-                    event.setCancelled(true);
                 }
                 else if ((Cache.getTeamMembers().get("Yellow")).size() >= teamLimit) {
                     playerYellow.sendMessage(ChatColor.RED + "The Team already has " + teamLimit + " Members.");
-                    event.setCancelled(true);
                 }
-                else if(!event.isCancelled()) {
+                else {
                     TeamSystem.removePlayerTeam(playerYellow);
                     (Cache.getTeamMembers().get("Yellow")).add(playerYellow);
                     playerYellow.sendMessage("§7You have entered Team §eYellow§7.");
                 }
-                event.setCancelled(true);
                 TeamSystem.loadSelection((Player) event.getWhoClicked());
             }
         }
         else if (Objects.equals(event.getCurrentItem().getItemMeta().getDisplayName()," " ) && event.getView().getTitle().equals(ChatColor.RED + "Team Selecting")) {
-            event.setCancelled(true);
             TeamSystem.loadSelection((Player) event.getWhoClicked());
         }
     }

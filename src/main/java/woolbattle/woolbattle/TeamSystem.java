@@ -3,24 +3,20 @@ package woolbattle.woolbattle;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
-import woolbattle.woolbattle.lobby.LobbySystem;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
-public class TeamSystem implements Listener, CommandExecutor {
+public class TeamSystem implements Listener {
     public static void teamsOnStart() {
         int numActiveTeams = 0;
         String teamWithMembers = null;
@@ -209,25 +205,6 @@ public class TeamSystem implements Listener, CommandExecutor {
         }
     }
 
-    //temporary event which adds item to inventory upon typing a command
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
-        Bukkit.broadcastMessage("F");
-        if(sender instanceof Player){
-            Player player = (Player) sender;
-
-            ItemStack teamSelect = new ItemStack(Material.COMPASS, 1);
-            ArrayList<String> teamSelectLore = new ArrayList<>();
-            ItemMeta teamSelectMeta = teamSelect.getItemMeta();
-
-            teamSelectMeta.setDisplayName(ChatColor.DARK_PURPLE + "Select Team");
-            teamSelectMeta.setLore(teamSelectLore);
-            teamSelect.setItemMeta(teamSelectMeta);
-
-            player.getInventory().setItem(8, teamSelect);
-        }
-        return true;
-    }
     /**
      * A Method that returns the team of the player with the colour as a string.
      * @param player the player which team gets returned

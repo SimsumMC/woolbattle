@@ -38,8 +38,5 @@
     <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver:3.12.10" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:bson:3.12.10" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver-core:3.12.10" level="project" />
-    <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.2.3" level="project" />
-    <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.2.3" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
   </component>
 </module>

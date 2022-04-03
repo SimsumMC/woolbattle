@@ -39,7 +39,6 @@ public final class Main extends JavaPlugin {
         // Beelzebub's Stuff
         Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);
         Bukkit.getPluginManager().registerEvents(new LivesSystem(), this);
-        getCommand("teamVote").setExecutor(new TeamSystem());
     }
 
     @Override
