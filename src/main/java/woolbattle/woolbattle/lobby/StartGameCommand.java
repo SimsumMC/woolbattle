@@ -5,6 +5,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import woolbattle.woolbattle.Cache;
+import woolbattle.woolbattle.TeamSystem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,10 +26,12 @@ public class StartGameCommand implements CommandExecutor {
                 return false;
             }
             HashMap<String, ArrayList<Player>> teamMembers = Cache.getTeamMembers();
-            ArrayList<Player> blueMembers = teamMembers.get("Blue");
-            blueMembers.add(player);
-            teamMembers.put("Blue", blueMembers);
-            Cache.setTeamMembers(teamMembers);
+            if(TeamSystem.getPlayerTeam(player, false).equals("§cNot selected")){
+                ArrayList<Player> blueMembers = teamMembers.get("Blue");
+                blueMembers.add(player);
+                teamMembers.put("Blue", blueMembers);
+                Cache.setTeamMembers(teamMembers);
+            }
             if (startGame()){
                 player.sendMessage("§aStarted the game.");
             } else{
