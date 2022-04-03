@@ -1,6 +1,7 @@
 package woolbattle.woolbattle;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +13,14 @@ public class Cache {
      * @author SimsumMC
      */
 
-    private static HashMap<String, Integer> jumpCooldown = new HashMap<>();
+    private static HashMap<Player, Long> lastDeath = new HashMap<>();
+
+    private static HashMap<String, HashMap<Player, Integer>> killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
+        put("Blue", new HashMap<>());
+        put("Red", new HashMap<>());
+        put("Green", new HashMap<>());
+        put("Yellow", new HashMap<>());
+    }};
 
     private static HashMap<String, ArrayList<Player>> teamMembers = new HashMap<String, ArrayList<Player>>(){{
         put("Blue", new ArrayList<>());
@@ -22,7 +30,7 @@ public class Cache {
     }};
 
     private static HashMap<String, Integer> teamLives = new HashMap<String, Integer>(){{
-        put("Blue", 0);
+        put("Blue", 10);
         put("Red", 0);
         put("Green", 0);
         put("Yellow", 0);
@@ -34,8 +42,11 @@ public class Cache {
         put(15, new ArrayList<>());
     }};
 
-    public static HashMap<String, Integer> getJumpCooldown() {return jumpCooldown;}
-    public static void setJumpCooldown(HashMap<String, Integer> jumpCooldown) {Cache.jumpCooldown = jumpCooldown;}
+    public static HashMap<Player, Long> getLastDeath() {return lastDeath;}
+    public static void setLastDeath(HashMap<Player, Long> lastDeath) {Cache.lastDeath = lastDeath;}
+
+    public static HashMap<String, HashMap<Player, Integer>> getKillStreaks() {return killStreaks;}
+    public static void setKillStreaks(HashMap<String, HashMap<Player, Integer>> killStreaks) {Cache.killStreaks = killStreaks;}
 
     public static HashMap<String, ArrayList<Player>> getTeamMembers() {return teamMembers;}
     public static void setTeamMembers(HashMap<String, ArrayList<Player>> teamMembers) {Cache.teamMembers = teamMembers;}
@@ -47,10 +58,35 @@ public class Cache {
     public static void setLifeVoting(HashMap<Integer, ArrayList<Player>> lifeVoting) {Cache.lifeVoting = lifeVoting;}
 
     public static void clear(){
-        jumpCooldown.clear();
-        teamMembers.clear();
-        teamLives.clear();
-        lifeVoting.clear();
+
+        lastDeath = new HashMap<>();
+
+        killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
+            put("Blue", new HashMap<>());
+            put("Red", new HashMap<>());
+            put("Green", new HashMap<>());
+            put("Yellow", new HashMap<>());
+        }};
+
+        teamMembers = new HashMap<String, ArrayList<Player>>(){{
+            put("Blue", new ArrayList<>());
+            put("Red", new ArrayList<>());
+            put("Green", new ArrayList<>());
+            put("Yellow", new ArrayList<>());
+        }};
+
+        teamLives = new HashMap<String, Integer>(){{
+            put("Blue", 0);
+            put("Red", 0);
+            put("Green", 0);
+            put("Yellow", 0);
+        }};
+
+        lifeVoting = new HashMap<Integer, ArrayList<Player>>(){{
+            put(5, new ArrayList<>());
+            put(10, new ArrayList<>());
+            put(15, new ArrayList<>());
+        }};
     }
 
 }

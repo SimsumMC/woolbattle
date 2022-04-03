@@ -4,6 +4,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import woolbattle.woolbattle.Cache;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import static woolbattle.woolbattle.lobby.LobbySystem.startGame;
 
@@ -20,10 +24,14 @@ public class StartGameCommand implements CommandExecutor {
             if(!player.isOp()){
                 return false;
             }
+            HashMap<String, ArrayList<Player>> teamMembers = Cache.getTeamMembers();
+            ArrayList<Player> blueMembers = teamMembers.get("Blue");
+            blueMembers.add(player);
+            teamMembers.put("Blue", blueMembers);
+            Cache.setTeamMembers(teamMembers);
             if (startGame()){
                 player.sendMessage("§aStarted the game.");
-            }
-            else{
+            } else{
                 player.sendMessage("§cThe game has already been started!");
             }
             return true;

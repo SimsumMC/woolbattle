@@ -13,13 +13,25 @@ import java.util.ArrayList;
 
 public class Config {
 
-    public static final String defaultMap = (String) Config.getValue("mapName");
+    /**
+     * A Config class that contains all default values from the config.json as variables.
+     * @author SimsumMC & Servaturus
+     */
 
+    public static final String defaultMap = (String) Config.getValue("mapName");
     public static final int defaultLives = (int) (long) Config.getValue("defaultLives");
+
     public static final int startCooldown = (int) (long) Config.getValue("startCooldown");
+    public static final int deathCooldown = (int) (long) Config.getValue("deathCooldown");
+    public static final int jumpCooldown = (int) (long) getValue("jumpCooldown");
+
     public static final int minHeight = (int) (long) getValue("minHeight");
     public static final int maxHeight = (int) (long) Config.getValue("maxHeight");
+
     public static final int teamSize = (int) (long) Config.getValue("teamSize");
+
+    public static final int givenWoolAmount = (int) (long) getValue("givenWoolAmount");
+    public static final int maxStacks = (int) (long) getValue("maxStacks");
 
     public static final ArrayList<Long> lobbyCoordinates = (ArrayList<Long>) Config.getValue("lobbySpawn");
     public static final ArrayList<Long> midCoordinates = (ArrayList<Long>) Config.getValue("mapSpawn");

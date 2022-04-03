@@ -22,8 +22,7 @@ public class StopGameCommand implements CommandExecutor {
             }
             if(endGame("§cUnknown")){
                 player.sendMessage("§aStopped the game successfully.");
-            }
-            else{
+            } else{
                 player.sendMessage("§cThere is no running game!");
             }
             return true;
