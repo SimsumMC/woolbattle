@@ -90,57 +90,5 @@ public class Base implements Listener {
         event.setCancelled(true);
     }
 
-    /**
-     * An Event that gets executed whenever a Player moves to use it as a kill event when a player gets under a
-     * specific y coordinate.
-     *
-     * @param event the PlayerMoveEvent
-     * @author SimsumMC & Beelzebub
-     */
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        if(!LobbySystem.gameStarted){
-            return;
-        }
-        Player player = event.getPlayer();
-        if (player.getLocation().getY() <= Config.minHeight) {
-            HashMap<Player, Long> lastDeath = Cache.getLastDeath();
-            if(lastDeath.containsKey(player)){
-                long realLastDeath = lastDeath.get(player);
-                long unixTime = System.currentTimeMillis() / 1000L;
-                if(unixTime - realLastDeath >= Config.deathCooldown){
-                    // ignore deaths that are old enough
-                    return;
-                }
-            }
-
-            String team = TeamSystem.getPlayerTeam(player, true);
-            HashMap<String, Integer> teamLives = Cache.getTeamLives();
-            int lives = teamLives.get(team);
-            if (lives == 0) {
-                TeamSystem.removePlayerTeam(player);
-                LobbySystem.setPlayerSpectator(player);
-            } else {
-                lives -= 1;
-                teamLives.put(team, lives);
-                Cache.setTeamLives(teamLives);
-
-                EntityDamageEvent lastDamage = event.getPlayer().getLastDamageCause();
-
-                Entity entity = lastDamage.getEntity();
-
-                if (entity instanceof Player) {
-                    String message = "§7The player " + TeamSystem.getTeamColour(team)
-                            + player.getDisplayName() + "§7was killed by " +
-                            TeamSystem.getPlayerTeam((Player) entity, false).substring(2) +
-                            ((Player) entity).getDisplayName() + "§7.";
-                    Bukkit.broadcastMessage(message);
-                }
-                LobbySystem.determinateWinnerTeam();
-
-            }
-        }
-
-
     }
 }
