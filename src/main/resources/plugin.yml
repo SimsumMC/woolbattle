@@ -6,3 +6,9 @@ description: A Woolbattle Plugin
 commands:
   teamVote:
     description: Opens a GUI to select your team
+  gstart:
+    description: Start the game instantly.
+    usage: /start
+  gstop:
+    description: Stop the game instantly.
+    usage: /stop
