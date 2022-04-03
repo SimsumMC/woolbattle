@@ -59,7 +59,7 @@ public class MapBlocksCommand implements CommandExecutor {
                         int previousSizeDb;
                         if(!Main.getMongoClient().listDatabaseNames().into(new ArrayList<String>()).contains("woolbattle")||
                                 !Main.getMongoClient().getDatabase("woolbattle").listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking") ||
-                                !Main.getMongoClient().getDatabase("woolbattle").getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(new Document("_id", Main.getObjectId())
+                                !Main.getMongoClient().getDatabase("woolbattle").getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(new Document("_id", "mapBlocks")
                         )){
                            previousSizeDb = 0;
                         }
@@ -67,7 +67,7 @@ public class MapBlocksCommand implements CommandExecutor {
                             previousSizeDb = ((ArrayList<BsonValue>) Main.getMongoClient().
                                     getDatabase("woolbattle").
                                     getCollection("blockBreaking").
-                                    find(eq("_id", Main.getObjectId())).
+                                    find(eq("_id", "mapBlocks")).
                                     first().
                                     get("mapBlocks"))
                                     .size();
@@ -78,7 +78,7 @@ public class MapBlocksCommand implements CommandExecutor {
                         int currentSize= ((ArrayList<ArrayList<Double>>) Main.getMongoClient().
                                 getDatabase("woolbattle").
                                 getCollection("blockBreaking").
-                                find(eq("_id", Main.getObjectId())).
+                                find(eq("_id", "mapBlocks")).
                                 first().
                                 get("mapBlocks")).size();
 
@@ -112,7 +112,7 @@ public class MapBlocksCommand implements CommandExecutor {
                                         getCollection("blockBreaking").
                                         find(eq(
                                                 "_id",
-                                                Main.getObjectId())
+                                                "mapBlocks")
                                         ).
                                         first().
                                         get("mapBlocks"))

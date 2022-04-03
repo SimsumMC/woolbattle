@@ -1,8 +1,10 @@
 package woolbattle.woolbattle;
 
-import com.mongodb.MongoClient;
+import com.mongodb.ConnectionString;
+import com.mongodb.client.MongoClient;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
-import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
@@ -16,22 +18,28 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
-import static com.mongodb.client.model.Filters.exists;
+import static com.mongodb.client.model.Filters.eq;
 
 public final class Main extends JavaPlugin {
     private static Main instance;
-    private static final MongoClient mongoClient = new MongoClient("localhost");
-    private static ObjectId objectId = new ObjectId();
+    private static ConnectionString connectionString = new ConnectionString("mongodb://woolbattle:iloveminecraft@cluster0-shard-00-00.eqlbi.mongodb.net:27017,cluster0-shard-00-01.eqlbi.mongodb.net:27017,cluster0-shard-00-02.eqlbi.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-5qmtum-shard-0&authSource=admin&retryWrites=true&w=majority");
+    private static MongoClientSettings settings = MongoClientSettings.builder()
+            .applyConnectionString(connectionString)
+            .build();
+    private static final MongoClient mongoClient = MongoClients.create(settings);
     private final MongoDatabase db = mongoClient.getDatabase("woolbattle");
+    private static ObjectId mapBlocksObjectId = new ObjectId();
 
-    public static ObjectId getObjectId() {
-        return objectId;
+
+    public static ObjectId getMapBlocksObjectId() {
+        return mapBlocksObjectId;
     }
 
-    public static void setObjectId(ObjectId objectIdArg) {
-        objectId = objectIdArg;
+    public static void setMapBlocksObjectId(ObjectId objectIdArg) {
+        mapBlocksObjectId = objectIdArg;
     }
 
     @Override
@@ -39,25 +47,36 @@ public final class Main extends JavaPlugin {
         // Plugin startup logic
 
         instance = this;
-        if(!db.listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking")){
+
+        if (!db.listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking")) {
             db.createCollection("blockBreaking");
 
-        }else{}
+        } else {
+        }
 
-        if(!db.getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(new Document("mapBlocks", new ArrayList<>()))){
-            db.getCollection("blockBreaking").insertOne(new Document("mapBlocks", new ArrayList<ArrayList<Double>>()));
-            objectId = db.getCollection("blockBreaking").find(exists("mapBlocks")).first().getObjectId("_id");
-        }else{}
+        if (!db.getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(eq("_id", "mapBlocks"))) {
+            System.out.println("\n\n\nThere seems to be no document in the indexes with an id of mapBlocks\n\n\n");
+            HashMap<String, Object> mapBlocks = new HashMap(){
+                {
+                    put("mapBlocks", new ArrayList<ArrayList<Double>>());
+                    put("_id", "mapBlocks");
+                }
+            };
+            //mapBlocks.remove("_id");
+            db.getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
+        } else {
+        }
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
         getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
         getCommand("mapblocks").setExecutor(new MapBlocksCommand());
         BlockBreakingSystem.setCollectBrokenBlocks(false);
         BlockBreakingSystem.fetchMapBlocks();
-        for(Player p : Bukkit.getOnlinePlayers()){
+        for (Player p : Bukkit.getOnlinePlayers()) {
             p.setAllowFlight(true);
-            p.setFlying(false);
+            //p.setFlying(false);
         }
     }
+
 
     @Override
     public void onDisable() {

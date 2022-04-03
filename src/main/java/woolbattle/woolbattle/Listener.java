@@ -1,11 +1,13 @@
 package woolbattle.woolbattle;
-
 import org.bukkit.*;
 import org.bukkit.block.Block;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.inventory.Inventory;
@@ -13,42 +15,47 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
 import org.bukkit.scheduler.BukkitRunnable;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
-
-import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.UUID;
 
 public class Listener implements org.bukkit.event.Listener {
-
+    /**
+     *
+     *
+     * @param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
+     *      *              information, concerning these circumstances.
+     */
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
 
-        Player player = event.getPlayer();
-        if(player.getGameMode().equals(GameMode.CREATIVE) || player.getGameMode().equals(GameMode.SPECTATOR)){
-
+        Player p = event.getPlayer();
+        //Checks, whether the player, having broken the event's block is in the creative, or spectator mode, returns if
+        //this is the case
+        if(p.getGameMode().equals(GameMode.CREATIVE) || p.getGameMode().equals(GameMode.SPECTATOR)){
+            return;
         }
-        ItemStack mainHand = player.getItemInHand();
-        if(mainHand.getType().equals(Material.SHEARS)){
-            mainHand.setDurability((short) (mainHand.getDurability() -1));
-        }else{}
+        //Resets the durability of a potential tool, the event's block was possibly broken with.
+        Inventory inv = p.getInventory();
+        ItemStack mainHand = p.getItemInHand();
+        mainHand.setDurability((short) 0);
+
+
+
 
         //Internal variables of the plugin, not meant to be modifiable by the end-user
-        DyeColor teamColor = DyeColor.GREEN;//Is to be implemented in the team-system, being created
-        Inventory inventory = player.getInventory();
+
+        DyeColor teamColor = Cache.findTeamColor(p);//Is to be implemented in the team-system, being created
+        Inventory inventory = p.getInventory();
         Block block = event.getBlock();
         ItemStack itemStack = new ItemStack(Material.WOOL, 0, (byte) teamColor.getWoolData()){};
         Material type = block.getType();
+        boolean blockIsMap = false;
         int itemAmount = 0;
 
-        //Variables that are about to be able to be modified by the end-user
-        int givenWoolAmount = 1; //Is to be changed, to be modifiable by the user
-        int maxStacks = 3;//Too has to be embedded in a command to database system, to be able to customize it through mere minecraft chat
-        int delayInTicks= 10;
-        boolean blockIsMap = false;
+        int givenWoolAmount = Config.givenWoolAmount;
+        int maxStacks = Config.maxStacks;
+        int delayInTicks= Config.woolReplaceDelay;
 
-        //Checks
+        //Checks, whether the event's block is specified in the internal array of map-blocks, writes the value of the operation in the boolean blockIsMap.
         for(Location iterBlock : BlockBreakingSystem.getMapBlocks()){
             if(iterBlock.equals(block.getLocation())){
                 blockIsMap = true;
@@ -56,7 +63,9 @@ public class Listener implements org.bukkit.event.Listener {
             }
         }
 
-
+        //Checks, whether a modification of the map's blocks, following the action of breaking a block is to be made.
+        // If this is not the case, and if the broken block possesses the wool material as it's type, it is replaced
+        // after cooldown and an amount of
         if(BlockBreakingSystem.isCollectBrokenBlocks()){
             ArrayList<Location> mapBlocks = BlockBreakingSystem.getMapBlocks();
             ArrayList<Location> removedBlocks = BlockBreakingSystem.getRemovedBlocks();
@@ -69,11 +78,7 @@ public class Listener implements org.bukkit.event.Listener {
                 BlockBreakingSystem.setRemovedBlocks(removedBlocks);
                 Bukkit.broadcastMessage("Removed Blocks: " + BlockBreakingSystem.locArrayToString(BlockBreakingSystem.getRemovedBlocks()));
             }
-            /*for(Location iterBlock : BlockBreakingSystem.getMapBlocks()){
-                if(event.getBlock().getLocation().equals(iterBlock)){
-                    mapBlocks.remove(iterBlock);
-                }
-            }*/
+
         }else{
             event.setCancelled(true);
             if(type.equals(Material.WOOL)){
@@ -84,7 +89,7 @@ public class Listener implements org.bukkit.event.Listener {
                     }
                 }
 
-                itemStack.setType(type); // The wool, additionally to this, is to be coloured according to the team colour of the player, breaking the block
+                itemStack.setType(type);
 
                 if(itemAmount < maxStacks*64){
                     itemStack.setAmount(givenWoolAmount);
@@ -109,6 +114,20 @@ public class Listener implements org.bukkit.event.Listener {
     }
 
     @EventHandler
+    public void onPlayerItemDamage(PlayerItemDamageEvent event) {
+        System.out.println("Event is called");
+        //event.setCancelled(true);
+        event.getItem().setDurability((short) event.getItem().getType().getMaxDurability());
+    }
+
+    /**
+     *  The block, placed, in case a block-scanning-process is occurring, is, if it is contained by either the array of
+     *  map blocks or the array of removed blocks, purged from the latter and added to the first one.
+     *@param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
+     *              information, concerning these circumstances.
+     */
+
+    @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
 
         if(BlockBreakingSystem.isCollectBrokenBlocks()){
@@ -124,62 +143,79 @@ public class Listener implements org.bukkit.event.Listener {
         }
     }
 
+    /**
+     * Method, called in case a player tries to toggle to or out of a flying state of presence. If the player, the
+     * method is called upon possesses a gamemode, naturally not granting the permission to fly, their velocity is set
+     * to the direction, their facing to, multiplied by a previously specified factor,additionally to this incremented
+     * by a given value in the y dimension. To prevent them from flying, as they are granted the permission to do so, if
+     * the method is called, their state of movement at first is set to a non-flying state, after which the previously
+     * specified edit of their velocity is exerted.
+     * After a delay, specified by the config.json file, this permission however is once again granted to them, to allow
+     * for another double-jump after this period of time.
+     *
+     * @param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
+     *              information, concerning these circumstances.
+     * @author Servaturus
+     */
+
     @EventHandler
     public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
 
-        int defaultJumpDelay = 2000;
+        int jumpCooldown = Config.jumpCooldown;
         Player p = event.getPlayer();
-        Bukkit.broadcastMessage("Listener is called");
+        event.setCancelled(true);
+
         if(p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR || p.isFlying()){
+
             event.setCancelled(false);
+
+            if(!p.isFlying()){
+
+                p.setFlying(true);
+            }else{
+
+                p.setFlying(false);
+            }
+
+            p.setAllowFlight(true);
             return;
-
-        } else {
-            event.setCancelled(true);
-            p.setFlying(false);
-
-            if(Cache.getJumpCooldown().containsKey(p.getUniqueId())){
-                if(new Date().getTime()-Cache.getJumpCooldown().get(p.getUniqueId())<defaultJumpDelay){
-                    p.sendMessage(ChatColor.RED + "You are not allowed to use the double jump yet...");
-                    p.setAllowFlight(true);
-                    p.setFlying(false);
-                    return;
-                }
-                else{
-
-                }
-            }else {
-
-            }
-            Bukkit.broadcastMessage("Actual double jump fragment");
-            p.setVelocity(event.getPlayer().getLocation().getDirection().multiply(1.1).setY(1));
-                new BukkitRunnable(){
-                    @Override
-                    public void run() {
-                        p.setAllowFlight(true);
-                    }
-                }.runTaskLater(Main.getInstance(), 20);
-                HashMap<UUID, Long> jumpCooldown = Cache.getJumpCooldown();
-
-
-                if(jumpCooldown.containsKey(p.getUniqueId())){
-                    jumpCooldown.remove(p.getUniqueId());
-
-                }else{
-
-                }
-                jumpCooldown.put(p.getUniqueId(), new Date().getTime());
-                Cache.setJumpCooldown(jumpCooldown);
-            //p.setAllowFlight(true);
-            //p.setFlying(false);
-            }
-
         }
 
+        event.setCancelled(true);
+        p.setFlying(false);
+        p.setAllowFlight(false);
+        p.setVelocity(event.getPlayer().getLocation().getDirection().multiply(1.1).setY(1));
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                p.setAllowFlight(true);
+            }
+        }.runTaskLater(Main.getInstance(), jumpCooldown);
+    }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         event.getPlayer().setAllowFlight(true);
         event.getPlayer().setFlying(false);
+    }
+
+    /**
+     * Method, called when a player condones a modification to their gamemode. If the gamemode to be switched to by
+     * default does not guarantee for the player to be capable of using the movement-option of flying, this permission,
+     * in order to allow for the onPlayerToggleFlight method to be called, is given to them.
+     *
+     * @param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
+     *              information, concerning these circumstances.
+     * @author Servaturus
+     *
+     */
+
+    @EventHandler
+    public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+        Player p = event.getPlayer();
+        if(event.getNewGameMode().equals(GameMode.SURVIVAL) || event.getNewGameMode().equals(GameMode.ADVENTURE)){
+            p.setAllowFlight(true);
+            p.setFlying(false);
+        }
     }
 }
