@@ -6,233 +6,213 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
+import woolbattle.woolbattle.lobby.LobbySystem;
+
+import java.util.*;
+
 
 public class TeamSystem implements Listener, CommandExecutor {
+    public static void teamsOnStart() {
+        int numActiveTeams = 0;
+        String teamWithMembers = null;
+        ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
+        ArrayList<Player> teamlessPlayers = new ArrayList<>();
 
-    public int teamLimit = 2; //temporary
+        for (int i = Bukkit.getOnlinePlayers().size() - 1; i>=0; i--) {
+            Player player = onlinePlayers.get(i);
+            if (TeamSystem.getPlayerTeam(player, true).equals("§cNot selected")) {
+                teamlessPlayers.add(player);
+            }
+        }
 
-    public ArrayList<HumanEntity> membersRed = new ArrayList<>();
-    public ArrayList<HumanEntity> membersBlue = new ArrayList<>();
-    public ArrayList<HumanEntity> membersGreen = new ArrayList<>();
-    public ArrayList<HumanEntity> membersYellow = new ArrayList<>();
-
-    public HashMap<String, ArrayList> teams = new HashMap<String, ArrayList>(){{
-        put("Blue", membersBlue);
-        put("Green", membersGreen);
-        put("Red", membersRed);
-        put("Green", membersYellow);
-    }};
-
-    //Event which handles the team selecting
-    @EventHandler
-    public void clickEvent(InventoryClickEvent click){
-        if (click.getCurrentItem() == null) return;
-        else if (click.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "Select team Red")){
-            if (click.getView().getTitle().equals(ChatColor.RED + "Team Select")) {
-                HumanEntity playerRed = click.getWhoClicked();
-                if (membersRed.contains(playerRed)) {
-                    click.setCancelled(true);
-                    playerRed.sendMessage(ChatColor.DARK_RED + "You have already entered this Team!");
+        for (int i = teamlessPlayers.size() - 1; i>=0; i--) {
+            int[] sizes = {
+                    Cache.getTeamMembers().get("Red").size(),
+                    Cache.getTeamMembers().get("Blue").size(),
+                    Cache.getTeamMembers().get("Green").size(),
+                    Cache.getTeamMembers().get("Yellow").size()
+            };
+            int smallestNumber = 0;
+            int temp = sizes[0];
+            for(int a=0;a<sizes.length;a++) {
+                if(sizes[a] <= temp) {
+                    temp = sizes[a];
+                    smallestNumber = a;
                 }
-                else if (membersRed.size() >= teamLimit){
-                    playerRed.sendMessage(ChatColor.RED + "The Team already has " + teamLimit + " Members.");
+            }
+            switch (smallestNumber){
+                case 0:
+                    (Cache.getTeamMembers().get("Red")).add(teamlessPlayers.get(i));
+                    teamlessPlayers.get(i).sendMessage(ChatColor.RED + "You didn't enter a team so you were put into team red!");
+                break;
+                case 1: (Cache.getTeamMembers().get("Blue")).add(teamlessPlayers.get(i));
+                    teamlessPlayers.get(i).sendMessage(ChatColor.BLUE + "You didn't enter a team so you were put into team blue!");
+                break;
+                case 2: (Cache.getTeamMembers().get("Green")).add(teamlessPlayers.get(i));
+                    teamlessPlayers.get(i).sendMessage(ChatColor.GREEN + "You didn't enter a team so you were put into team green!");
+                break;
+                case 3: (Cache.getTeamMembers().get("Yellow")).add(teamlessPlayers.get(i));
+                    teamlessPlayers.get(i).sendMessage(ChatColor.YELLOW + "You didn't enter a team so you were put into team yellow!");
+                break;
+            }
+            teamlessPlayers.remove(teamlessPlayers.get(i));
+        }
+        int[] sizes = {
+                Cache.getTeamMembers().get("Red").size(),
+                Cache.getTeamMembers().get("Blue").size(),
+                Cache.getTeamMembers().get("Green").size(),
+                Cache.getTeamMembers().get("Yellow").size()
+        };
+        for (int i = 0; i < sizes.length; i++) {
+            if (sizes[i] > 0) {
+                switch (i) {
+                    case 0: teamWithMembers = "Red"; break;
+                    case 1: teamWithMembers = "Blue"; break;
+                    case 2: teamWithMembers = "Green"; break;
+                    case 3: teamWithMembers = "Yellow"; break;
                 }
-                else if(membersBlue.contains(playerRed) || membersGreen.contains(playerRed) || membersYellow.contains(playerRed)) {
-                    membersRed.add(playerRed);
-                    if (membersBlue.contains(playerRed)) membersBlue.remove(playerRed);
-                    else if (membersYellow.contains(playerRed)) membersYellow.remove(playerRed);
-                    else if (membersGreen.contains(playerRed)) membersGreen.remove(playerRed);
+                numActiveTeams += 1;
+            }
+        }
 
-                    playerRed.sendMessage(ChatColor.RED + "You have entered Team Red");
+        if (numActiveTeams < 2) {
+            int size = Cache.getTeamMembers().get(teamWithMembers).size();
+            if (size / 2 != 0) {
+
+                ArrayList<Player> member = Cache.getTeamMembers().get(teamWithMembers);
+
+                if (!teamWithMembers.equals("Blue")) {
+                    HashMap<String, ArrayList<Player>> members = Cache.getTeamMembers();
+
+                    ArrayList<Player> newMem = new ArrayList<Player>() {{
+                       add(member.get(0));
+                    }};
+                    member.remove(0);
+                    members.put("Blue", newMem);
+
+                    members.put(teamWithMembers, member);
+
+                    Cache.setTeamMembers(members);
                 }
                 else {
+                    HashMap<String, ArrayList<Player>> members = Cache.getTeamMembers();
 
-                    membersRed.add(playerRed);
-                    playerRed.sendMessage(ChatColor.RED + "You have entered Team Red");
+                    ArrayList<Player> newMem = new ArrayList<Player>() {{
+                        add(member.get(0));
+                    }};
+                    member.remove(0);
+                    members.put("Red", newMem);
+
+                    members.put(teamWithMembers, member);
+
+                    Cache.setTeamMembers(members);
                 }
-                click.setCancelled(true);
 
             }
         }
-        else if (click.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.BLUE + "Select team Blue")){
-            if (click.getView().getTitle().equals(ChatColor.RED + "Team Selecting")) {
-                HumanEntity playerBlue = click.getWhoClicked();
-                if (membersBlue.contains(playerBlue)) {
-                    click.setCancelled(true);
-                    playerBlue.sendMessage(ChatColor.DARK_RED + "You have already entered this Team!");
-                }
-                else if (membersBlue.size() >= teamLimit) {
-                    playerBlue.sendMessage(ChatColor.RED + "The Team already has " + teamLimit + " Members.");
-                }
-                else if(membersRed.contains(playerBlue) || membersGreen.contains(playerBlue) || membersYellow.contains(playerBlue)) {
-                    membersBlue.add(playerBlue);
-                    if (membersRed.contains(playerBlue)) membersRed.remove(playerBlue);
-                    else if (membersYellow.contains(playerBlue)) membersYellow.remove(playerBlue);
-                    else if (membersGreen.contains(playerBlue)) membersGreen.remove(playerBlue);
-
-                    playerBlue.sendMessage(ChatColor.BLUE + "You have entered Team Blue");
-                }
-                else {
-                    membersBlue.add(playerBlue);
-                    playerBlue.sendMessage(ChatColor.BLUE + "You have entered Team Blue");
-                }
-                click.setCancelled(true);
-            }
-        }
-        else if (click.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Select team Green")) {
-            if (click.getView().getTitle().equals(ChatColor.RED + "Team Selecting")) {
-                HumanEntity playerGreen = click.getWhoClicked();
-                if (membersGreen.contains(playerGreen)) {
-                    click.setCancelled(true);
-                    playerGreen.sendMessage(ChatColor.DARK_RED + "You have already entered this Team!");
-                }
-                else if (membersGreen.size() >= teamLimit) {
-                    playerGreen.sendMessage(ChatColor.RED + "The Team already has " + teamLimit + " Members.");
-                }
-                else if(membersRed.contains(playerGreen) || membersBlue.contains(playerGreen) || membersYellow.contains(playerGreen)) {
-                    membersGreen.add(playerGreen);
-                    if (membersRed.contains(playerGreen)) membersRed.remove(playerGreen);
-                    else if (membersYellow.contains(playerGreen)) membersYellow.remove(playerGreen);
-                    else if (membersBlue.contains(playerGreen)) membersBlue.remove(playerGreen);
-
-                    playerGreen.sendMessage(ChatColor.GREEN + "You have entered Team Green");
-                }
-                else {
-                    membersGreen.add(playerGreen);
-                    playerGreen.sendMessage(ChatColor.GREEN + "You have entered Team Green");
-                }
-                click.setCancelled(true);
-            }
-        }
-        else if (click.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Select team Yellow")){
-            if (click.getView().getTitle().equals(ChatColor.RED + "Team Selecting")) {
-                HumanEntity playerYellow = click.getWhoClicked();
-                if (membersYellow.contains(playerYellow)) {
-                    click.setCancelled(true);
-                    playerYellow.sendMessage(ChatColor.DARK_RED + "You have already entered this Team!");
-                }
-                else if (membersYellow.size() >= teamLimit) {
-                    playerYellow.sendMessage(ChatColor.RED + "The Team already has " + teamLimit + " Members.");
-                }
-                else if(membersRed.contains(playerYellow) || membersGreen.contains(playerYellow) || membersBlue.contains(playerYellow)) {
-                    membersYellow.add(playerYellow);
-                    if (membersRed.contains(playerYellow)) membersRed.remove(playerYellow);
-                    else if (membersBlue.contains(playerYellow)) membersBlue.remove(playerYellow);
-                    else if (membersGreen.contains(playerYellow)) membersGreen.remove(playerYellow);
-
-                    playerYellow.sendMessage(ChatColor.YELLOW + "You have entered Team Yellow");
-                }
-                else {
-                    membersYellow.add(playerYellow);
-                    playerYellow.sendMessage(ChatColor.YELLOW + "You have entered Team Yellow");
-                }
-                click.setCancelled(true);
-            }
-        }
-        else if (Objects.equals(click.getCurrentItem().getItemMeta().getDisplayName()," " ) && click.getView().getTitle().equals(ChatColor.RED + "Team Selecting")) {
-            click.setCancelled(true);
-        }
-
     }
 
-    //Event which Opens Team Selection GUI upon clicking item
-    @EventHandler
-    public void onClick (PlayerInteractEvent click){
-        if (Objects.equals(click.getItem().getItemMeta().getDisplayName(),ChatColor.DARK_PURPLE + "Select Team" )){
+    public static void loadSelection (Player player) {
+        Inventory voting = Bukkit.createInventory(null, 27, ChatColor.RED + "Team Selecting");
 
-            HumanEntity player = click.getPlayer();
-            Inventory voting = Bukkit.createInventory(null, 27, ChatColor.RED + "Team Selecting");
+        //adding glass
+        ItemStack Glass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15);
+        ItemMeta GlassMeta = Glass.getItemMeta();
+        GlassMeta.setDisplayName(" ");
+        Glass.setItemMeta(GlassMeta);
 
-            //adding glass
-            ItemStack Glass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte)15);
-            ItemMeta GlassMeta = Glass.getItemMeta();
-            GlassMeta.setDisplayName(" ");
-            Glass.setItemMeta(GlassMeta);
-
-            for (int i = 0; i<= 26; i++) {
-                voting.setItem(i, Glass);
-            }
-            // Adding the "Vote for red" item
-            ItemStack voteRed = new ItemStack(Material.WOOL, 1, (byte)14);
-            ArrayList<String> voteRedLore = new ArrayList<>();
-            ItemMeta voteRedMeta = voteRed.getItemMeta();
-
-            voteRedMeta.setDisplayName(ChatColor.RED + "Select team Red");
-            voteRedMeta.setLore(voteRedLore);
-            voteRed.setItemMeta(voteRedMeta);
-            voting.setItem(11, voteRed);
-
-            // Adding the "Vote for blue" item
-            ItemStack voteBlue = new ItemStack(Material.WOOL, 1, (byte)11);
-            ArrayList<String> voteBlueLore = new ArrayList<>();
-            ItemMeta voteBlueMeta = voteBlue.getItemMeta();
-
-            voteBlueMeta.setDisplayName(ChatColor.BLUE + "Select team Blue");
-            voteBlueMeta.setLore(voteBlueLore);
-            voteBlue.setItemMeta(voteBlueMeta);
-            voting.setItem(12, voteBlue);
-
-            // Adding the "Vote for Green" item
-            ItemStack voteGreen = new ItemStack(Material.WOOL, 1, (byte)5);
-            ArrayList<String> voteGreenLore = new ArrayList<>();
-            ItemMeta voteGreenMeta = voteGreen.getItemMeta();
-
-            voteGreenMeta.setDisplayName(ChatColor.GREEN + "Select team Green");
-            if (membersGreen.size() == 1){
-                String hello = String.valueOf(membersGreen.get(1));
-                voteGreenLore.add(hello);
-            }
-            voteGreenMeta.setLore(voteGreenLore);
-            voteGreen.setItemMeta(voteGreenMeta);
-            voting.setItem(14, voteGreen);
-
-            // Adding the "Vote for Yellow" item
-            ItemStack voteYellow = new ItemStack(Material.WOOL, 1, (byte)4);
-            ArrayList<String> voteYellowLore = new ArrayList<>();
-            ItemMeta voteYellowMeta = voteYellow.getItemMeta();
-
-            voteYellowMeta.setDisplayName(ChatColor.YELLOW + "Select team Yellow");
-            voteYellowMeta.setLore(voteYellowLore);
-            voteYellow.setItemMeta(voteYellowMeta);
-            voting.setItem(15, voteYellow);
-
-            player.openInventory(voting);
+        for (int i = 0; i <= 26; i++) {
+            voting.setItem(i, Glass);
         }
+
+        // Adding the "Vote for red" item
+        ItemStack voteRed = new ItemStack(Material.WOOL, 1, (byte) 14);
+        ArrayList<String> voteRedLore = new ArrayList<>();
+        ItemMeta voteRedMeta = voteRed.getItemMeta();
+        for (int i = Cache.getTeamMembers().get("Red").size() - 1; i >= 0; i--) {
+            voteRedLore.add("§7» " + Cache.getTeamMembers().get("Red").get(i).getDisplayName());
+        }
+
+        voteRedMeta.setDisplayName(ChatColor.RED + "Select team Red");
+        voteRedMeta.setLore(voteRedLore);
+        voteRed.setItemMeta(voteRedMeta);
+        voting.setItem(11, voteRed);
+
+        // Adding the "Vote for blue" item
+        ItemStack voteBlue = new ItemStack(Material.WOOL, 1, (byte) 11);
+        ArrayList<String> voteBlueLore = new ArrayList<>();
+        ItemMeta voteBlueMeta = voteBlue.getItemMeta();
+        for (int i = Cache.getTeamMembers().get("Blue").size() - 1; i >= 0; i--) {
+            voteBlueLore.add("§7» " + Cache.getTeamMembers().get("Blue").get(i).getDisplayName());
+        }
+
+        voteBlueMeta.setDisplayName(ChatColor.BLUE + "Select team Blue");
+        voteBlueMeta.setLore(voteBlueLore);
+        voteBlue.setItemMeta(voteBlueMeta);
+        voting.setItem(12, voteBlue);
+
+        // Adding the "Vote for Green" item
+        ItemStack voteGreen = new ItemStack(Material.WOOL, 1, (byte) 5);
+        ArrayList<String> voteGreenLore = new ArrayList<>();
+        ItemMeta voteGreenMeta = voteGreen.getItemMeta();
+        for (int i = Cache.getTeamMembers().get("Green").size() - 1; i >= 0; i--) {
+            voteGreenLore.add("§7» " + Cache.getTeamMembers().get("Green").get(i).getDisplayName());
+        }
+
+        voteGreenMeta.setDisplayName(ChatColor.GREEN + "Select team Green");
+        voteGreenMeta.setLore(voteGreenLore);
+        voteGreen.setItemMeta(voteGreenMeta);
+        voting.setItem(14, voteGreen);
+
+        // Adding the "Vote for Yellow" item
+        ItemStack voteYellow = new ItemStack(Material.WOOL, 1, (byte) 4);
+        ArrayList<String> voteYellowLore = new ArrayList<>();
+        ItemMeta voteYellowMeta = voteYellow.getItemMeta();
+        for (int i = Cache.getTeamMembers().get("Yellow").size() - 1; i >= 0; i--) {
+            voteYellowLore.add("§7» " + Cache.getTeamMembers().get("Yellow").get(i).getDisplayName());
+        }
+
+        voteYellowMeta.setDisplayName(ChatColor.YELLOW + "Select team Yellow");
+        voteYellowMeta.setLore(voteYellowLore);
+        voteYellow.setItemMeta(voteYellowMeta);
+        voting.setItem(15, voteYellow);
+
+        player.openInventory(voting);
     }
 
     //Event which cancels team Damage
     @EventHandler
     public void DamageProtection(EntityDamageByEntityEvent damage){
+        HashMap<Player, Long> lastDeath = Cache.getLastDeath();
+        long unixTime = System.currentTimeMillis() / 1000L;
+        lastDeath.put((Player) damage.getEntity(), unixTime);
+        Cache.setLastDeath(lastDeath);
+
         if (damage.getEntity() instanceof Player && damage.getDamager() instanceof Player) {
-            HumanEntity damager = (HumanEntity) damage.getDamager();
-            HumanEntity damaged = (HumanEntity) damage.getEntity();
-            if (membersRed.contains(damager) && membersRed.contains(damaged) || membersGreen.contains(damager) && membersGreen.contains(damaged) || membersYellow.contains(damager) && membersYellow.contains(damaged) || membersBlue.contains(damager) && membersBlue.contains(damaged)) {
+            Player damager = (Player) damage.getDamager();
+            Player damaged = (Player) damage.getEntity();
+            if (TeamSystem.getPlayerTeam(damager, true).equals(TeamSystem.getPlayerTeam(damaged, true))) {
                 Vector velocity;
                 velocity = damage.getEntity().getVelocity();
                 damage.getEntity().setVelocity(velocity);
                 damage.setCancelled(true);
             }
         }
-        else return;
     }
 
     //temporary event which adds item to inventory upon typing a command
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
+        Bukkit.broadcastMessage("F");
         if(sender instanceof Player){
             Player player = (Player) sender;
 
@@ -244,9 +224,74 @@ public class TeamSystem implements Listener, CommandExecutor {
             teamSelectMeta.setLore(teamSelectLore);
             teamSelect.setItemMeta(teamSelectMeta);
 
-
             player.getInventory().setItem(8, teamSelect);
         }
         return true;
     }
+    /**
+     * A Method that returns the team of the player with the colour as a string.
+     * @param player the player which team gets returned
+     * @param raw a boolean whether the method should return a raw string or a colored one
+     * @return the team name as a string if any, else "§cNot selected"
+     * @author SimsumMC
+     */
+    public static String getPlayerTeam(Player player, boolean raw) {
+
+        String teamName = "§cNot selected";
+        HashMap<String, ArrayList<Player>> data = Cache.getTeamMembers();
+
+        for(String key : data.keySet()){
+            ArrayList<Player> players = data.get(key);
+            if(players.contains(player)){
+                if(!raw){
+                    teamName = getTeamColour(key);
+                }
+                else{
+                    teamName = "";
+                }
+                teamName += key;
+                break;
+            }
+        }
+        return teamName;
+
+    }
+
+    /**
+     * A Method that removes the player from the current team
+     * @param player which gets removed from his team
+     * @author SimsumMC
+     */
+    public static void removePlayerTeam(Player player) {
+        HashMap<String, ArrayList<Player>> teamMembers = Cache.getTeamMembers();
+        for(String key : teamMembers.keySet()){
+            ArrayList<Player> players = teamMembers.get(key);
+            if(players.contains(player)){
+                players.remove(player);
+                teamMembers.put(key, players);
+                Cache.setTeamMembers(teamMembers);
+                break;
+            }
+        }
+    }
+
+    /**
+     * A Method that returns the team of the player with the colour as a string.
+     * @param team a S
+     * @return the colour of the team
+     * @author SimsumMC
+     */
+    public static String getTeamColour(String team) {
+        switch(team){
+            case "Blue":
+                return "§1";
+            case "Green":
+                return "§2";
+            case "Yellow":
+                return "§e";
+            default:
+                return "§4";
+        }
+    }
 }
+
