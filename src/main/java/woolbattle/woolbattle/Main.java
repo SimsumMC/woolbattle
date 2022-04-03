@@ -1,8 +1,5 @@
 package woolbattle.woolbattle;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -10,7 +7,6 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.slf4j.LoggerFactory;
 import woolbattle.woolbattle.base.Base;
 import woolbattle.woolbattle.lobby.LobbySystem;
 import woolbattle.woolbattle.lobby.StartGameCommand;
@@ -33,11 +29,6 @@ public final class Main extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         instance = this;
-
-        // Disable MongoDB Debug Output **AFTER ENABLING**
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Logger rootLogger = loggerContext.getLogger("org.mongodb.driver");
-        rootLogger.setLevel(Level.OFF);
 
         // SimsumMC's Things
         Bukkit.getPluginManager().registerEvents(new LobbySystem(), this);
