@@ -30,18 +30,27 @@ public class LivesSystem implements Listener {
 
         Player player = event.getPlayer();
         HashMap<Player, Long> lastDeath = Cache.getLastDeath();
+        HashMap<Player, Long> lastDamage = Cache.getLastDamage();
+        long unixTime = System.currentTimeMillis() / 1000L;
         if (player.getLocation().getY() <= Config.minHeight) {
-            if (lastDeath.containsKey(player)) {
+            if(lastDamage.containsKey(player)){
                 long realLastDeath = lastDeath.get(player);
-                long unixTime = System.currentTimeMillis() / 1000L;
-                if (unixTime - realLastDeath >= Config.deathCooldown) {
+                if (unixTime - realLastDeath <= 5000) {
+                    return;
+                }
+            }
+            if (lastDamage.containsKey(player)) {
+                long realLastDamage = lastDamage.get(player);
+                if (unixTime - realLastDamage >= Config.deathCooldown) {
                     // ignore deaths that are old enough
                     return;
                 }
             }
-
+            lastDeath.put(player, unixTime);
             String team = TeamSystem.getPlayerTeam(player, true);
+            System.out.println(team);
             HashMap<String, Integer> teamLives = Cache.getTeamLives();
+            System.out.println(team);
             int lives = teamLives.get(team);
             if (lives == 0) {
                 TeamSystem.removePlayerTeam(player);
@@ -51,13 +60,13 @@ public class LivesSystem implements Listener {
                 teamLives.put(team, lives);
                 Cache.setTeamLives(teamLives);
 
-                EntityDamageEvent lastDamage = event.getPlayer().getLastDamageCause();
+                EntityDamageEvent lastDamageEvent = event.getPlayer().getLastDamageCause();
 
-                Entity entity = lastDamage.getEntity();
+                Entity entity = lastDamageEvent.getEntity();
 
                 if (entity instanceof Player) {
                     String message = "§7The player " + TeamSystem.getPlayerTeam(player, false).substring(2)
-                            + player.getDisplayName() + "§7was killed by " +
+                            + player.getDisplayName() + "§7 was killed by " +
                            TeamSystem.getPlayerTeam((Player) entity, false).substring(2) +
                             ((Player) entity).getDisplayName() + "§7.";
                     Bukkit.broadcastMessage(message);
@@ -75,8 +84,6 @@ public class LivesSystem implements Listener {
                         Cache.setKillStreaks(teamKills);
                     }
                 }
-                Bukkit.broadcastMessage(String.valueOf(Cache.getTeamLives().get("Blue")));
-                Bukkit.broadcastMessage(String.valueOf(Cache.getKillStreaks().get("Green").get(entity)));
                 LobbySystem.determinateWinnerTeam();
             }
         }

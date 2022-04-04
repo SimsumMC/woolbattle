@@ -184,75 +184,75 @@ public class LobbySystem implements Listener {
             //update the inventory
             showLifeAmountVoting(player);
         }
-        else if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "Select team Red")){
-            if (event.getView().getTitle().equals(ChatColor.RED + "Team Selecting")) {
+        else if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "Team Red")){
+            if (event.getView().getTitle().equals(ChatColor.YELLOW + "Team Selecting")) {
                 Player playerRed = (Player)event.getWhoClicked();
                 if ((Cache.getTeamMembers().get("Red")).contains(playerRed)) {
-                    playerRed.sendMessage(ChatColor.DARK_PURPLE + "You have already entered this Team!");
+                    return;
                 }
                 else if ((Cache.getTeamMembers().get("Red")).size() >= teamLimit){
-                    playerRed.sendMessage(ChatColor.RED + "The Team already has " + teamLimit + " Members.");
+                    playerRed.sendMessage(ChatColor.RED + "The team already has " + teamLimit + " Members!");
                 }
                 else {
                     TeamSystem.removePlayerTeam(playerRed);
                     (Cache.getTeamMembers().get("Red")).add(playerRed);
-                    playerRed.sendMessage("§7You have entered Team §4Red§7.");
+                    playerRed.sendMessage("§7You have entered team §4Red§7.");
                 }
                 TeamSystem.loadSelection((Player) event.getWhoClicked());
             }
         }
-        else if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.BLUE + "Select team Blue")){
-            if (event.getView().getTitle().equals(ChatColor.RED + "Team Selecting")) {
+        else if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.BLUE + "Team Blue")){
+            if (event.getView().getTitle().equals(ChatColor.YELLOW + "Team Selecting")) {
                 Player playerBlue = (Player) event.getWhoClicked();
                 if ((Cache.getTeamMembers().get("Blue")).contains(playerBlue)) {
-                    playerBlue.sendMessage(ChatColor.DARK_RED + "You have already entered this Team!");
+                    return;
                 }
                 else if ((Cache.getTeamMembers().get("Blue")).size() >= teamLimit) {
-                    playerBlue.sendMessage(ChatColor.RED + "The Team already has " + teamLimit + " Members.");
+                    playerBlue.sendMessage(ChatColor.RED + "The team already has " + teamLimit + " Members.");
                 }
                 else {
                     TeamSystem.removePlayerTeam(playerBlue);
                     (Cache.getTeamMembers().get("Blue")).add(playerBlue);
-                    playerBlue.sendMessage("§7You have entered Team §1Blue§7.");
+                    playerBlue.sendMessage("§7You have entered team §1Blue§7.");
                 }
                 TeamSystem.loadSelection((Player) event.getWhoClicked());
             }
         }
-        else if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Select team Green")) {
-            if (event.getView().getTitle().equals(ChatColor.RED + "Team Selecting")) {
+        else if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Team Green")) {
+            if (event.getView().getTitle().equals(ChatColor.YELLOW + "Team Selecting")) {
                 Player playerGreen = (Player) event.getWhoClicked();
                 if ((Cache.getTeamMembers().get("Green")).contains(playerGreen)) {
-                    playerGreen.sendMessage(ChatColor.DARK_RED + "You have already entered this Team!");
+                    return;
                 }
                 else if ((Cache.getTeamMembers().get("Green")).size() >= teamLimit) {
-                    playerGreen.sendMessage(ChatColor.RED + "The Team already has " + teamLimit + " Members.");
+                    playerGreen.sendMessage(ChatColor.RED + "The team already has " + teamLimit + " Members.");
                 }
                 else {
                     TeamSystem.removePlayerTeam(playerGreen);
                     (Cache.getTeamMembers().get("Green")).add(playerGreen);
-                    playerGreen.sendMessage("§7You have entered Team §2Green§7.");
+                    playerGreen.sendMessage("§7You have entered team §2Green§7.");
                 }
                 TeamSystem.loadSelection((Player) event.getWhoClicked());
             }
         }
-        else if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Select team Yellow")){
-            if (event.getView().getTitle().equals(ChatColor.RED + "Team Selecting")) {
+        else if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Team Yellow")){
+            if (event.getView().getTitle().equals(ChatColor.YELLOW + "Team Selecting")) {
                 Player playerYellow = (Player) event.getWhoClicked();
                 if ((Cache.getTeamMembers().get("Yellow")).contains(playerYellow)) {
-                    playerYellow.sendMessage(ChatColor.DARK_RED + "You have already entered this Team!");
+                    return;
                 }
                 else if ((Cache.getTeamMembers().get("Yellow")).size() >= teamLimit) {
-                    playerYellow.sendMessage(ChatColor.RED + "The Team already has " + teamLimit + " Members.");
+                    playerYellow.sendMessage(ChatColor.RED + "The team already has " + teamLimit + " Members.");
                 }
                 else {
                     TeamSystem.removePlayerTeam(playerYellow);
                     (Cache.getTeamMembers().get("Yellow")).add(playerYellow);
-                    playerYellow.sendMessage("§7You have entered Team §eYellow§7.");
+                    playerYellow.sendMessage("§7You have entered team §eYellow§7.");
                 }
                 TeamSystem.loadSelection((Player) event.getWhoClicked());
             }
         }
-        else if (Objects.equals(event.getCurrentItem().getItemMeta().getDisplayName()," " ) && event.getView().getTitle().equals(ChatColor.RED + "Team Selecting")) {
+        else if (Objects.equals(event.getCurrentItem().getItemMeta().getDisplayName()," " ) && event.getView().getTitle().equals(ChatColor.YELLOW + "Team Selecting")) {
             TeamSystem.loadSelection((Player) event.getWhoClicked());
         }
     }
@@ -416,6 +416,9 @@ public class LobbySystem implements Listener {
             setPlayerCooldown(player, 0);
             setGameScoreBoard(player);
             player.teleport(location);
+            if(player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.CREATIVE){
+                player.setGameMode(GameMode.SURVIVAL);
+            }
 
         }
 
@@ -452,7 +455,7 @@ public class LobbySystem implements Listener {
         for(Player player: players){
             setLobbyScoreBoard(player);
             player.teleport(Config.lobbyLocation);
-            if(player.getGameMode() == GameMode.SPECTATOR){
+            if(player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.CREATIVE){
                 player.setGameMode(GameMode.SURVIVAL);
             }
         }

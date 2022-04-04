@@ -90,5 +90,4 @@ public class Base implements Listener {
         event.setCancelled(true);
     }
 
-    }
 }

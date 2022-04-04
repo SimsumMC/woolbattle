@@ -6,7 +6,7 @@ description: A Woolbattle Plugin
 commands:
   gstart:
     description: Start the game instantly.
-    usage: /start
+    usage: /gstart
   gstop:
     description: Stop the game instantly.
-    usage: /stop
+    usage: /gstop

@@ -12,6 +12,8 @@ public class Cache {
      * @author SimsumMC
      */
 
+    private static HashMap<Player, Long> lastDamage = new HashMap<>();
+
     private static HashMap<Player, Long> lastDeath = new HashMap<>();
 
     private static HashMap<String, HashMap<Player, Integer>> killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
@@ -41,6 +43,9 @@ public class Cache {
         put(15, new ArrayList<>());
     }};
 
+    public static HashMap<Player, Long> getLastDamage() {return lastDamage;}
+    public static void setLastDamage(HashMap<Player, Long> lastDamage) {Cache.lastDamage = lastDamage;}
+
     public static HashMap<Player, Long> getLastDeath() {return lastDeath;}
     public static void setLastDeath(HashMap<Player, Long> lastDeath) {Cache.lastDeath = lastDeath;}
 
@@ -58,7 +63,7 @@ public class Cache {
 
     public static void clear(){
 
-        lastDeath = new HashMap<>();
+        lastDamage = new HashMap<>();
 
         killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
             put("Blue", new HashMap<>());
@@ -75,7 +80,7 @@ public class Cache {
         }};
 
         teamLives = new HashMap<String, Integer>(){{
-            put("Blue", 10);
+            put("Blue", 0);
             put("Red", 0);
             put("Green", 0);
             put("Yellow", 0);

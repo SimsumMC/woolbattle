@@ -48,16 +48,16 @@ public class TeamSystem implements Listener {
             switch (smallestNumber){
                 case 0:
                     (Cache.getTeamMembers().get("Red")).add(teamlessPlayers.get(i));
-                    teamlessPlayers.get(i).sendMessage(ChatColor.RED + "You didn't enter a team so you were put into team red!");
+                    teamlessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.RED + " red" + ChatColor.GRAY + "!");
                 break;
                 case 1: (Cache.getTeamMembers().get("Blue")).add(teamlessPlayers.get(i));
-                    teamlessPlayers.get(i).sendMessage(ChatColor.BLUE + "You didn't enter a team so you were put into team blue!");
+                    teamlessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.DARK_BLUE + " blue" + ChatColor.GRAY + "!");
                 break;
                 case 2: (Cache.getTeamMembers().get("Green")).add(teamlessPlayers.get(i));
-                    teamlessPlayers.get(i).sendMessage(ChatColor.GREEN + "You didn't enter a team so you were put into team green!");
+                    teamlessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.DARK_GREEN + " green" + ChatColor.GRAY + "!");
                 break;
                 case 3: (Cache.getTeamMembers().get("Yellow")).add(teamlessPlayers.get(i));
-                    teamlessPlayers.get(i).sendMessage(ChatColor.YELLOW + "You didn't enter a team so you were put into team yellow!");
+                    teamlessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.YELLOW + " yellow" + ChatColor.GRAY + "!");
                 break;
             }
             teamlessPlayers.remove(teamlessPlayers.get(i));
@@ -118,7 +118,7 @@ public class TeamSystem implements Listener {
     }
 
     public static void loadSelection (Player player) {
-        Inventory voting = Bukkit.createInventory(null, 27, ChatColor.RED + "Team Selecting");
+        Inventory voting = Bukkit.createInventory(null, 27, ChatColor.YELLOW + "Team Selecting");
 
         //adding glass
         ItemStack Glass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15);
@@ -138,7 +138,7 @@ public class TeamSystem implements Listener {
             voteRedLore.add("§7» " + Cache.getTeamMembers().get("Red").get(i).getDisplayName());
         }
 
-        voteRedMeta.setDisplayName(ChatColor.RED + "Select team Red");
+        voteRedMeta.setDisplayName(ChatColor.RED + "Team Red");
         voteRedMeta.setLore(voteRedLore);
         voteRed.setItemMeta(voteRedMeta);
         voting.setItem(11, voteRed);
@@ -151,7 +151,7 @@ public class TeamSystem implements Listener {
             voteBlueLore.add("§7» " + Cache.getTeamMembers().get("Blue").get(i).getDisplayName());
         }
 
-        voteBlueMeta.setDisplayName(ChatColor.BLUE + "Select team Blue");
+        voteBlueMeta.setDisplayName(ChatColor.BLUE + "Team Blue");
         voteBlueMeta.setLore(voteBlueLore);
         voteBlue.setItemMeta(voteBlueMeta);
         voting.setItem(12, voteBlue);
@@ -164,7 +164,7 @@ public class TeamSystem implements Listener {
             voteGreenLore.add("§7» " + Cache.getTeamMembers().get("Green").get(i).getDisplayName());
         }
 
-        voteGreenMeta.setDisplayName(ChatColor.GREEN + "Select team Green");
+        voteGreenMeta.setDisplayName(ChatColor.GREEN + "Team Green");
         voteGreenMeta.setLore(voteGreenLore);
         voteGreen.setItemMeta(voteGreenMeta);
         voting.setItem(14, voteGreen);
@@ -177,7 +177,7 @@ public class TeamSystem implements Listener {
             voteYellowLore.add("§7» " + Cache.getTeamMembers().get("Yellow").get(i).getDisplayName());
         }
 
-        voteYellowMeta.setDisplayName(ChatColor.YELLOW + "Select team Yellow");
+        voteYellowMeta.setDisplayName(ChatColor.YELLOW + "Team Yellow");
         voteYellowMeta.setLore(voteYellowLore);
         voteYellow.setItemMeta(voteYellowMeta);
         voting.setItem(15, voteYellow);
@@ -188,10 +188,10 @@ public class TeamSystem implements Listener {
     //Event which cancels team Damage
     @EventHandler
     public void DamageProtection(EntityDamageByEntityEvent damage){
-        HashMap<Player, Long> lastDeath = Cache.getLastDeath();
+        HashMap<Player, Long> lastDamage = Cache.getLastDamage();
         long unixTime = System.currentTimeMillis() / 1000L;
-        lastDeath.put((Player) damage.getEntity(), unixTime);
-        Cache.setLastDeath(lastDeath);
+        lastDamage.put((Player) damage.getEntity(), unixTime);
+        Cache.setLastDamage(lastDamage);
 
         if (damage.getEntity() instanceof Player && damage.getDamager() instanceof Player) {
             Player damager = (Player) damage.getDamager();

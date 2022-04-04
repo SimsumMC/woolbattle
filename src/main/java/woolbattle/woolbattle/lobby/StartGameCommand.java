@@ -25,13 +25,6 @@ public class StartGameCommand implements CommandExecutor {
             if(!player.isOp()){
                 return false;
             }
-            HashMap<String, ArrayList<Player>> teamMembers = Cache.getTeamMembers();
-            if(TeamSystem.getPlayerTeam(player, false).equals("§cNot selected")){
-                ArrayList<Player> blueMembers = teamMembers.get("Blue");
-                blueMembers.add(player);
-                teamMembers.put("Blue", blueMembers);
-                Cache.setTeamMembers(teamMembers);
-            }
             if (startGame()){
                 player.sendMessage("§aStarted the game.");
             } else{
