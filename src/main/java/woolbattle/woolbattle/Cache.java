@@ -1,7 +1,6 @@
 package woolbattle.woolbattle;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +11,8 @@ public class Cache {
      * A Class that contains a few HashMaps with setters and getters to cache different things easily.
      * @author SimsumMC
      */
+
+    private static HashMap<Player, Long> lastDamage = new HashMap<>();
 
     private static HashMap<Player, Long> lastDeath = new HashMap<>();
 
@@ -30,7 +31,7 @@ public class Cache {
     }};
 
     private static HashMap<String, Integer> teamLives = new HashMap<String, Integer>(){{
-        put("Blue", 10);
+        put("Blue", 0);
         put("Red", 0);
         put("Green", 0);
         put("Yellow", 0);
@@ -41,6 +42,9 @@ public class Cache {
         put(10, new ArrayList<>());
         put(15, new ArrayList<>());
     }};
+
+    public static HashMap<Player, Long> getLastDamage() {return lastDamage;}
+    public static void setLastDamage(HashMap<Player, Long> lastDamage) {Cache.lastDamage = lastDamage;}
 
     public static HashMap<Player, Long> getLastDeath() {return lastDeath;}
     public static void setLastDeath(HashMap<Player, Long> lastDeath) {Cache.lastDeath = lastDeath;}
@@ -58,6 +62,8 @@ public class Cache {
     public static void setLifeVoting(HashMap<Integer, ArrayList<Player>> lifeVoting) {Cache.lifeVoting = lifeVoting;}
 
     public static void clear(){
+
+        lastDamage = new HashMap<>();
 
         lastDeath = new HashMap<>();
 
@@ -88,5 +94,4 @@ public class Cache {
             put(15, new ArrayList<>());
         }};
     }
-
 }

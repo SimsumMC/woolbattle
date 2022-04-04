@@ -11,10 +11,5 @@
   "teamSpawns": [[0, 66, 57], [0, 66, 0], [-29, 66, 28], [28, 66, 28]],
   "givenWoolAmount": 1,
   "maxStacks": 3,
-  "jumpCooldown": 10,
-  "uuid": {
-    "bow": 1,
-    "shears": 2,
-    "ender_pearl": 3,
-  }
+  "jumpCooldown": 10
 }
