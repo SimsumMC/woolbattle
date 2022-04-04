@@ -8,11 +8,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Colorable;
+import org.bukkit.material.MaterialData;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
@@ -51,9 +54,9 @@ public class Listener implements org.bukkit.event.Listener {
         boolean blockIsMap = false;
         int itemAmount = 0;
 
-        int givenWoolAmount = Config.givenWoolAmount;
-        int maxStacks = Config.maxStacks;
-        int delayInTicks= Config.woolReplaceDelay;
+        int givenWoolAmount = 2;//Config.givenWoolAmount;
+        int maxStacks = 3;//Config.maxStacks;
+        int delayInTicks= 20;//Config.woolReplaceDelay;
 
         //Checks, whether the event's block is specified in the internal array of map-blocks, writes the value of the operation in the boolean blockIsMap.
         for(Location iterBlock : BlockBreakingSystem.getMapBlocks()){
@@ -161,9 +164,14 @@ public class Listener implements org.bukkit.event.Listener {
 
     @EventHandler
     public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
-
-        int jumpCooldown = Config.jumpCooldown;
+        long jumpCooldown = 40;
+        try{
+            jumpCooldown = Config.jumpCooldown;
+        }catch(ExceptionInInitializerError e){
+            jumpCooldown = 40;
+        }
         Player p = event.getPlayer();
+        p.setFlying(false);
         event.setCancelled(true);
 
         if(p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR || p.isFlying()){
@@ -222,129 +230,121 @@ public class Listener implements org.bukkit.event.Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        event.getPlayer().sendMessage("PlayerInteract is called");
+
         if(event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)){
-
+            event.setCancelled(false);
             return;
-        }else{
-            event.setCancelled(true);
-
-            ArrayList<String> itemNames = new ArrayList<String>(){
-                {
-                    //add(ChatColor.DARK_PURPLE + "Shears");
-                    add(ChatColor.DARK_PURPLE + "Bow");
-                    add(ChatColor.DARK_PURPLE + "EnderPearl");
+        }
+        ItemStack is = event.getItem();
+        Player player = event.getPlayer();
+        PlayerInventory inv = player.getInventory();
+        if(is == null){
+            event.setCancelled(false);
+            return;
+        }
+        int slot = inv.first(is);
+        ArrayList<String> itemNames = new ArrayList<String>() {
+            {
+                //add(ChatColor.DARK_PURPLE + "Shears");
+                add(ChatColor.DARK_PURPLE + "Bow");
+                add(ChatColor.DARK_PURPLE + "EnderPearl");
+            }
+        };
+        if(!itemNames.contains(is.getItemMeta().getDisplayName())){
+            event.setCancelled(false);
+            return;
+        }
+        else if(is.getType().equals(Material.ENDER_PEARL)){
+            int defaultEndepearlCooldown = 8;
+            player.getInventory().setItem(slot, is);
+            int woolAmount = 0;
+            int enderPearlWoolCost = 8;
+            for(ItemStack iterStack : inv.getContents()){
+                if(iterStack != null && iterStack.getType().equals(Material.WOOL)){
+                    woolAmount += iterStack.getAmount();
                 }
-            };
-            PlayerInventory inv = event.getPlayer().getInventory();
-            ItemStack is = event.getItem();
-            int slot = inv.first(is);
-            event.getPlayer().sendMessage("Slot: " + slot);
-            if(event.getItem() == null){
-                event.getPlayer().sendMessage("No item is recognized.");
+            }
+            if(woolAmount-enderPearlWoolCost < 0){
+                player.sendMessage(ChatColor.RED + "You possess to little amounts of wool, to use this perk...");
+                player.getInventory().setItem(slot, is);
+                event.setCancelled(true);
                 return;
             }
-            else {
-                //ItemStack is = event.getItem();
 
-                if(!itemNames.contains(is.getItemMeta().getDisplayName())) {
-                    event.getPlayer().sendMessage("Displayname of item is not contained.");
-                    return;
+            player.sendMessage(ChatColor.GREEN + "You possess sufficient amounts of wool, to use this perk...");
+            HashMap<UUID, Long> enderPearlCooldowns = Cache.getEnderPearlCooldowns();
+
+            if(enderPearlCooldowns.get(player.getUniqueId()) == null){
+                enderPearlCooldowns.put(player.getUniqueId(), new Date().getTime());
+            }else if(new Date().getTime()-enderPearlCooldowns.get(player.getUniqueId())<defaultEndepearlCooldown){
+                player.sendMessage("\nThe time differences is too small for the item, to be thrown.\n");
+                player.getInventory().setItem(slot, is);
+                event.setCancelled(true);
+                return;
+            }
+            ItemSystem.setItemCooldown(player, slot, is, defaultEndepearlCooldown);
+            player.getInventory().setItem(slot, is);
+            enderPearlCooldowns.replace(player.getUniqueId(), new Date().getTime());
+            Cache.setEnderPearlCooldowns(enderPearlCooldowns);
+            ItemSystem.subtractWool(player, enderPearlWoolCost);
+        }else if(is.getType().equals(Material.BOW)){
+            player.getInventory().setItem(slot, is);
+            int woolAmount = 0;
+            int bowWoolCost = 1;
+            for(ItemStack iterStack : inv.getContents()){
+                if(iterStack != null && iterStack.getType().equals(Material.WOOL)){
+                    woolAmount += iterStack.getAmount();
                 }
-                if(is.getItemMeta().getDisplayName().equals(itemNames.get(1))) {
-                    event.setCancelled(true);
-                    boolean allowEnderPearl;
-                    if (!Cache.getEnderPearlFlags().containsKey(event.getPlayer().getUniqueId())) {
-                        event.getPlayer().sendMessage("Enderpearlflag is not contained in cache.");
-                        HashMap<UUID, Boolean> enderPearlFlags = Cache.getEnderPearlFlags();
-                        enderPearlFlags.put(event.getPlayer().getUniqueId(), true);
-                        Cache.setEnderPearlFlags(enderPearlFlags);
-                        allowEnderPearl = true;
-                    } else {
-                        allowEnderPearl = Cache.getEnderPearlFlags().get(event.getPlayer().getUniqueId());
-                    }
-                    event.getPlayer().sendMessage("Contain-check is passed.");
-                    int enderpearlCost = 8;
-                    //boolean allowEnderPearl = Cache.getEnderPearlFlags().get(event.getPlayer().getUniqueId());
-                    // boolean allowEnderPearl =
-                    long enderpearlCooldown = 60;
-                    if (!allowEnderPearl) {
-                        event.getPlayer().sendMessage(ChatColor.RED + "You are not yet allowed to use this perk");
-                        //event.setCancelled(true);
-                        return;
-                    }else{
-                        //PlayerInventory inv = event.getPlayer().getInventory();
-                        event.getPlayer().sendMessage(ChatColor.RED + "The enderpearl usage is allowed");
-                        int itemAmount = 0;
-                        for (ItemStack iterStack : inv.getContents()) {
+            }
+            if(woolAmount-bowWoolCost < 0){
+                player.sendMessage(ChatColor.RED + "You possess to little amounts of wool, to use this perk...");
+                player.getInventory().setItem(slot, is);
+                event.setCancelled(true);
+                return;
+            }
+            ItemSystem.subtractWool(player, bowWoolCost);
 
-                            if(iterStack!= null){
-                                if(iterStack.getType().equals(Material.WOOL)){
-                                    itemAmount += iterStack.getAmount();
-                                }
-                            }
-
-                            //event.getPlayer().sendMessage("ItemAmount: " + itemAmount);
-                        }
-                        event.getPlayer().sendMessage("ItemAmount: " + itemAmount);
-                        if ((itemAmount - enderpearlCost) < 0) {
-                            event.getPlayer().sendMessage(ChatColor.RED + "You possess too little amounts of wool to use this item...");
-                            event.setCancelled(true);
-                        } else {
-                            event.getPlayer().sendMessage(ChatColor.RED + "Else clause is called.");
-                            HashMap<UUID, Boolean> enderPearlFlags = Cache.getEnderPearlFlags();
-                            enderPearlFlags.replace(event.getPlayer().getUniqueId(), false);
-                            Cache.setEnderPearlFlags(enderPearlFlags);
-
-                            Location loc = event.getPlayer().getLocation();
-
-                            World world = Bukkit.getWorld(loc.getWorld().getUID());
-
-                            Location entLoc = loc.getDirection().toLocation(loc.getWorld());
-
-                            Entity entity = world.spawnEntity(loc, EntityType.ENDER_PEARL);
-                            ((Projectile) world.spawnEntity(loc, EntityType.ENDER_PEARL)).setShooter(event.getPlayer());
-                            event.getPlayer().sendMessage("loc: " + loc + "\nworld: " + world + "\nentLoc: " + entLoc + "\nentity: " + entity);
-                            Projectile projectile = null;
-                           // Entity entity1 = world.spawn(loc, new Class<EnderPearl>());
-                            try{
-                                projectile = ((Projectile) world.spawnEntity(loc, EntityType.ENDER_PEARL));
-                            }catch(NullPointerException e){
-                                event.getPlayer().sendMessage(ChatColor.RED + "Projectile could not be spawned.");
-                                projectile = (Projectile) world.spawnEntity(loc, EntityType.ENDER_PEARL);
-                            }
-
-                            //Bukkit.getWorld(loc.getWorld().getUID()).spawnEntity(loc.getDirection().toLocation(loc.getWorld()), EntityType.ENDER_PEARL);
-                            projectile.setVelocity(event.getPlayer().getLocation().getDirection().multiply(3));
-
-                            event.getPlayer().getInventory().setItem(slot, new ItemStack(Material.SULPHUR));
-                /*new BukkitRunnable(){
-                    @Override
-                    public void run(){
-                        inv.setItem(slot, is);
-                    }
-                }.runTaskLater(Main.getInstance(), 20);*/
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    HashMap<UUID, Boolean> currentEnderpearlFlags = Cache.getEnderPearlFlags();
-                                    currentEnderpearlFlags.replace(event.getPlayer().getUniqueId(), true);
-                                    Cache.setEnderPearlFlags(currentEnderpearlFlags);
-                                    event.getPlayer().getInventory().setItem(slot, is);
-                                }
-                            }.runTaskLater(Main.getInstance(), enderpearlCooldown);
-                        }
-                    }
-
-                } else if (is.getType().equals(Material.ENDER_PEARL)) {
-                    Location loc = event.getPlayer().getLocation();
-                    Projectile projectile = (Projectile) Bukkit.getWorld(loc.getWorld().getUID()).spawnEntity(loc.getDirection().toLocation(loc.getWorld()), EntityType.ENDER_PEARL);
-                    //Bukkit.getWorld(loc.getWorld().getUID()).spawnEntity(loc.getDirection().toLocation(loc.getWorld()), EntityType.ENDER_PEARL);
-                    projectile.setVelocity(event.getPlayer().getLocation().getDirection().multiply(3));
-                }
         }
+
+        /*new BukkitRunnable(){
+            @Override
+            public void run() {
+
+                long maxLoops = defaultEndepearlCooldown/1000;
+                ItemStack expiredItem = new ItemStack(Material.SULPHUR){
+                    {
+                        ItemMeta meta = getItemMeta();
+                        meta.setDisplayName(ChatColor.RED + "Item on Cooldown");
+                        setItemMeta(meta);
+                    }
+                };
+
+                new BukkitRunnable(){
+
+                    volatile long loops = 0;
+
+                    @Override
+                    public void run() {
+                        if(loops == maxLoops){
+                            if(is.getAmount()<1){
+                                is.setAmount(is.getAmount() +1);
+                                player.getInventory().setItem(slot, is);
+                            }
+                        }else{
+                            expiredItem.setAmount((int) (maxLoops-loops));
+                            player.getInventory().setItem(slot,expiredItem);
+                            loops++;
+
+                        }
+                    }
+                }.runTaskTimer(Main.getInstance(), 0, 20);//(defaultEndepearlCooldown*20)/1000);
+            }
+        }.runTaskAsynchronously(Main.getInstance());*/
+
 
     }
 
-}
+    @EventHandler(ignoreCancelled = true)
+    public void onProjectileLaunch(ProjectileLaunchEvent event) {
+    }
 }

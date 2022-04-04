@@ -16,7 +16,7 @@ public class Cache {
      * A Class that contains a few HashMaps with setters and getters to cache different things easily.
      * @author SimsumMC
      */
-    private static HashMap<UUID, Boolean> enderPearlFlags = new HashMap<UUID, Boolean>();
+    private static HashMap<UUID, Long> enderPearlCooldowns = new HashMap<UUID, Long>();
 
     private static HashMap<String, Integer> lastDeath = new HashMap<>();
 
@@ -57,9 +57,9 @@ public class Cache {
     public static HashMap<Integer, ArrayList<Player>> getLifeVoting() {return lifeVoting;}
     public static void setLifeVoting(HashMap<Integer, ArrayList<Player>> lifeVoting) {Cache.lifeVoting = lifeVoting;}
 
-    public static HashMap<UUID, Boolean> getEnderPearlFlags() {return enderPearlFlags;}
+    public static HashMap<UUID, Long> getEnderPearlCooldowns() {return enderPearlCooldowns;}
 
-    public static void setEnderPearlFlags(HashMap<UUID, Boolean> enderPearlFlags) {Cache.enderPearlFlags = enderPearlFlags;}
+    public static void setEnderPearlCooldowns(HashMap<UUID, Long> enderPearlCooldowns) {Cache.enderPearlCooldowns = enderPearlCooldowns;}
 
     public static void clear(){
 

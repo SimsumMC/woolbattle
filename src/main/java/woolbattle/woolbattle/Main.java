@@ -19,11 +19,11 @@ import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
 import woolbattle.woolbattle.woolsystem.MapBlocksCommand;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -38,7 +38,6 @@ public final class Main extends JavaPlugin {
     private static final MongoClient mongoClient = MongoClients.create(settings);
     private final MongoDatabase db = mongoClient.getDatabase("woolbattle");
     private static ObjectId mapBlocksObjectId = new ObjectId();
-
 
     public static ObjectId getMapBlocksObjectId() {
         return mapBlocksObjectId;
@@ -87,6 +86,32 @@ public final class Main extends JavaPlugin {
             p.setAllowFlight(true);
             //p.setFlying(false);
         }
+        File file = new File("config.json");
+        if(!file.exists()){
+                try {
+                    file.createNewFile();
+                    Files.write(Paths.get(file.toURI()), Collections.singleton("{" +
+                            "\"mapName\": \"Vimo\",\n" +
+                            "\"mapSpawn\": [0, 71, 28],\n" +
+                            "\"lobbySpawn\": [1000, 100, 1000],\n" +
+                            "\"defaultLives\": 10,\n" +
+                            "\"startCooldown\": 60,\n" +
+                            "\"deathCooldown\": 20,\n" +
+                            "\"maxHeight\": 100,\n" +
+                            "\"minHeight\": 0,\n" +
+                            "\"teamSize\": 1,\n" +
+                            "\"teamSpawns\": [[0, 66, 57], [0, 66, 0], [-29, 66, 28], [28, 66, 28]],\n" +
+                            "\"givenWoolAmount\": 1,\n" +
+                            "\"maxStacks\": 3,\n" +
+                            "\"jumpCooldown\": 10,\n" +
+                            "\"woolReplaceDelay\" : 10\n" +
+                            "}"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+
+
     }
 
 

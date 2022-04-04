@@ -8,15 +8,16 @@ import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.material.MaterialData;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -49,6 +50,7 @@ public class ItemSystem {
     private static int enderpearlSlotDefault = 5;
     private static int perk1SlotDefault = 3;
     private static int perk2SlotDefault = 4;
+
     //Modifies these values further, once again according to information known befor giveItems is called
     static{
         shearsMeta.addEnchant(Enchantment.KNOCKBACK, 2, true);
@@ -61,6 +63,7 @@ public class ItemSystem {
         bowMeta.addEnchant(Enchantment.ARROW_KNOCKBACK, 2, true);
         bowMeta.spigot().setUnbreakable(true);
         bowMeta.setDisplayName(ChatColor.DARK_PURPLE + "Bow");
+        bowMeta.addEnchant(Enchantment.ARROW_INFINITE, 1, true);
         for(LeatherArmorMeta meta : armorStacks.values()){
             meta.addEnchant(Enchantment.DURABILITY, 10, true);
             meta.spigot().setUnbreakable(true);
@@ -173,7 +176,7 @@ public class ItemSystem {
             //playerInv.setItem(index, armorPiece);//setItem(index, armorPiece);
             }
         }
-
+        playerInv.setItem(9, new ItemStack(Material.ARROW));
         addPerkItems(playerInv);
         p.getInventory().setContents(playerInv.getContents());
     }
@@ -183,21 +186,94 @@ public class ItemSystem {
 
     }
     public static void subtractWool(Player p, int amount){
-        Inventory inv = p.getInventory();
+        p.sendMessage("SubtractWool is called.");
+        PlayerInventory inv = p.getInventory();
         int woolAmount = 0;
         ArrayList<ItemStack> woolStacks = new ArrayList<>();
-        ItemStack lowestStack = null;
-        for(ItemStack iterStack : inv.getContents()){
-                if(iterStack.getType().equals(Material.WOOL)){
-                    woolStacks.add(iterStack);
-                }
-        }
-        for(ItemStack woolStack : woolStacks){
-            if(lowestStack == null){
-                lowestStack = woolStack;
-            }else if(lowestStack.getAmount()>woolStack.getAmount()){
-                lowestStack = woolStack;
+        ArrayList<Integer> slots = new ArrayList<>();
+        DyeColor color = Cache.findTeamDyeColor(p);
+
+        int maximumStacks = 3;
+        for(ItemStack is : inv.getContents()){
+            if(is != null && is.getType().equals(Material.WOOL)){
+                woolAmount += is.getAmount();
             }
         }
+        p.sendMessage("woolAmount: " + woolAmount);
+        if(woolAmount-amount <=0){
+            p.sendMessage("woolAmount is lower than subtracted amount.");
+            //((PlayerInventory) p.getInventory()).setContents(inv.getContents());
+            return;
+        }
+        woolAmount = woolAmount-amount;
+        p.sendMessage("woolAmountAfterSubtraction: " + woolAmount + " " +  woolAmount%64);
+        int modulo = woolAmount%64;
+        inv.remove(Material.WOOL);
+        //int amountToDistribute = woolAmount-amount;
+        ItemStack woolInstance =  new ItemStack(Material.WOOL);
+        MaterialData materialData = new MaterialData(Material.WOOL);
+        materialData.setData(color.getWoolData());
+        woolInstance.setData(materialData);
+        int iterator =0;
+        if(woolAmount%64 !=0){
+            p.sendMessage("Modulo:  " + modulo);
+            ItemStack wool = new ItemStack(woolInstance);
+            wool.setAmount(modulo);
+            woolStacks.add(new ItemStack(wool));
+            p.sendMessage("woolstacks: " + woolStacks);
+            woolAmount-=(woolAmount%64);
+            p.sendMessage("woolAmount-Modulo:  " + woolAmount);
+        }
+        for(int i = 0; i<woolAmount/64;i++){
+            p.sendMessage("iterator: " + i);
+            ItemStack wool = new ItemStack(woolInstance);
+            wool.setAmount(64);
+            woolStacks.add(wool);
+            iterator++;
+        }
+        p.sendMessage(woolStacks.toString());
+
+        for(ItemStack woolStack : woolStacks){
+            inv.addItem(woolStack);
+        }
+        //((PlayerInventory) p.getInventory()).setContents(inv.getContents());
+
     }
+    public static void setItemCooldown(Player p, int slot, ItemStack item, int cooldownInSeconds){
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+
+                int maxLoops = cooldownInSeconds;
+                ItemStack expiredItem = new ItemStack(Material.SULPHUR){
+                    {
+                        ItemMeta meta = getItemMeta();
+                        meta.setDisplayName(ChatColor.RED + "Item on Cooldown");
+                        setItemMeta(meta);
+                    }
+                };
+
+                new BukkitRunnable(){
+
+                    volatile int loops = 0;
+
+                    @Override
+                    public void run() {
+                        if(loops == maxLoops){
+                            if(item.getAmount()<1){
+                                item.setAmount(item.getAmount() +1);
+                                p.getInventory().setItem(slot, item);
+                            }
+                        }else{
+                            expiredItem.setAmount((maxLoops-loops));
+                            p.getInventory().setItem(slot,expiredItem);
+                            loops++;
+
+                        }
+                    }
+                }.runTaskTimer(Main.getInstance(), 0, 20);
+            }
+        }.runTaskAsynchronously(Main.getInstance());
+    }
+
 }
