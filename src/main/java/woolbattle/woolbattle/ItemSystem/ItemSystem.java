@@ -1,4 +1,4 @@
-package woolbattle.woolbattle;
+package woolbattle.woolbattle.ItemSystem;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
@@ -15,6 +15,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.material.MaterialData;
 import org.bukkit.scheduler.BukkitRunnable;
+import woolbattle.woolbattle.Cache;
+import woolbattle.woolbattle.Main;
 
 import java.util.ArrayList;
 import java.util.HashMap;

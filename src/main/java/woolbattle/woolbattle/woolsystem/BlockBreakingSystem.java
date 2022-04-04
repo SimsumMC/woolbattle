@@ -10,7 +10,6 @@ import java.util.HashMap;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
 
-
 public class BlockBreakingSystem {
     private static boolean collectBlocksTroughDiff = false;
 

@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.material.Colorable;
 import org.bukkit.scheduler.BukkitRunnable;
+import woolbattle.woolbattle.ItemSystem.ItemSystem;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 
 import java.util.ArrayList;
@@ -24,16 +25,11 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class Listener implements org.bukkit.event.Listener {
-    public boolean allowEnderPearl = true;
 
     /**
-     *
-     *
      * @param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
-     *      *              information, concerning these circumstances.
+     * information, concerning these circumstances.
      */
-
-
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
 
