@@ -5,7 +5,9 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import woolbattle.woolbattle.base.Base;
 import woolbattle.woolbattle.lives.LivesSystem;
@@ -13,6 +15,19 @@ import woolbattle.woolbattle.lobby.LobbySystem;
 import woolbattle.woolbattle.lobby.StartGameCommand;
 import woolbattle.woolbattle.lobby.StopGameCommand;
 import woolbattle.woolbattle.team.TeamSystem;
+import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
+import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
+import woolbattle.woolbattle.woolsystem.MapBlocksCommand;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+
+import static com.mongodb.client.model.Filters.eq;
 
 public final class Main extends JavaPlugin {
 
@@ -41,6 +56,55 @@ public final class Main extends JavaPlugin {
         // Beelzebub's Stuff
         Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);
         Bukkit.getPluginManager().registerEvents(new LivesSystem(), this);
+
+        if (!db.listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking")) {
+            db.createCollection("blockBreaking");
+
+        } else {
+        }
+
+        Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
+        if (found == null) {
+            HashMap<String, Object> mapBlocks = new HashMap<String, Object>(){
+                {
+                    put("mapBlocks", new ArrayList<ArrayList<Double>>());
+                    put("_id", "mapBlocks");
+                }
+            };
+            db.getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
+        }
+        Bukkit.getPluginManager().registerEvents(new Listener(), this);
+        getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
+        getCommand("mapblocks").setExecutor(new MapBlocksCommand());
+        BlockBreakingSystem.setCollectBrokenBlocks(false);
+        BlockBreakingSystem.fetchMapBlocks();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.setAllowFlight(true);
+        }
+        File file = new File("config.json");
+        if(!file.exists()){
+            try {
+                file.createNewFile();
+                Files.write(Paths.get(file.toURI()), Collections.singleton("{" +
+                        "\"mapName\": \"Vimo\",\n" +
+                        "\"mapSpawn\": [0, 71, 28],\n" +
+                        "\"lobbySpawn\": [1000, 100, 1000],\n" +
+                        "\"defaultLives\": 10,\n" +
+                        "\"startCooldown\": 60,\n" +
+                        "\"deathCooldown\": 20,\n" +
+                        "\"maxHeight\": 100,\n" +
+                        "\"minHeight\": 0,\n" +
+                        "\"teamSize\": 1,\n" +
+                        "\"teamSpawns\": [[0, 66, 57], [0, 66, 0], [-29, 66, 28], [28, 66, 28]],\n" +
+                        "\"givenWoolAmount\": 1,\n" +
+                        "\"maxStacks\": 3,\n" +
+                        "\"jumpCooldown\": 10,\n" +
+                        "\"woolReplaceDelay\" : 10\n" +
+                        "}"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -54,6 +118,10 @@ public final class Main extends JavaPlugin {
 
     public static MongoDatabase getMongoDatabase() {
         return db;
+    }
+
+    public static MongoClient getMongoClient() {
+        return mongoClient;
     }
 
 }

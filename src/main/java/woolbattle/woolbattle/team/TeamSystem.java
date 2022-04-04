@@ -1,8 +1,6 @@
 package woolbattle.woolbattle.team;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,6 +14,8 @@ import woolbattle.woolbattle.lobby.LobbySystem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static woolbattle.woolbattle.Cache.getTeamMembers;
 
 
 public class TeamSystem implements Listener {
@@ -39,10 +39,10 @@ public class TeamSystem implements Listener {
 
         for (int i = teamLessPlayers.size() - 1; i>=0; i--) {
             int[] sizes = {
-                    Cache.getTeamMembers().get("Red").size(),
-                    Cache.getTeamMembers().get("Blue").size(),
-                    Cache.getTeamMembers().get("Green").size(),
-                    Cache.getTeamMembers().get("Yellow").size()
+                    getTeamMembers().get("Red").size(),
+                    getTeamMembers().get("Blue").size(),
+                    getTeamMembers().get("Green").size(),
+                    getTeamMembers().get("Yellow").size()
             };
             int smallestNumber = 0;
             int temp = sizes[0];
@@ -54,26 +54,26 @@ public class TeamSystem implements Listener {
             }
             switch (smallestNumber){
                 case 0:
-                    (Cache.getTeamMembers().get("Red")).add(teamLessPlayers.get(i));
+                    (getTeamMembers().get("Red")).add(teamLessPlayers.get(i));
                     teamLessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.RED + "red" + ChatColor.GRAY + "!");
                     break;
-                case 1: (Cache.getTeamMembers().get("Blue")).add(teamLessPlayers.get(i));
+                case 1: (getTeamMembers().get("Blue")).add(teamLessPlayers.get(i));
                     teamLessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.DARK_BLUE + "blue" + ChatColor.GRAY + "!");
                     break;
-                case 2: (Cache.getTeamMembers().get("Green")).add(teamLessPlayers.get(i));
+                case 2: (getTeamMembers().get("Green")).add(teamLessPlayers.get(i));
                     teamLessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.DARK_GREEN + "green" + ChatColor.GRAY + "!");
                     break;
-                case 3: (Cache.getTeamMembers().get("Yellow")).add(teamLessPlayers.get(i));
+                case 3: (getTeamMembers().get("Yellow")).add(teamLessPlayers.get(i));
                     teamLessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.YELLOW + "yellow" + ChatColor.GRAY + "!");
                     break;
             }
             teamLessPlayers.remove(teamLessPlayers.get(i));
         }
         int[] sizes = {
-                Cache.getTeamMembers().get("Red").size(),
-                Cache.getTeamMembers().get("Blue").size(),
-                Cache.getTeamMembers().get("Green").size(),
-                Cache.getTeamMembers().get("Yellow").size()
+                getTeamMembers().get("Red").size(),
+                getTeamMembers().get("Blue").size(),
+                getTeamMembers().get("Green").size(),
+                getTeamMembers().get("Yellow").size()
         };
         for (int i = 0; i < sizes.length; i++) {
             if (sizes[i] > 0) {
@@ -88,13 +88,13 @@ public class TeamSystem implements Listener {
         }
 
         if (numActiveTeams < 2) {
-            int size = Cache.getTeamMembers().get(teamWithMembers).size();
+            int size = getTeamMembers().get(teamWithMembers).size();
             if (size / 2 != 0) {
 
-                ArrayList<Player> member = Cache.getTeamMembers().get(teamWithMembers);
+                ArrayList<Player> member = getTeamMembers().get(teamWithMembers);
 
                 if (!teamWithMembers.equals("Blue")) {
-                    HashMap<String, ArrayList<Player>> members = Cache.getTeamMembers();
+                    HashMap<String, ArrayList<Player>> members = getTeamMembers();
 
                     ArrayList<Player> newMem = new ArrayList<Player>() {{
                         add(member.get(0));
@@ -107,7 +107,7 @@ public class TeamSystem implements Listener {
                     Cache.setTeamMembers(members);
                 }
                 else {
-                    HashMap<String, ArrayList<Player>> members = Cache.getTeamMembers();
+                    HashMap<String, ArrayList<Player>> members = getTeamMembers();
 
                     ArrayList<Player> newMem = new ArrayList<Player>() {{
                         add(member.get(0));
@@ -146,8 +146,8 @@ public class TeamSystem implements Listener {
         ItemStack voteRed = new ItemStack(Material.WOOL, 1, (byte) 14);
         ArrayList<String> voteRedLore = new ArrayList<>();
         ItemMeta voteRedMeta = voteRed.getItemMeta();
-        for (int i = Cache.getTeamMembers().get("Red").size() - 1; i >= 0; i--) {
-            voteRedLore.add("§7» " + Cache.getTeamMembers().get("Red").get(i).getDisplayName());
+        for (int i = getTeamMembers().get("Red").size() - 1; i >= 0; i--) {
+            voteRedLore.add("§7» " + getTeamMembers().get("Red").get(i).getDisplayName());
         }
 
         voteRedMeta.setDisplayName(ChatColor.RED + "Team Red");
@@ -159,8 +159,8 @@ public class TeamSystem implements Listener {
         ItemStack voteBlue = new ItemStack(Material.WOOL, 1, (byte) 11);
         ArrayList<String> voteBlueLore = new ArrayList<>();
         ItemMeta voteBlueMeta = voteBlue.getItemMeta();
-        for (int i = Cache.getTeamMembers().get("Blue").size() - 1; i >= 0; i--) {
-            voteBlueLore.add("§7» " + Cache.getTeamMembers().get("Blue").get(i).getDisplayName());
+        for (int i = getTeamMembers().get("Blue").size() - 1; i >= 0; i--) {
+            voteBlueLore.add("§7» " + getTeamMembers().get("Blue").get(i).getDisplayName());
         }
 
         voteBlueMeta.setDisplayName(ChatColor.BLUE + "Team Blue");
@@ -172,8 +172,8 @@ public class TeamSystem implements Listener {
         ItemStack voteGreen = new ItemStack(Material.WOOL, 1, (byte) 5);
         ArrayList<String> voteGreenLore = new ArrayList<>();
         ItemMeta voteGreenMeta = voteGreen.getItemMeta();
-        for (int i = Cache.getTeamMembers().get("Green").size() - 1; i >= 0; i--) {
-            voteGreenLore.add("§7» " + Cache.getTeamMembers().get("Green").get(i).getDisplayName());
+        for (int i = getTeamMembers().get("Green").size() - 1; i >= 0; i--) {
+            voteGreenLore.add("§7» " + getTeamMembers().get("Green").get(i).getDisplayName());
         }
 
         voteGreenMeta.setDisplayName(ChatColor.GREEN + "Team Green");
@@ -185,8 +185,8 @@ public class TeamSystem implements Listener {
         ItemStack voteYellow = new ItemStack(Material.WOOL, 1, (byte) 4);
         ArrayList<String> voteYellowLore = new ArrayList<>();
         ItemMeta voteYellowMeta = voteYellow.getItemMeta();
-        for (int i = Cache.getTeamMembers().get("Yellow").size() - 1; i >= 0; i--) {
-            voteYellowLore.add("§7» " + Cache.getTeamMembers().get("Yellow").get(i).getDisplayName());
+        for (int i = getTeamMembers().get("Yellow").size() - 1; i >= 0; i--) {
+            voteYellowLore.add("§7» " + getTeamMembers().get("Yellow").get(i).getDisplayName());
         }
 
         voteYellowMeta.setDisplayName(ChatColor.YELLOW + "Team Yellow");
@@ -231,7 +231,7 @@ public class TeamSystem implements Listener {
     public static String getPlayerTeam(Player player, boolean raw) {
 
         String teamName = "§cNot selected";
-        HashMap<String, ArrayList<Player>> data = Cache.getTeamMembers();
+        HashMap<String, ArrayList<Player>> data = getTeamMembers();
 
         for(String key : data.keySet()){
             ArrayList<Player> players = data.get(key);
@@ -256,7 +256,7 @@ public class TeamSystem implements Listener {
      * @author SimsumMC
      */
     public static void removePlayerTeam(Player player) {
-        HashMap<String, ArrayList<Player>> teamMembers = Cache.getTeamMembers();
+        HashMap<String, ArrayList<Player>> teamMembers = getTeamMembers();
 
         for(String key : teamMembers.keySet()){
             ArrayList<Player> players = teamMembers.get(key);
@@ -287,5 +287,52 @@ public class TeamSystem implements Listener {
                 return "§4";
         }
     }
-}
 
+    /**
+     * Method that returns the team-color of the specified player as a DyeColor.
+     * @param p The player to get the team-color of
+     * @author Servaturus
+     */
+    public static DyeColor findTeamDyeColor(Player p){
+        HashMap<String, ArrayList<Player>> teamMembers = getTeamMembers();
+        ArrayList<Player> red = teamMembers.get("red"),
+                blue = teamMembers.get("blue"),
+                yellow = teamMembers.get("yellow"),
+                green = teamMembers.get("green");
+        if(red != null && blue.contains(p)){
+            return DyeColor.RED;
+        }else if(yellow != null && yellow.contains(p)){
+            return DyeColor.ORANGE;
+        }else if(green != null && green.contains(p)){
+            return DyeColor.GREEN;
+        }else if(blue != null && blue.contains(p)){
+            return DyeColor.BLUE;
+        }else{
+            return DyeColor.WHITE;
+        }
+    }
+
+    /**
+     * Method that returns the team-color of the specified player as a Color.
+     * @param p The player to get the team-color of
+     * @author Servaturus
+     */
+    public static Color findTeamColor(Player p){
+        HashMap<String, ArrayList<Player>> teamMembers = getTeamMembers();
+        ArrayList<Player> red = teamMembers.get("red"),
+                blue = teamMembers.get("blue"),
+                yellow = teamMembers.get("yellow"),
+                green = teamMembers.get("green");
+        if(red != null && blue.contains(p)){
+            return Color.RED;
+        }else if(yellow != null && yellow.contains(p)){
+            return Color.ORANGE;
+        }else if(green != null && green.contains(p)){
+            return Color.GREEN;
+        }else if(blue != null && blue.contains(p)){
+            return Color.BLUE;
+        }else{
+            return Color.WHITE;
+        }
+    }
+}

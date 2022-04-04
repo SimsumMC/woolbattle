@@ -26,6 +26,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
 import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Config;
+import woolbattle.woolbattle.itemsystem.ItemSystem;
 import woolbattle.woolbattle.Main;
 import woolbattle.woolbattle.team.TeamSystem;
 
@@ -388,7 +389,6 @@ public class LobbySystem implements Listener {
      * @author SimsumMC
      */
     public static boolean startGame() {
-        //TODO: give items to the player @Servaturus
         if(gameStarted){
             return false;
         }
@@ -421,6 +421,7 @@ public class LobbySystem implements Listener {
             }
             setPlayerCooldown(player, 0);
             setGameScoreBoard(player);
+            ItemSystem.giveItems(player);
             player.teleport(location);
             if(player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.CREATIVE){
                 player.setGameMode(GameMode.SURVIVAL);

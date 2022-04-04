@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class Cache {
 
@@ -15,6 +16,12 @@ public class Cache {
     private static HashMap<Player, Long> lastDamage = new HashMap<>();
 
     private static HashMap<Player, Long> lastDeath = new HashMap<>();
+
+    private static HashMap<String, Integer> jumpCooldown = new HashMap<>();
+
+    private static HashMap<UUID, Long> enderPearlCooldowns = new HashMap<>();
+
+    private static HashMap<UUID, Boolean> bowFlags = new HashMap<>();
 
     private static HashMap<String, HashMap<Player, Integer>> killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
         put("Blue", new HashMap<>());
@@ -48,6 +55,15 @@ public class Cache {
 
     public static HashMap<Player, Long> getLastDeath() {return lastDeath;}
     public static void setLastDeath(HashMap<Player, Long> lastDeath) {Cache.lastDeath = lastDeath;}
+
+    public static HashMap<String, Integer> getJumpCooldown() {return jumpCooldown;}
+    public static void setJumpCooldown(HashMap<String, Integer> jumpCooldown) {Cache.jumpCooldown = jumpCooldown;}
+
+    public static HashMap<UUID, Long> getEnderPearlCooldowns() {return enderPearlCooldowns;}
+    public static void setEnderPearlCooldowns(HashMap<UUID, Long> enderPearlCooldowns) {Cache.enderPearlCooldowns = enderPearlCooldowns;}
+
+    public static HashMap<UUID, Boolean> getBowFlags() {return bowFlags;}
+    public static void setBowFlags(HashMap<UUID, Boolean> bowFlags) {Cache.bowFlags = bowFlags;}
 
     public static HashMap<String, HashMap<Player, Integer>> getKillStreaks() {return killStreaks;}
     public static void setKillStreaks(HashMap<String, HashMap<Player, Integer>> killStreaks) {Cache.killStreaks = killStreaks;}
@@ -93,5 +109,11 @@ public class Cache {
             put(10, new ArrayList<>());
             put(15, new ArrayList<>());
         }};
+
+        jumpCooldown = new HashMap<>();
+
+        enderPearlCooldowns = new HashMap<>();
+
+        bowFlags = new HashMap<>();
     }
 }
