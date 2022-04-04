@@ -4,11 +4,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import woolbattle.woolbattle.Cache;
-import woolbattle.woolbattle.TeamSystem;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import static woolbattle.woolbattle.lobby.LobbySystem.startGame;
 

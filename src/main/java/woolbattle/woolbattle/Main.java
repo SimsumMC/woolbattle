@@ -8,9 +8,11 @@ import com.mongodb.client.MongoDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import woolbattle.woolbattle.base.Base;
+import woolbattle.woolbattle.lives.LivesSystem;
 import woolbattle.woolbattle.lobby.LobbySystem;
 import woolbattle.woolbattle.lobby.StartGameCommand;
 import woolbattle.woolbattle.lobby.StopGameCommand;
+import woolbattle.woolbattle.team.TeamSystem;
 
 public final class Main extends JavaPlugin {
 

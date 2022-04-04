@@ -1,0 +1,15 @@
+{
+  "mapName": "Vimo",
+  "mapSpawn": [0, 71, 28],
+  "lobbySpawn": [1000, 100, 1000],
+  "defaultLives": 10,
+  "startCooldown": 60,
+  "deathCooldown": 20,
+  "maxHeight": 100,
+  "minHeight": 0,
+  "teamSize": 1,
+  "teamSpawns": [[0, 66, 57], [0, 66, 0], [-29, 66, 28], [28, 66, 28]],
+  "givenWoolAmount": 1,
+  "maxStacks": 3,
+  "jumpCooldown": 10
+}

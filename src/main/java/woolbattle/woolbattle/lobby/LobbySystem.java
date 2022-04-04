@@ -27,7 +27,7 @@ import org.bukkit.scoreboard.*;
 import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.Main;
-import woolbattle.woolbattle.TeamSystem;
+import woolbattle.woolbattle.team.TeamSystem;
 
 import java.util.*;
 
@@ -131,10 +131,16 @@ public class LobbySystem implements Listener {
      */
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+
+        if(event.getCurrentItem().getType() == Material.SULPHUR){
+            player.sendMessage(ChatColor.RED + "You can't move items that are on cooldown!");
+            event.setCancelled(true);
+        }
         if (gameStarted) {
             return;
         }
-        Player player = (Player) event.getWhoClicked();
+
         if (event.getWhoClicked() instanceof Player && event.getClickedInventory() != null && event.getCurrentItem().getItemMeta() != null) {
             if (!event.getClickedInventory().getName().equals("§b§lEdit Inventory") || event.getCurrentItem().getItemMeta().getDisplayName().equals(" ")) {
                 List<ItemStack> items = new ArrayList<>();
@@ -198,7 +204,7 @@ public class LobbySystem implements Listener {
                     (Cache.getTeamMembers().get("Red")).add(playerRed);
                     playerRed.sendMessage("§7You have entered team §4Red§7.");
                 }
-                TeamSystem.loadSelection((Player) event.getWhoClicked());
+                TeamSystem.showTeamSelectionInventory((Player) event.getWhoClicked());
             }
         }
         else if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.BLUE + "Team Blue")){
@@ -208,14 +214,14 @@ public class LobbySystem implements Listener {
                     return;
                 }
                 else if ((Cache.getTeamMembers().get("Blue")).size() >= teamLimit) {
-                    playerBlue.sendMessage(ChatColor.RED + "The team already has " + teamLimit + " Members.");
+                    playerBlue.sendMessage(ChatColor.RED + "The team already has " + teamLimit + " Members!");
                 }
                 else {
                     TeamSystem.removePlayerTeam(playerBlue);
                     (Cache.getTeamMembers().get("Blue")).add(playerBlue);
                     playerBlue.sendMessage("§7You have entered team §1Blue§7.");
                 }
-                TeamSystem.loadSelection((Player) event.getWhoClicked());
+                TeamSystem.showTeamSelectionInventory((Player) event.getWhoClicked());
             }
         }
         else if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Team Green")) {
@@ -225,14 +231,14 @@ public class LobbySystem implements Listener {
                     return;
                 }
                 else if ((Cache.getTeamMembers().get("Green")).size() >= teamLimit) {
-                    playerGreen.sendMessage(ChatColor.RED + "The team already has " + teamLimit + " Members.");
+                    playerGreen.sendMessage(ChatColor.RED + "The team already has " + teamLimit + " Members!");
                 }
                 else {
                     TeamSystem.removePlayerTeam(playerGreen);
                     (Cache.getTeamMembers().get("Green")).add(playerGreen);
                     playerGreen.sendMessage("§7You have entered team §2Green§7.");
                 }
-                TeamSystem.loadSelection((Player) event.getWhoClicked());
+                TeamSystem.showTeamSelectionInventory((Player) event.getWhoClicked());
             }
         }
         else if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Team Yellow")){
@@ -242,18 +248,18 @@ public class LobbySystem implements Listener {
                     return;
                 }
                 else if ((Cache.getTeamMembers().get("Yellow")).size() >= teamLimit) {
-                    playerYellow.sendMessage(ChatColor.RED + "The team already has " + teamLimit + " Members.");
+                    playerYellow.sendMessage(ChatColor.RED + "The team already has " + teamLimit + " Members!");
                 }
                 else {
                     TeamSystem.removePlayerTeam(playerYellow);
                     (Cache.getTeamMembers().get("Yellow")).add(playerYellow);
                     playerYellow.sendMessage("§7You have entered team §eYellow§7.");
                 }
-                TeamSystem.loadSelection((Player) event.getWhoClicked());
+                TeamSystem.showTeamSelectionInventory((Player) event.getWhoClicked());
             }
         }
         else if (Objects.equals(event.getCurrentItem().getItemMeta().getDisplayName()," " ) && event.getView().getTitle().equals(ChatColor.YELLOW + "Team Selecting")) {
-            TeamSystem.loadSelection((Player) event.getWhoClicked());
+            TeamSystem.showTeamSelectionInventory((Player) event.getWhoClicked());
         }
     }
 
@@ -282,7 +288,7 @@ public class LobbySystem implements Listener {
             player.sendMessage(ChatColor.RED + "This item isn't finished yet!");
         }
         else if (event.getItem().getItemMeta().getDisplayName().equals("§e§lChoose Team")){
-            TeamSystem.loadSelection(player);
+            TeamSystem.showTeamSelectionInventory(player);
         }
     }
 
@@ -424,8 +430,6 @@ public class LobbySystem implements Listener {
 
         Cache.setTeamLives(teamLives);
 
-        Bukkit.broadcastMessage(ChatColor.GREEN + "Game Starting...");
-
         return true;
     }
 
@@ -462,7 +466,6 @@ public class LobbySystem implements Listener {
 
         updateScoreBoard();
 
-        Bukkit.broadcastMessage(ChatColor.RED + "Game Ending...");
         return true;
     }
 
@@ -473,8 +476,10 @@ public class LobbySystem implements Listener {
     public static void determinateWinnerTeam() {
         //check for teams -> if only one is left over
         HashMap<String, ArrayList<Player>> teamMembers = Cache.getTeamMembers();
+
         int emptyTeams = 0;
         String existingTeam = null;
+
         for(String key : teamMembers.keySet()){
             ArrayList<Player> players = teamMembers.get(key);
             if(players.size() == 0){
@@ -492,12 +497,15 @@ public class LobbySystem implements Listener {
             else{
                 endGame("§cUnknown");
             }
+            return;
         }
 
         //check for lives
         HashMap<String, Integer> teamLives = Cache.getTeamLives();
+
         int deathTeams = 0;
         existingTeam = null;
+
         for(String key : teamLives.keySet()){
             int lives = teamLives.get(key);
             if(lives == 0){

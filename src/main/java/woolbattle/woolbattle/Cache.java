@@ -31,7 +31,7 @@ public class Cache {
     }};
 
     private static HashMap<String, Integer> teamLives = new HashMap<String, Integer>(){{
-        put("Blue", 10);
+        put("Blue", 0);
         put("Red", 0);
         put("Green", 0);
         put("Yellow", 0);
@@ -64,6 +64,8 @@ public class Cache {
     public static void clear(){
 
         lastDamage = new HashMap<>();
+
+        lastDeath = new HashMap<>();
 
         killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
             put("Blue", new HashMap<>());

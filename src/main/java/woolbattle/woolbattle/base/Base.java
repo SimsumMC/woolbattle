@@ -1,8 +1,6 @@
 package woolbattle.woolbattle.base;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,29 +9,27 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.material.Wool;
-import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Config;
-import woolbattle.woolbattle.TeamSystem;
-import woolbattle.woolbattle.lobby.LobbySystem;
-
-import java.util.HashMap;
 
 public class Base implements Listener {
 
 
     /**
-     * An Event that gets executed whenever an entity gets damage to prevent fall damage.
+     * An Event that gets executed whenever an entity gets damage to prevent any damage.
      *
      * @param event the EntityDamageEvent
      * @author SimsumMC
      */
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-        // Disables Fall Damage
-        if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
+        //disable fall damage
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             event.setCancelled(true);
+        }
+        else{
+            Player player = (Player) event.getEntity();
+            player.setHealth(20);
         }
     }
 

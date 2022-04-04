@@ -1,4 +1,4 @@
-package woolbattle.woolbattle;
+package woolbattle.woolbattle.team;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -11,26 +11,33 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
+import woolbattle.woolbattle.Cache;
+import woolbattle.woolbattle.lobby.LobbySystem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 
 public class TeamSystem implements Listener {
+
+    /**
+     * A method that handles the team division.
+     * @author Beelzebub
+     */
     public static void teamsOnStart() {
         int numActiveTeams = 0;
         String teamWithMembers = null;
         ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
-        ArrayList<Player> teamlessPlayers = new ArrayList<>();
+        ArrayList<Player> teamLessPlayers = new ArrayList<>();
 
         for (int i = Bukkit.getOnlinePlayers().size() - 1; i>=0; i--) {
             Player player = onlinePlayers.get(i);
             if (TeamSystem.getPlayerTeam(player, true).equals("§cNot selected")) {
-                teamlessPlayers.add(player);
+                teamLessPlayers.add(player);
             }
         }
 
-        for (int i = teamlessPlayers.size() - 1; i>=0; i--) {
+        for (int i = teamLessPlayers.size() - 1; i>=0; i--) {
             int[] sizes = {
                     Cache.getTeamMembers().get("Red").size(),
                     Cache.getTeamMembers().get("Blue").size(),
@@ -47,20 +54,20 @@ public class TeamSystem implements Listener {
             }
             switch (smallestNumber){
                 case 0:
-                    (Cache.getTeamMembers().get("Red")).add(teamlessPlayers.get(i));
-                    teamlessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.RED + " red" + ChatColor.GRAY + "!");
+                    (Cache.getTeamMembers().get("Red")).add(teamLessPlayers.get(i));
+                    teamLessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.RED + "red" + ChatColor.GRAY + "!");
                 break;
-                case 1: (Cache.getTeamMembers().get("Blue")).add(teamlessPlayers.get(i));
-                    teamlessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.DARK_BLUE + " blue" + ChatColor.GRAY + "!");
+                case 1: (Cache.getTeamMembers().get("Blue")).add(teamLessPlayers.get(i));
+                    teamLessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.DARK_BLUE + "blue" + ChatColor.GRAY + "!");
                 break;
-                case 2: (Cache.getTeamMembers().get("Green")).add(teamlessPlayers.get(i));
-                    teamlessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.DARK_GREEN + " green" + ChatColor.GRAY + "!");
+                case 2: (Cache.getTeamMembers().get("Green")).add(teamLessPlayers.get(i));
+                    teamLessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.DARK_GREEN + "green" + ChatColor.GRAY + "!");
                 break;
-                case 3: (Cache.getTeamMembers().get("Yellow")).add(teamlessPlayers.get(i));
-                    teamlessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.YELLOW + " yellow" + ChatColor.GRAY + "!");
+                case 3: (Cache.getTeamMembers().get("Yellow")).add(teamLessPlayers.get(i));
+                    teamLessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.YELLOW + "yellow" + ChatColor.GRAY + "!");
                 break;
             }
-            teamlessPlayers.remove(teamlessPlayers.get(i));
+            teamLessPlayers.remove(teamLessPlayers.get(i));
         }
         int[] sizes = {
                 Cache.getTeamMembers().get("Red").size(),
@@ -117,7 +124,12 @@ public class TeamSystem implements Listener {
         }
     }
 
-    public static void loadSelection (Player player) {
+    /**
+     * A method that opens the Inventory for the team selection for the given player.
+     * @param player - the player that gets the inventory "shown" (opened)
+     * @author Beelzebub
+     */
+    public static void showTeamSelectionInventory(Player player) {
         Inventory voting = Bukkit.createInventory(null, 27, ChatColor.YELLOW + "Team Selecting");
 
         //adding glass
@@ -185,22 +197,26 @@ public class TeamSystem implements Listener {
         player.openInventory(voting);
     }
 
-    //Event which cancels team Damage
+    /**
+     * An event that gets executed whenever an entity damages another entity to prevent hitting team members.
+     * @param event - the EntityDamageByEntityEvent
+     * @author Beelzebub
+     */
     @EventHandler
-    public void DamageProtection(EntityDamageByEntityEvent damage){
+    public void DamageProtection(EntityDamageByEntityEvent event){
         HashMap<Player, Long> lastDamage = Cache.getLastDamage();
         long unixTime = System.currentTimeMillis() / 1000L;
-        lastDamage.put((Player) damage.getEntity(), unixTime);
+        lastDamage.put((Player) event.getEntity(), unixTime);
         Cache.setLastDamage(lastDamage);
 
-        if (damage.getEntity() instanceof Player && damage.getDamager() instanceof Player) {
-            Player damager = (Player) damage.getDamager();
-            Player damaged = (Player) damage.getEntity();
-            if (TeamSystem.getPlayerTeam(damager, true).equals(TeamSystem.getPlayerTeam(damaged, true))) {
+        if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
+            Player damager = (Player) event.getDamager();
+            Player damaged = (Player) event.getEntity();
+            if (TeamSystem.getPlayerTeam(damager, true).equals(TeamSystem.getPlayerTeam(damaged, true)) || !LobbySystem.gameStarted) {
                 Vector velocity;
-                velocity = damage.getEntity().getVelocity();
-                damage.getEntity().setVelocity(velocity);
-                damage.setCancelled(true);
+                velocity = event.getEntity().getVelocity();
+                event.getEntity().setVelocity(velocity);
+                event.setCancelled(true);
             }
         }
     }
@@ -241,6 +257,7 @@ public class TeamSystem implements Listener {
      */
     public static void removePlayerTeam(Player player) {
         HashMap<String, ArrayList<Player>> teamMembers = Cache.getTeamMembers();
+
         for(String key : teamMembers.keySet()){
             ArrayList<Player> players = teamMembers.get(key);
             if(players.contains(player)){
