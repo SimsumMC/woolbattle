@@ -1,17 +1,22 @@
 package woolbattle.woolbattle;
 
+import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class Cache {
+
+
 
     /**
      * A Class that contains a few HashMaps with setters and getters to cache different things easily.
      * @author SimsumMC
      */
+    private static HashMap<UUID, Boolean> enderPearlFlags = new HashMap<UUID, Boolean>();
 
     private static HashMap<String, Integer> lastDeath = new HashMap<>();
 
@@ -52,6 +57,10 @@ public class Cache {
     public static HashMap<Integer, ArrayList<Player>> getLifeVoting() {return lifeVoting;}
     public static void setLifeVoting(HashMap<Integer, ArrayList<Player>> lifeVoting) {Cache.lifeVoting = lifeVoting;}
 
+    public static HashMap<UUID, Boolean> getEnderPearlFlags() {return enderPearlFlags;}
+
+    public static void setEnderPearlFlags(HashMap<UUID, Boolean> enderPearlFlags) {Cache.enderPearlFlags = enderPearlFlags;}
+
     public static void clear(){
 
         lastDeath = new HashMap<>();
@@ -79,7 +88,7 @@ public class Cache {
         }};
     }
 
-    public static DyeColor findTeamColor(Player p){
+    public static DyeColor findTeamDyeColor(Player p){
         HashMap<String, ArrayList<Player>> teamMembers = getTeamMembers();
         ArrayList<Player> red = teamMembers.get("red"),
                 blue = teamMembers.get("blue"),
@@ -95,6 +104,24 @@ public class Cache {
             return DyeColor.BLUE;
         }else{
             return DyeColor.WHITE;
+        }
+    }
+    public static Color findTeamColor(Player p){
+        HashMap<String, ArrayList<Player>> teamMembers = getTeamMembers();
+        ArrayList<Player> red = teamMembers.get("red"),
+                blue = teamMembers.get("blue"),
+                yellow = teamMembers.get("yellow"),
+                green = teamMembers.get("green");
+        if(red != null && blue.contains(p)){
+            return Color.RED;
+        }else if(yellow != null && yellow.contains(p)){
+            return Color.ORANGE;
+        }else if(green != null && green.contains(p)){
+            return Color.GREEN;
+        }else if(blue != null && blue.contains(p)){
+            return Color.BLUE;
+        }else{
+            return Color.WHITE;
         }
     }
 }

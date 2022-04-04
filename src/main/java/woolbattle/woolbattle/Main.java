@@ -1,8 +1,11 @@
 package woolbattle.woolbattle;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 import com.mongodb.ConnectionString;
-import com.mongodb.client.MongoClient;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
@@ -11,7 +14,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
-import woolbattle.woolbattle.woolsystem.*;
+import org.slf4j.LoggerFactory;
+import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
+import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
+import woolbattle.woolbattle.woolsystem.MapBlocksCommand;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -48,13 +54,19 @@ public final class Main extends JavaPlugin {
 
         instance = this;
 
+        /*// Disable MongoDB Debug Output **AFTER ENABLING**
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        Logger rootLogger = loggerContext.getLogger("org.mongodb.driver");
+        rootLogger.setLevel(Level.OFF);*/
+
         if (!db.listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking")) {
             db.createCollection("blockBreaking");
 
         } else {
         }
 
-        if (!db.getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(eq("_id", "mapBlocks"))) {
+        Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
+        if (found == null) {
             System.out.println("\n\n\nThere seems to be no document in the indexes with an id of mapBlocks\n\n\n");
             HashMap<String, Object> mapBlocks = new HashMap(){
                 {

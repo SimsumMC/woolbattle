@@ -1,49 +1,49 @@
 package woolbattle.woolbattle;
+import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.material.Colorable;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
-import java.util.ArrayList;
+
+import java.util.*;
 
 public class Listener implements org.bukkit.event.Listener {
+    public boolean allowEnderPearl = true;
+
     /**
      *
      *
      * @param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
      *      *              information, concerning these circumstances.
      */
-    @EventHandler(ignoreCancelled = true)
+
+
+    @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
 
         Player p = event.getPlayer();
+        ItemSystem.giveItems(p);
         //Checks, whether the player, having broken the event's block is in the creative, or spectator mode, returns if
         //this is the case
         if(p.getGameMode().equals(GameMode.CREATIVE) || p.getGameMode().equals(GameMode.SPECTATOR)){
             return;
         }
-        //Resets the durability of a potential tool, the event's block was possibly broken with.
-        Inventory inv = p.getInventory();
-        ItemStack mainHand = p.getItemInHand();
-        mainHand.setDurability((short) 0);
-
-
-
 
         //Internal variables of the plugin, not meant to be modifiable by the end-user
 
-        DyeColor teamColor = Cache.findTeamColor(p);//Is to be implemented in the team-system, being created
+        DyeColor teamColor = Cache.findTeamDyeColor(p);//Is to be implemented in the team-system, being created
         Inventory inventory = p.getInventory();
         Block block = event.getBlock();
         ItemStack itemStack = new ItemStack(Material.WOOL, 0, (byte) teamColor.getWoolData()){};
@@ -111,6 +111,7 @@ public class Listener implements org.bukkit.event.Listener {
                 }
             }
         }
+
     }
 
     @EventHandler
@@ -218,4 +219,132 @@ public class Listener implements org.bukkit.event.Listener {
             p.setFlying(false);
         }
     }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        event.getPlayer().sendMessage("PlayerInteract is called");
+        if(event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)){
+
+            return;
+        }else{
+            event.setCancelled(true);
+
+            ArrayList<String> itemNames = new ArrayList<String>(){
+                {
+                    //add(ChatColor.DARK_PURPLE + "Shears");
+                    add(ChatColor.DARK_PURPLE + "Bow");
+                    add(ChatColor.DARK_PURPLE + "EnderPearl");
+                }
+            };
+            PlayerInventory inv = event.getPlayer().getInventory();
+            ItemStack is = event.getItem();
+            int slot = inv.first(is);
+            event.getPlayer().sendMessage("Slot: " + slot);
+            if(event.getItem() == null){
+                event.getPlayer().sendMessage("No item is recognized.");
+                return;
+            }
+            else {
+                //ItemStack is = event.getItem();
+
+                if(!itemNames.contains(is.getItemMeta().getDisplayName())) {
+                    event.getPlayer().sendMessage("Displayname of item is not contained.");
+                    return;
+                }
+                if(is.getItemMeta().getDisplayName().equals(itemNames.get(1))) {
+                    event.setCancelled(true);
+                    boolean allowEnderPearl;
+                    if (!Cache.getEnderPearlFlags().containsKey(event.getPlayer().getUniqueId())) {
+                        event.getPlayer().sendMessage("Enderpearlflag is not contained in cache.");
+                        HashMap<UUID, Boolean> enderPearlFlags = Cache.getEnderPearlFlags();
+                        enderPearlFlags.put(event.getPlayer().getUniqueId(), true);
+                        Cache.setEnderPearlFlags(enderPearlFlags);
+                        allowEnderPearl = true;
+                    } else {
+                        allowEnderPearl = Cache.getEnderPearlFlags().get(event.getPlayer().getUniqueId());
+                    }
+                    event.getPlayer().sendMessage("Contain-check is passed.");
+                    int enderpearlCost = 8;
+                    //boolean allowEnderPearl = Cache.getEnderPearlFlags().get(event.getPlayer().getUniqueId());
+                    // boolean allowEnderPearl =
+                    long enderpearlCooldown = 60;
+                    if (!allowEnderPearl) {
+                        event.getPlayer().sendMessage(ChatColor.RED + "You are not yet allowed to use this perk");
+                        //event.setCancelled(true);
+                        return;
+                    }else{
+                        //PlayerInventory inv = event.getPlayer().getInventory();
+                        event.getPlayer().sendMessage(ChatColor.RED + "The enderpearl usage is allowed");
+                        int itemAmount = 0;
+                        for (ItemStack iterStack : inv.getContents()) {
+
+                            if(iterStack!= null){
+                                if(iterStack.getType().equals(Material.WOOL)){
+                                    itemAmount += iterStack.getAmount();
+                                }
+                            }
+
+                            //event.getPlayer().sendMessage("ItemAmount: " + itemAmount);
+                        }
+                        event.getPlayer().sendMessage("ItemAmount: " + itemAmount);
+                        if ((itemAmount - enderpearlCost) < 0) {
+                            event.getPlayer().sendMessage(ChatColor.RED + "You possess too little amounts of wool to use this item...");
+                            event.setCancelled(true);
+                        } else {
+                            event.getPlayer().sendMessage(ChatColor.RED + "Else clause is called.");
+                            HashMap<UUID, Boolean> enderPearlFlags = Cache.getEnderPearlFlags();
+                            enderPearlFlags.replace(event.getPlayer().getUniqueId(), false);
+                            Cache.setEnderPearlFlags(enderPearlFlags);
+
+                            Location loc = event.getPlayer().getLocation();
+
+                            World world = Bukkit.getWorld(loc.getWorld().getUID());
+
+                            Location entLoc = loc.getDirection().toLocation(loc.getWorld());
+
+                            Entity entity = world.spawnEntity(loc, EntityType.ENDER_PEARL);
+                            ((Projectile) world.spawnEntity(loc, EntityType.ENDER_PEARL)).setShooter(event.getPlayer());
+                            event.getPlayer().sendMessage("loc: " + loc + "\nworld: " + world + "\nentLoc: " + entLoc + "\nentity: " + entity);
+                            Projectile projectile = null;
+                           // Entity entity1 = world.spawn(loc, new Class<EnderPearl>());
+                            try{
+                                projectile = ((Projectile) world.spawnEntity(loc, EntityType.ENDER_PEARL));
+                            }catch(NullPointerException e){
+                                event.getPlayer().sendMessage(ChatColor.RED + "Projectile could not be spawned.");
+                                projectile = (Projectile) world.spawnEntity(loc, EntityType.ENDER_PEARL);
+                            }
+
+                            //Bukkit.getWorld(loc.getWorld().getUID()).spawnEntity(loc.getDirection().toLocation(loc.getWorld()), EntityType.ENDER_PEARL);
+                            projectile.setVelocity(event.getPlayer().getLocation().getDirection().multiply(3));
+
+                            event.getPlayer().getInventory().setItem(slot, new ItemStack(Material.SULPHUR));
+                /*new BukkitRunnable(){
+                    @Override
+                    public void run(){
+                        inv.setItem(slot, is);
+                    }
+                }.runTaskLater(Main.getInstance(), 20);*/
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    HashMap<UUID, Boolean> currentEnderpearlFlags = Cache.getEnderPearlFlags();
+                                    currentEnderpearlFlags.replace(event.getPlayer().getUniqueId(), true);
+                                    Cache.setEnderPearlFlags(currentEnderpearlFlags);
+                                    event.getPlayer().getInventory().setItem(slot, is);
+                                }
+                            }.runTaskLater(Main.getInstance(), enderpearlCooldown);
+                        }
+                    }
+
+                } else if (is.getType().equals(Material.ENDER_PEARL)) {
+                    Location loc = event.getPlayer().getLocation();
+                    Projectile projectile = (Projectile) Bukkit.getWorld(loc.getWorld().getUID()).spawnEntity(loc.getDirection().toLocation(loc.getWorld()), EntityType.ENDER_PEARL);
+                    //Bukkit.getWorld(loc.getWorld().getUID()).spawnEntity(loc.getDirection().toLocation(loc.getWorld()), EntityType.ENDER_PEARL);
+                    projectile.setVelocity(event.getPlayer().getLocation().getDirection().multiply(3));
+                }
+        }
+
+    }
+
+}
 }

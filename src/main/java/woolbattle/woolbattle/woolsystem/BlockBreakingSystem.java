@@ -66,8 +66,8 @@ public class BlockBreakingSystem {
         if(!db.listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking")){
             db.createCollection("blockBreaking");
         }else{}
-
-        if(!db.getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(eq("_id", "mapBlocks"))){
+        Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
+        if(found == null){
             //System.out.println("\n\n\n" + "The id of the mapBlocks document is structured like this:\n" + mapBlocks.get("_id") + "\n\n\n");
             db.getCollection("blockBreaking").insertOne( new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));
         }else{}
@@ -115,7 +115,8 @@ public class BlockBreakingSystem {
             db.createCollection("blockBreaking");
         }else{}
 
-        if(!db.getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(eq("_id", "mapBlocks"))){
+        Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
+        if(found == null){
             HashMap<String, Object> mapBlocks = new HashMap(){
                 {
                     put("_id", "mapBlocks");
