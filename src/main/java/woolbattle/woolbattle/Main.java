@@ -1,8 +1,5 @@
 package woolbattle.woolbattle;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -14,18 +11,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.slf4j.LoggerFactory;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
 import woolbattle.woolbattle.woolsystem.MapBlocksCommand;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.UUID;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -66,14 +62,12 @@ public final class Main extends JavaPlugin {
 
         Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
         if (found == null) {
-            System.out.println("\n\n\nThere seems to be no document in the indexes with an id of mapBlocks\n\n\n");
             HashMap<String, Object> mapBlocks = new HashMap(){
                 {
                     put("mapBlocks", new ArrayList<ArrayList<Double>>());
                     put("_id", "mapBlocks");
                 }
             };
-            //mapBlocks.remove("_id");
             db.getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
         } else {
         }
@@ -84,7 +78,6 @@ public final class Main extends JavaPlugin {
         BlockBreakingSystem.fetchMapBlocks();
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.setAllowFlight(true);
-            //p.setFlying(false);
         }
         File file = new File("config.json");
         if(!file.exists()){
@@ -129,12 +122,4 @@ public final class Main extends JavaPlugin {
         return mongoClient;
     }
 
-    public static UUID readWorldUID(File file) {
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(file))) {
-            return new UUID(dis.readLong(), dis.readLong());
-        } catch (IOException e) {
-
-            return null;
-        }
-    }
 }

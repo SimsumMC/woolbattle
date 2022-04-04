@@ -38,7 +38,6 @@ public class BlockRegistrationCommand implements CommandExecutor {
 
                 case "range":
                     //if(args.length < 7){
-                    Bukkit.broadcastMessage("Range is reached");
                     //}
                     if(args[1].toLowerCase(Locale.ROOT) == null || args[2].toLowerCase(Locale.ROOT) == null || args[3] == null || args[4].toLowerCase(Locale.ROOT) == null || args[5].toLowerCase(Locale.ROOT) == null || args[6] == null){
                         sender.sendMessage(ChatColor.RED + "At least one of the given coordinate-arguments hasn't had a form of a parsable integer. To use this command, all of them have to fulfill this requirement." + syntax);
@@ -49,10 +48,9 @@ public class BlockRegistrationCommand implements CommandExecutor {
 
                             Location start = new Location(Bukkit.getWorlds().get(0), Double.parseDouble(args[1].toLowerCase(Locale.ROOT)),Double.parseDouble(args[2].toLowerCase(Locale.ROOT)), Double.parseDouble(args[3].toLowerCase(Locale.ROOT)));
                             Location end = new Location(Bukkit.getWorlds().get(0), Double.parseDouble(args[4].toLowerCase(Locale.ROOT)),Double.parseDouble(args[5].toLowerCase(Locale.ROOT)), Double.parseDouble(args[6].toLowerCase(Locale.ROOT)));
-                            Bukkit.broadcastMessage("Locations are created");
+
                             BlockBreakingSystem.addBlocksByRange(start, end);
                         }catch(NumberFormatException e){
-                            Bukkit.broadcastMessage("Numberformatexception is caught");
                             e.printStackTrace();
                         }
                     }

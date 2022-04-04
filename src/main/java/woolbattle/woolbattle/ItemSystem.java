@@ -17,7 +17,6 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -80,11 +79,11 @@ public class ItemSystem {
         Color color = Cache.findTeamColor(p);
         PlayerInventory playerInv = p.getInventory();
         //()playerInv
-
+        playerInv.clear();
         MongoCollection collection = Main.getMongoClient().getDatabase("woolbattle").getCollection("playerInventories");
         Document found = (Document) collection.find(eq("_id", "mapBlocks")).first();
-        int shearSlot; //Is to be made modifiable by the user.
-        int bowSlot ; //As above.
+        int shearSlot;
+        int bowSlot ;
         int enderpearlSlot;
         int perk1Slot;
         int perk2Slot;
@@ -126,7 +125,7 @@ public class ItemSystem {
         playerInv.setItem(enderpearlSlot, enderpearl);
         for(Integer index : armorStacks.keySet()){
             LeatherArmorMeta meta = (LeatherArmorMeta) armorStacks.get(index);
-            meta.setColor(color/*color*/);
+            meta.setColor(color);
 
             ItemStack armorPiece = new ItemStack(){
                 {
@@ -151,12 +150,8 @@ public class ItemSystem {
                     meta.setDisplayName(ChatColor.DARK_PURPLE + getType().toString());
                     setItemMeta(meta);
                     setAmount(1);
-                    //setType(armorStacks.get(index));
-
                 }
             };
-
-            //armorPiece.setData(new MaterialData(armorPiece.getType(), color));
             armorPiece.setAmount(1);
             switch(index){
             case 0:
@@ -185,8 +180,14 @@ public class ItemSystem {
     private static void addPerkItems(Inventory inv){
 
     }
+    /**
+     * Method that subtracts wool from a players inventory.
+     * @author Servaturus
+     * @param p The player, to remove the wool from
+     * @param amount The wool amount to subtract
+     */
     public static void subtractWool(Player p, int amount){
-        p.sendMessage("SubtractWool is called.");
+
         PlayerInventory inv = p.getInventory();
         int woolAmount = 0;
         ArrayList<ItemStack> woolStacks = new ArrayList<>();
@@ -199,14 +200,11 @@ public class ItemSystem {
                 woolAmount += is.getAmount();
             }
         }
-        p.sendMessage("woolAmount: " + woolAmount);
         if(woolAmount-amount <=0){
-            p.sendMessage("woolAmount is lower than subtracted amount.");
-            //((PlayerInventory) p.getInventory()).setContents(inv.getContents());
+            p.getInventory().remove(Material.WOOL);
             return;
         }
         woolAmount = woolAmount-amount;
-        p.sendMessage("woolAmountAfterSubtraction: " + woolAmount + " " +  woolAmount%64);
         int modulo = woolAmount%64;
         inv.remove(Material.WOOL);
         //int amountToDistribute = woolAmount-amount;
@@ -216,16 +214,13 @@ public class ItemSystem {
         woolInstance.setData(materialData);
         int iterator =0;
         if(woolAmount%64 !=0){
-            p.sendMessage("Modulo:  " + modulo);
             ItemStack wool = new ItemStack(woolInstance);
             wool.setAmount(modulo);
             woolStacks.add(new ItemStack(wool));
-            p.sendMessage("woolstacks: " + woolStacks);
             woolAmount-=(woolAmount%64);
-            p.sendMessage("woolAmount-Modulo:  " + woolAmount);
+
         }
         for(int i = 0; i<woolAmount/64;i++){
-            p.sendMessage("iterator: " + i);
             ItemStack wool = new ItemStack(woolInstance);
             wool.setAmount(64);
             woolStacks.add(wool);
@@ -236,9 +231,19 @@ public class ItemSystem {
         for(ItemStack woolStack : woolStacks){
             inv.addItem(woolStack);
         }
-        //((PlayerInventory) p.getInventory()).setContents(inv.getContents());
 
     }
+    /**
+     * Method that replaces the specified itemSlot with a gunpowder-itemstack, lowering it's amount every second by one,
+     * until the specified cooldown has run out, which makes it replace said slot with the original item, illustrated by
+     * itemStack passed in.
+     * @param p The player, to add a cooldown to one of their items.
+     * @param slot The slot, to condone the cooldown in.
+     * @param cooldownInSeconds The cooldown's duration.
+     * @param item The item, to replace the specified slot with after the cooldown.
+     *
+     * @author Servaturus
+     */
     public static void setItemCooldown(Player p, int slot, ItemStack item, int cooldownInSeconds){
         new BukkitRunnable(){
             @Override

@@ -3,13 +3,10 @@ package woolbattle.woolbattle.woolsystem;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.bukkit.*;
 import woolbattle.woolbattle.Main;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
 
@@ -56,7 +53,6 @@ public class BlockBreakingSystem {
      *
      */
     public static void fetchMapBlocks() {
-        System.out.println("FetchMapBlocks is called");
         MongoDatabase db = Main.getMongoClient().getDatabase("woolbattle");
         MongoCollection<Document> blockBreaking;
         ArrayList<Location> updatedMapBlocks = mapBlocks;
@@ -101,7 +97,7 @@ public class BlockBreakingSystem {
     public static void pushMapBlocks(){
 
         //Pushes the currently present cached blocks into the database.
-        System.out.println("PushMapBlocks is called");
+
         if(mapBlocks.size() == 0){
 
             return;
@@ -166,7 +162,6 @@ public class BlockBreakingSystem {
                 put("_id", "mapBlocks");
             }
         };
-        //Document updatedMapBlocks = new Document("mapBlocks", update).append("_id",  new ObjectId("mapBlocks"));
 
         db.getCollection("blockBreaking").replaceOne(
                         db.getCollection("blockBreaking").

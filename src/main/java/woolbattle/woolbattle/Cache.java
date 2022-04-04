@@ -3,7 +3,6 @@ package woolbattle.woolbattle;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -21,6 +20,10 @@ public class Cache {
     private static HashMap<String, Integer> lastDeath = new HashMap<>();
 
     private static HashMap<String, Integer> jumpCooldown = new HashMap<>();
+
+    private static HashMap<UUID, Boolean> bowFlags = new HashMap<>();
+
+
 
     private static HashMap<String, ArrayList<Player>> teamMembers = new HashMap<String, ArrayList<Player>>(){{
         put("Blue", new ArrayList<>());
@@ -58,8 +61,10 @@ public class Cache {
     public static void setLifeVoting(HashMap<Integer, ArrayList<Player>> lifeVoting) {Cache.lifeVoting = lifeVoting;}
 
     public static HashMap<UUID, Long> getEnderPearlCooldowns() {return enderPearlCooldowns;}
-
     public static void setEnderPearlCooldowns(HashMap<UUID, Long> enderPearlCooldowns) {Cache.enderPearlCooldowns = enderPearlCooldowns;}
+
+    public static HashMap<UUID, Boolean> getBowFlags() {return bowFlags;}
+    public static void setBowFlags(HashMap<UUID, Boolean> bowFlags) {Cache.bowFlags = bowFlags;}
 
     public static void clear(){
 
@@ -87,7 +92,11 @@ public class Cache {
             put(15, new ArrayList<>());
         }};
     }
-
+    /**
+     * Method that returns the team-color of the specified player as a DyeColor.
+     * @param p The player to get the team-color of
+     * @author Servaturus
+     */
     public static DyeColor findTeamDyeColor(Player p){
         HashMap<String, ArrayList<Player>> teamMembers = getTeamMembers();
         ArrayList<Player> red = teamMembers.get("red"),
@@ -106,6 +115,11 @@ public class Cache {
             return DyeColor.WHITE;
         }
     }
+    /**
+     * Method that returns the team-color of the specified player as a Color.
+     * @param p The player to get the team-color of
+     * @author Servaturus
+     */
     public static Color findTeamColor(Player p){
         HashMap<String, ArrayList<Player>> teamMembers = getTeamMembers();
         ArrayList<Player> red = teamMembers.get("red"),

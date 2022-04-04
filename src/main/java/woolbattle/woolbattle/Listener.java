@@ -1,9 +1,10 @@
 package woolbattle.woolbattle;
-import org.apache.commons.lang.ObjectUtils;
+
 import org.bukkit.*;
 import org.bukkit.block.Block;
-
-import org.bukkit.entity.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -13,14 +14,14 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Colorable;
-import org.bukkit.material.MaterialData;
-import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class Listener implements org.bukkit.event.Listener {
     public boolean allowEnderPearl = true;
@@ -54,9 +55,9 @@ public class Listener implements org.bukkit.event.Listener {
         boolean blockIsMap = false;
         int itemAmount = 0;
 
-        int givenWoolAmount = 2;//Config.givenWoolAmount;
-        int maxStacks = 3;//Config.maxStacks;
-        int delayInTicks= 20;//Config.woolReplaceDelay;
+        int givenWoolAmount = 2;
+        int maxStacks = 3;
+        int delayInTicks= 20;
 
         //Checks, whether the event's block is specified in the internal array of map-blocks, writes the value of the operation in the boolean blockIsMap.
         for(Location iterBlock : BlockBreakingSystem.getMapBlocks()){
@@ -119,8 +120,6 @@ public class Listener implements org.bukkit.event.Listener {
 
     @EventHandler
     public void onPlayerItemDamage(PlayerItemDamageEvent event) {
-        System.out.println("Event is called");
-        //event.setCancelled(true);
         event.getItem().setDurability((short) event.getItem().getType().getMaxDurability());
     }
 
@@ -235,7 +234,9 @@ public class Listener implements org.bukkit.event.Listener {
             event.setCancelled(false);
             return;
         }
+
         ItemStack is = event.getItem();
+
         Player player = event.getPlayer();
         PlayerInventory inv = player.getInventory();
         if(is == null){
@@ -255,7 +256,7 @@ public class Listener implements org.bukkit.event.Listener {
             return;
         }
         else if(is.getType().equals(Material.ENDER_PEARL)){
-            int defaultEndepearlCooldown = 8;
+            int enderderPearlWoolCost = 8;
             player.getInventory().setItem(slot, is);
             int woolAmount = 0;
             int enderPearlWoolCost = 8;
@@ -265,30 +266,33 @@ public class Listener implements org.bukkit.event.Listener {
                 }
             }
             if(woolAmount-enderPearlWoolCost < 0){
-                player.sendMessage(ChatColor.RED + "You possess to little amounts of wool, to use this perk...");
+
+                player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.C));
+                player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.B));
                 player.getInventory().setItem(slot, is);
                 event.setCancelled(true);
                 return;
             }
 
-            player.sendMessage(ChatColor.GREEN + "You possess sufficient amounts of wool, to use this perk...");
+            //player.sendMessage(ChatColor.GREEN + "You possess sufficient amounts of wool, to use this perk...");
             HashMap<UUID, Long> enderPearlCooldowns = Cache.getEnderPearlCooldowns();
 
             if(enderPearlCooldowns.get(player.getUniqueId()) == null){
                 enderPearlCooldowns.put(player.getUniqueId(), new Date().getTime());
-            }else if(new Date().getTime()-enderPearlCooldowns.get(player.getUniqueId())<defaultEndepearlCooldown){
-                player.sendMessage("\nThe time differences is too small for the item, to be thrown.\n");
+            }else if(new Date().getTime()-enderPearlCooldowns.get(player.getUniqueId())<enderderPearlWoolCost){
+                //player.sendMessage("\nThe time differences is too small for the item, to be thrown.\n");
                 player.getInventory().setItem(slot, is);
                 event.setCancelled(true);
                 return;
             }
-            ItemSystem.setItemCooldown(player, slot, is, defaultEndepearlCooldown);
+            ItemSystem.setItemCooldown(player, slot, is, enderderPearlWoolCost);
             player.getInventory().setItem(slot, is);
             enderPearlCooldowns.replace(player.getUniqueId(), new Date().getTime());
             Cache.setEnderPearlCooldowns(enderPearlCooldowns);
             ItemSystem.subtractWool(player, enderPearlWoolCost);
-        }else if(is.getType().equals(Material.BOW)){
-            player.getInventory().setItem(slot, is);
+
+        }else if(is.getType().equals(Material.BOW)) {
+            //player.sendMessage("Bow is called");
             int woolAmount = 0;
             int bowWoolCost = 1;
             for(ItemStack iterStack : inv.getContents()){
@@ -297,54 +301,53 @@ public class Listener implements org.bukkit.event.Listener {
                 }
             }
             if(woolAmount-bowWoolCost < 0){
-                player.sendMessage(ChatColor.RED + "You possess to little amounts of wool, to use this perk...");
+                //player.sendMessage(ChatColor.RED + "You possess to little amounts of wool, to use this perk...");
+                player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.C));
+                player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.B));
+
                 player.getInventory().setItem(slot, is);
                 event.setCancelled(true);
+
                 return;
             }
-            ItemSystem.subtractWool(player, bowWoolCost);
+            HashMap<UUID, Boolean> bowFlags = Cache.getBowFlags();
+            if(!bowFlags.containsKey(player.getUniqueId())){
+
+                bowFlags.put(player.getUniqueId(), false);
+                Cache.setBowFlags(bowFlags);
+            }
+            if(bowFlags.get(player.getUniqueId())){
+                return;
+            }
+
+            bowFlags = Cache.getBowFlags();
+            bowFlags.replace(player.getUniqueId(), true);
+            Cache.setBowFlags(bowFlags);
 
         }
-
-        /*new BukkitRunnable(){
-            @Override
-            public void run() {
-
-                long maxLoops = defaultEndepearlCooldown/1000;
-                ItemStack expiredItem = new ItemStack(Material.SULPHUR){
-                    {
-                        ItemMeta meta = getItemMeta();
-                        meta.setDisplayName(ChatColor.RED + "Item on Cooldown");
-                        setItemMeta(meta);
-                    }
-                };
-
-                new BukkitRunnable(){
-
-                    volatile long loops = 0;
-
-                    @Override
-                    public void run() {
-                        if(loops == maxLoops){
-                            if(is.getAmount()<1){
-                                is.setAmount(is.getAmount() +1);
-                                player.getInventory().setItem(slot, is);
-                            }
-                        }else{
-                            expiredItem.setAmount((int) (maxLoops-loops));
-                            player.getInventory().setItem(slot,expiredItem);
-                            loops++;
-
-                        }
-                    }
-                }.runTaskTimer(Main.getInstance(), 0, 20);//(defaultEndepearlCooldown*20)/1000);
-            }
-        }.runTaskAsynchronously(Main.getInstance());*/
-
-
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
+        int bowWoolCost = 1;
+        Projectile projectile = event.getEntity();
+        Player player = null;
+        if(!(event.getEntity().getShooter() instanceof Player)){
+            return;
+        }
+        player = (Player) projectile.getShooter();
+        if(!projectile.getType().equals(EntityType.ARROW)){
+            return;
+        }
+        HashMap<UUID, Boolean> bowFlags = Cache.getBowFlags();
+        if(bowFlags.keySet().contains(player.getUniqueId())){
+            bowFlags.put(player.getUniqueId(), false);
+        }else{
+            bowFlags.replace(player.getUniqueId(), false);
+        }
+        Cache.setBowFlags(bowFlags);
+        ItemSystem.subtractWool(player, bowWoolCost);
     }
+
+
 }
