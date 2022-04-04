@@ -1,4 +1,4 @@
-package woolbattle.woolbattle.ItemSystem;
+package woolbattle.woolbattle.itemsystem;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.mongodb.client.model.Filters.eq;
+import static woolbattle.woolbattle.team.TeamSystem.findTeamColor;
+import static woolbattle.woolbattle.team.TeamSystem.findTeamDyeColor;
 
 public class ItemSystem {
     //Creates the item-meta-specific values that are known, before a potential player is passed into the giveItems
@@ -78,7 +80,7 @@ public class ItemSystem {
      * @author Servaturus
      */
     public static void giveItems(Player p){
-        Color color = Cache.findTeamColor(p);
+        Color color = findTeamColor(p);
         PlayerInventory playerInv = p.getInventory();
         //()playerInv
         playerInv.clear();
@@ -194,7 +196,7 @@ public class ItemSystem {
         int woolAmount = 0;
         ArrayList<ItemStack> woolStacks = new ArrayList<>();
         ArrayList<Integer> slots = new ArrayList<>();
-        DyeColor color = Cache.findTeamDyeColor(p);
+        DyeColor color = findTeamDyeColor(p);
 
         int maximumStacks = 3;
         for(ItemStack is : inv.getContents()){

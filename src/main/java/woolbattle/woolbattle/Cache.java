@@ -1,29 +1,34 @@
 package woolbattle.woolbattle;
 
-import org.bukkit.Color;
-import org.bukkit.DyeColor;
 import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
 public class Cache {
 
-
-
     /**
      * A Class that contains a few HashMaps with setters and getters to cache different things easily.
      * @author SimsumMC
      */
-    private static HashMap<UUID, Long> enderPearlCooldowns = new HashMap<UUID, Long>();
 
-    private static HashMap<String, Integer> lastDeath = new HashMap<>();
+    private static HashMap<Player, Long> lastDamage = new HashMap<>();
+
+    private static HashMap<Player, Long> lastDeath = new HashMap<>();
 
     private static HashMap<String, Integer> jumpCooldown = new HashMap<>();
 
+    private static HashMap<UUID, Long> enderPearlCooldowns = new HashMap<>();
+
     private static HashMap<UUID, Boolean> bowFlags = new HashMap<>();
 
-
+    private static HashMap<String, HashMap<Player, Integer>> killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
+        put("Blue", new HashMap<>());
+        put("Red", new HashMap<>());
+        put("Green", new HashMap<>());
+        put("Yellow", new HashMap<>());
+    }};
 
     private static HashMap<String, ArrayList<Player>> teamMembers = new HashMap<String, ArrayList<Player>>(){{
         put("Blue", new ArrayList<>());
@@ -33,7 +38,7 @@ public class Cache {
     }};
 
     private static HashMap<String, Integer> teamLives = new HashMap<String, Integer>(){{
-        put("Blue", 10);
+        put("Blue", 0);
         put("Red", 0);
         put("Green", 0);
         put("Yellow", 0);
@@ -45,11 +50,23 @@ public class Cache {
         put(15, new ArrayList<>());
     }};
 
-    public static HashMap<String, Integer> getLastDeath() {return lastDeath;}
-    public static void setLastDeath(HashMap<String, Integer> lastDeath) {Cache.lastDeath = lastDeath;}
+    public static HashMap<Player, Long> getLastDamage() {return lastDamage;}
+    public static void setLastDamage(HashMap<Player, Long> lastDamage) {Cache.lastDamage = lastDamage;}
+
+    public static HashMap<Player, Long> getLastDeath() {return lastDeath;}
+    public static void setLastDeath(HashMap<Player, Long> lastDeath) {Cache.lastDeath = lastDeath;}
 
     public static HashMap<String, Integer> getJumpCooldown() {return jumpCooldown;}
     public static void setJumpCooldown(HashMap<String, Integer> jumpCooldown) {Cache.jumpCooldown = jumpCooldown;}
+
+    public static HashMap<UUID, Long> getEnderPearlCooldowns() {return enderPearlCooldowns;}
+    public static void setEnderPearlCooldowns(HashMap<UUID, Long> enderPearlCooldowns) {Cache.enderPearlCooldowns = enderPearlCooldowns;}
+
+    public static HashMap<UUID, Boolean> getBowFlags() {return bowFlags;}
+    public static void setBowFlags(HashMap<UUID, Boolean> bowFlags) {Cache.bowFlags = bowFlags;}
+
+    public static HashMap<String, HashMap<Player, Integer>> getKillStreaks() {return killStreaks;}
+    public static void setKillStreaks(HashMap<String, HashMap<Player, Integer>> killStreaks) {Cache.killStreaks = killStreaks;}
 
     public static HashMap<String, ArrayList<Player>> getTeamMembers() {return teamMembers;}
     public static void setTeamMembers(HashMap<String, ArrayList<Player>> teamMembers) {Cache.teamMembers = teamMembers;}
@@ -60,17 +77,18 @@ public class Cache {
     public static HashMap<Integer, ArrayList<Player>> getLifeVoting() {return lifeVoting;}
     public static void setLifeVoting(HashMap<Integer, ArrayList<Player>> lifeVoting) {Cache.lifeVoting = lifeVoting;}
 
-    public static HashMap<UUID, Long> getEnderPearlCooldowns() {return enderPearlCooldowns;}
-    public static void setEnderPearlCooldowns(HashMap<UUID, Long> enderPearlCooldowns) {Cache.enderPearlCooldowns = enderPearlCooldowns;}
-
-    public static HashMap<UUID, Boolean> getBowFlags() {return bowFlags;}
-    public static void setBowFlags(HashMap<UUID, Boolean> bowFlags) {Cache.bowFlags = bowFlags;}
-
     public static void clear(){
+
+        lastDamage = new HashMap<>();
 
         lastDeath = new HashMap<>();
 
-        jumpCooldown = new HashMap<>();
+        killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
+            put("Blue", new HashMap<>());
+            put("Red", new HashMap<>());
+            put("Green", new HashMap<>());
+            put("Yellow", new HashMap<>());
+        }};
 
         teamMembers = new HashMap<String, ArrayList<Player>>(){{
             put("Blue", new ArrayList<>());
@@ -80,7 +98,7 @@ public class Cache {
         }};
 
         teamLives = new HashMap<String, Integer>(){{
-            put("Blue", 10);
+            put("Blue", 0);
             put("Red", 0);
             put("Green", 0);
             put("Yellow", 0);
@@ -91,51 +109,11 @@ public class Cache {
             put(10, new ArrayList<>());
             put(15, new ArrayList<>());
         }};
-    }
-    /**
-     * Method that returns the team-color of the specified player as a DyeColor.
-     * @param p The player to get the team-color of
-     * @author Servaturus
-     */
-    public static DyeColor findTeamDyeColor(Player p){
-        HashMap<String, ArrayList<Player>> teamMembers = getTeamMembers();
-        ArrayList<Player> red = teamMembers.get("red"),
-                blue = teamMembers.get("blue"),
-                yellow = teamMembers.get("yellow"),
-                green = teamMembers.get("green");
-        if(red != null && blue.contains(p)){
-            return DyeColor.RED;
-        }else if(yellow != null && yellow.contains(p)){
-            return DyeColor.ORANGE;
-        }else if(green != null && green.contains(p)){
-            return DyeColor.GREEN;
-        }else if(blue != null && blue.contains(p)){
-            return DyeColor.BLUE;
-        }else{
-            return DyeColor.WHITE;
-        }
-    }
-    /**
-     * Method that returns the team-color of the specified player as a Color.
-     * @param p The player to get the team-color of
-     * @author Servaturus
-     */
-    public static Color findTeamColor(Player p){
-        HashMap<String, ArrayList<Player>> teamMembers = getTeamMembers();
-        ArrayList<Player> red = teamMembers.get("red"),
-                blue = teamMembers.get("blue"),
-                yellow = teamMembers.get("yellow"),
-                green = teamMembers.get("green");
-        if(red != null && blue.contains(p)){
-            return Color.RED;
-        }else if(yellow != null && yellow.contains(p)){
-            return Color.ORANGE;
-        }else if(green != null && green.contains(p)){
-            return Color.GREEN;
-        }else if(blue != null && blue.contains(p)){
-            return Color.BLUE;
-        }else{
-            return Color.WHITE;
-        }
+
+        jumpCooldown = new HashMap<>();
+
+        enderPearlCooldowns = new HashMap<>();
+
+        bowFlags = new HashMap<>();
     }
 }

@@ -6,11 +6,16 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
+import woolbattle.woolbattle.base.Base;
+import woolbattle.woolbattle.lives.LivesSystem;
+import woolbattle.woolbattle.lobby.LobbySystem;
+import woolbattle.woolbattle.lobby.StartGameCommand;
+import woolbattle.woolbattle.lobby.StopGameCommand;
+import woolbattle.woolbattle.team.TeamSystem;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
 import woolbattle.woolbattle.woolsystem.MapBlocksCommand;
@@ -26,28 +31,32 @@ import java.util.HashMap;
 import static com.mongodb.client.model.Filters.eq;
 
 public final class Main extends JavaPlugin {
+
     private static Main instance;
-    private static ConnectionString connectionString = new ConnectionString("mongodb://woolbattle:iloveminecraft@cluster0-shard-00-00.eqlbi.mongodb.net:27017,cluster0-shard-00-01.eqlbi.mongodb.net:27017,cluster0-shard-00-02.eqlbi.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-5qmtum-shard-0&authSource=admin&retryWrites=true&w=majority");
-    private static MongoClientSettings settings = MongoClientSettings.builder()
+    private static final ConnectionString connectionString = new ConnectionString(
+            "mongodb://woolbattle:iloveminecraft@cluster0-shard-00-00.eqlbi.mongodb.net:27017," +
+                    "cluster0-shard-00-01.eqlbi.mongodb.net:27017,cluster0-shard-00-02.eqlbi.mongodb.net:27017/" +
+                    "myFirstDatabase?ssl=true&replicaSet=atlas-5qmtum-shard-0&authSource=admin&retryWrites=true&w=majority");
+    private static final MongoClientSettings settings = MongoClientSettings.builder()
             .applyConnectionString(connectionString)
             .build();
     private static final MongoClient mongoClient = MongoClients.create(settings);
-    private final MongoDatabase db = mongoClient.getDatabase("woolbattle");
-    private static ObjectId mapBlocksObjectId = new ObjectId();
-
-    public static ObjectId getMapBlocksObjectId() {
-        return mapBlocksObjectId;
-    }
-
-    public static void setMapBlocksObjectId(ObjectId objectIdArg) {
-        mapBlocksObjectId = objectIdArg;
-    }
+    private static final MongoDatabase db = mongoClient.getDatabase("woolbattle");
 
     @Override
     public void onEnable() {
         // Plugin startup logic
-
         instance = this;
+
+        // SimsumMC's Things
+        Bukkit.getPluginManager().registerEvents(new LobbySystem(), this);
+        Bukkit.getPluginManager().registerEvents(new Base(), this);
+        this.getCommand("gstart").setExecutor(new StartGameCommand());
+        this.getCommand("gstop").setExecutor(new StopGameCommand());
+
+        // Beelzebub's Stuff
+        Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);
+        Bukkit.getPluginManager().registerEvents(new LivesSystem(), this);
 
         /*// Disable MongoDB Debug Output **AFTER ENABLING**
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();

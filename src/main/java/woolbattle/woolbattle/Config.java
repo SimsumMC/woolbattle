@@ -22,9 +22,8 @@ public class Config {
     public static final int defaultLives = (int) (long) Config.getValue("defaultLives");
 
     public static final int startCooldown = (int) (long) Config.getValue("startCooldown");
-    public static final int deathCooaldown = (int) (long) Config.getValue("deathCooldown");
+    public static final int deathCooldown = (int) (long) Config.getValue("deathCooldown");
     public static final int jumpCooldown = (int) (long) getValue("jumpCooldown");
-    public static final int woolReplaceDelay = (int) (long) getValue("woolReplaceDelay");
 
     public static final int minHeight = (int) (long) getValue("minHeight");
     public static final int maxHeight = (int) (long) Config.getValue("maxHeight");

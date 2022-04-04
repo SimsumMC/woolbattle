@@ -16,13 +16,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.material.Colorable;
 import org.bukkit.scheduler.BukkitRunnable;
-import woolbattle.woolbattle.ItemSystem.ItemSystem;
+import woolbattle.woolbattle.itemsystem.ItemSystem;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
+
+import static woolbattle.woolbattle.team.TeamSystem.findTeamDyeColor;
 
 public class Listener implements org.bukkit.event.Listener {
 
@@ -34,7 +36,6 @@ public class Listener implements org.bukkit.event.Listener {
     public void onBlockBreak(BlockBreakEvent event) {
 
         Player p = event.getPlayer();
-        ItemSystem.giveItems(p);
         //Checks, whether the player, having broken the event's block is in the creative, or spectator mode, returns if
         //this is the case
         if(p.getGameMode().equals(GameMode.CREATIVE) || p.getGameMode().equals(GameMode.SPECTATOR)){
@@ -43,7 +44,7 @@ public class Listener implements org.bukkit.event.Listener {
 
         //Internal variables of the plugin, not meant to be modifiable by the end-user
 
-        DyeColor teamColor = Cache.findTeamDyeColor(p);//Is to be implemented in the team-system, being created
+        DyeColor teamColor = findTeamDyeColor(p);//Is to be implemented in the team-system, being created
         Inventory inventory = p.getInventory();
         Block block = event.getBlock();
         ItemStack itemStack = new ItemStack(Material.WOOL, 0, (byte) teamColor.getWoolData()){};
