@@ -81,6 +81,7 @@ public class LobbySystem implements Listener {
         } else {
             setLobbyScoreBoard(player);
             giveLobbyItems(player);
+            player.teleport(Config.lobbyLocation);
         }
         if (!runCooldownTask) {
             updatePlayerCooldown();
@@ -447,6 +448,9 @@ public class LobbySystem implements Listener {
         if(!gameStarted){
             return false;
         }
+
+        cooldown = 60;
+
         gameStarted = false;
 
         Cache.clear();
@@ -459,6 +463,7 @@ public class LobbySystem implements Listener {
 
         for(Player player: players){
             setLobbyScoreBoard(player);
+            giveLobbyItems(player);
             player.teleport(Config.lobbyLocation);
             if(player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.CREATIVE){
                 player.setGameMode(GameMode.SURVIVAL);
@@ -536,7 +541,13 @@ public class LobbySystem implements Listener {
 
         PlayerInventory inv = player.getInventory();
 
+        // clear players inventory
         inv.clear();
+
+        inv.setBoots(null);
+        inv.setLeggings(null);
+        inv.setChestplate(null);
+        inv.setHelmet(null);
 
         // Team Choose Item TODO: add interaction @Beelzebub
         ItemStack teamStack = new ItemStack(Material.BED);
@@ -704,11 +715,10 @@ public class LobbySystem implements Listener {
                     if(!gameStarted) {
                         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
                         int playerAmount = players.size();
-                        int maxPlayers = Bukkit.getServer().getMaxPlayers();
-                        if (playerAmount >= (maxPlayers / 2) && playerAmount != 1) {
+                        if (playerAmount >= (Config.teamSize * 2)) {
                             if (cooldown == 0) {
                                 startGame();
-                            } else if (cooldown > 15 && playerAmount >= ((maxPlayers / 4) * 3)) {
+                            } else if (cooldown > 15 && playerAmount >= (Config.teamSize * 2)) {
                                 cooldown = 15;
                             }
                             cooldown -= 1;

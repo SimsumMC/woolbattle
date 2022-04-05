@@ -10,3 +10,9 @@ commands:
   gstop:
     description: Stop the game instantly.
     usage: /gstop
+  mapblocks:
+    aliases: [ mb ]
+  test:
+    aliases: [ ]
+  blockregistration:
+    aliases: [ blckreg ]
