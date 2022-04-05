@@ -1,6 +1,7 @@
 package woolbattle.woolbattle.base;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,7 +10,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.material.Wool;
 import woolbattle.woolbattle.Config;
 
 public class Base implements Listener {
@@ -24,7 +24,7 @@ public class Base implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
         //disable fall damage
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE) {
             event.setCancelled(true);
         }
         else{
@@ -69,7 +69,7 @@ public class Base implements Listener {
      */
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        if (event.getBlock() instanceof Wool && event.getBlock().getLocation().getY() <= Config.maxHeight || event.getPlayer().getGameMode() == GameMode.CREATIVE) {
+        if (event.getBlock().getType() == Material.WOOL && event.getBlock().getLocation().getY() <= Config.maxHeight || event.getPlayer().getGameMode() == GameMode.CREATIVE) {
             return;
         }
         event.setCancelled(true);

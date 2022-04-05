@@ -54,7 +54,7 @@ public class Listener implements org.bukkit.event.Listener {
 
         int givenWoolAmount = 2;
         int maxStacks = 3;
-        int delayInTicks= 20;
+        int delayInTicks = 5;
 
         //Checks, whether the event's block is specified in the internal array of map-blocks, writes the value of the operation in the boolean blockIsMap.
         for(Location iterBlock : BlockBreakingSystem.getMapBlocks()){
@@ -126,7 +126,6 @@ public class Listener implements org.bukkit.event.Listener {
      *@param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
      *              information, concerning these circumstances.
      */
-
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
 
@@ -157,7 +156,6 @@ public class Listener implements org.bukkit.event.Listener {
      *              information, concerning these circumstances.
      * @author Servaturus
      */
-
     @EventHandler
     public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
         long jumpCooldown = 40;

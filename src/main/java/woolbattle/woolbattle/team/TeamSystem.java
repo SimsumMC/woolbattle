@@ -294,21 +294,18 @@ public class TeamSystem implements Listener {
      * @author Servaturus
      */
     public static DyeColor findTeamDyeColor(Player p){
-        HashMap<String, ArrayList<Player>> teamMembers = getTeamMembers();
-        ArrayList<Player> red = teamMembers.get("red"),
-                blue = teamMembers.get("blue"),
-                yellow = teamMembers.get("yellow"),
-                green = teamMembers.get("green");
-        if(red != null && blue.contains(p)){
-            return DyeColor.RED;
-        }else if(yellow != null && yellow.contains(p)){
-            return DyeColor.ORANGE;
-        }else if(green != null && green.contains(p)){
-            return DyeColor.GREEN;
-        }else if(blue != null && blue.contains(p)){
-            return DyeColor.BLUE;
-        }else{
-            return DyeColor.WHITE;
+        String team = getPlayerTeam(p, true);
+        switch(team){
+            case "Blue":
+                return DyeColor.BLUE;
+            case "Red":
+                return DyeColor.RED;
+            case "Green":
+                return DyeColor.GREEN;
+            case "Yellow":
+                return DyeColor.YELLOW;
+            default:
+                return DyeColor.WHITE;
         }
     }
 
@@ -318,21 +315,18 @@ public class TeamSystem implements Listener {
      * @author Servaturus
      */
     public static Color findTeamColor(Player p){
-        HashMap<String, ArrayList<Player>> teamMembers = getTeamMembers();
-        ArrayList<Player> red = teamMembers.get("red"),
-                blue = teamMembers.get("blue"),
-                yellow = teamMembers.get("yellow"),
-                green = teamMembers.get("green");
-        if(red != null && blue.contains(p)){
-            return Color.RED;
-        }else if(yellow != null && yellow.contains(p)){
-            return Color.ORANGE;
-        }else if(green != null && green.contains(p)){
-            return Color.GREEN;
-        }else if(blue != null && blue.contains(p)){
-            return Color.BLUE;
-        }else{
-            return Color.WHITE;
+        String team = getPlayerTeam(p, true);
+        switch(team){
+            case "Blue":
+                return Color.BLUE;
+            case "Red":
+                return Color.RED;
+            case "Green":
+                return Color.GREEN;
+            case "Yellow":
+                return Color.YELLOW;
+            default:
+                return Color.WHITE;
         }
     }
 }

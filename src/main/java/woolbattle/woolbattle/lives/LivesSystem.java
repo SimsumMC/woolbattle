@@ -2,8 +2,10 @@ package woolbattle.woolbattle.lives;
 
 import org.bukkit.Bukkit;
 
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -66,6 +68,7 @@ public class LivesSystem implements Listener {
                 TeamSystem.removePlayerTeam(player);
                 LobbySystem.setPlayerSpectator(player);
             } else {
+                System.out.println("teleporting");
 
                 //teleport player to spawn
                 switch(team){
@@ -86,6 +89,7 @@ public class LivesSystem implements Listener {
                         break;
                 }
 
+
                 EntityDamageEvent lastDamageEvent = event.getPlayer().getLastDamageCause();
 
                 Entity damager;
@@ -95,6 +99,12 @@ public class LivesSystem implements Listener {
                 }
                 else{
                     damager = null;
+                }
+
+                if(damager instanceof Arrow){
+                    Arrow arrow = (Arrow) damager;
+                    damager = (Entity) arrow.getShooter();
+
                 }
 
                 if (damager instanceof Player) {
@@ -124,7 +134,7 @@ public class LivesSystem implements Listener {
                     kills.put((Player) damager, amKills);
 
                     if(amKills == 5){
-                        String streakMessage = "§7The player " + damagerTeamColour + ((Player) damager).getDisplayName() + "§7 has a 5er kill streak §7!";
+                        String streakMessage = "§7The player " + damagerTeamColour + ((Player) damager).getDisplayName() + "§7 has a 5er kill streak!";
                         Bukkit.broadcastMessage(streakMessage);
 
                         //reset deaths

@@ -1,6 +1,7 @@
 package woolbattle.woolbattle.itemsystem;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -13,9 +14,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.material.MaterialData;
+import org.bukkit.material.Wool;
 import org.bukkit.scheduler.BukkitRunnable;
-import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Main;
 
 import java.util.ArrayList;
@@ -28,10 +28,10 @@ import static woolbattle.woolbattle.team.TeamSystem.findTeamDyeColor;
 public class ItemSystem {
     //Creates the item-meta-specific values that are known, before a potential player is passed into the giveItems
     // method
-    private static ItemMeta shearsMeta = new ItemStack(Material.SHEARS).getItemMeta();
-    private static ItemMeta bowMeta = new ItemStack(Material.BOW).getItemMeta();
+    private static final ItemMeta shearsMeta = new ItemStack(Material.SHEARS).getItemMeta();
+    private static final ItemMeta bowMeta = new ItemStack(Material.BOW).getItemMeta();
 
-    private static HashMap<Integer, LeatherArmorMeta> armorStacks = new HashMap(){
+    private static final HashMap<Integer, ItemMeta> armorStacks = new HashMap<Integer, ItemMeta>(){
         {
             put(0, new ItemStack(Material.LEATHER_BOOTS).getItemMeta());
             put(1, new ItemStack(Material.LEATHER_LEGGINGS).getItemMeta());
@@ -39,7 +39,7 @@ public class ItemSystem {
             put(3, new ItemStack(Material.LEATHER_HELMET).getItemMeta());
         }
     };
-    private static HashMap<String, Integer> defaultSlots = new HashMap(){
+    private static final HashMap<String, Integer> defaultSlots = new HashMap<String, Integer>(){
         {
             put("shears", 0);
             put("bow", 1);
@@ -48,26 +48,22 @@ public class ItemSystem {
             put("perk2", 4);
         }
     };
-    private static int shearSlotDefault = 0; //Is to be made modifiable by the user.
-    private static int bowSlotDefault = 1; //As above.
-    private static int enderpearlSlotDefault = 5;
-    private static int perk1SlotDefault = 3;
-    private static int perk2SlotDefault = 4;
 
-    //Modifies these values further, once again according to information known befor giveItems is called
+    //Modifies these values further, once again according to information known before giveItems is called
     static{
-        shearsMeta.addEnchant(Enchantment.KNOCKBACK, 2, true);
+        shearsMeta.addEnchant(Enchantment.KNOCKBACK, 5, true);
+        shearsMeta.addEnchant(Enchantment.DIG_SPEED, 5,  true);
         shearsMeta.addEnchant(Enchantment.DURABILITY, 10, true);
         shearsMeta.spigot().setUnbreakable(true);
         shearsMeta.setDisplayName(ChatColor.DARK_PURPLE + "Shears");
 
-        bowMeta.addEnchant(Enchantment.KNOCKBACK, 2, true);
+        bowMeta.addEnchant(Enchantment.KNOCKBACK, 5, true);
         bowMeta.addEnchant(Enchantment.DURABILITY, 10, true);
-        bowMeta.addEnchant(Enchantment.ARROW_KNOCKBACK, 2, true);
+        bowMeta.addEnchant(Enchantment.ARROW_KNOCKBACK, 5, true);
         bowMeta.spigot().setUnbreakable(true);
         bowMeta.setDisplayName(ChatColor.DARK_PURPLE + "Bow");
         bowMeta.addEnchant(Enchantment.ARROW_INFINITE, 1, true);
-        for(LeatherArmorMeta meta : armorStacks.values()){
+        for(ItemMeta meta : armorStacks.values()){
             meta.addEnchant(Enchantment.DURABILITY, 10, true);
             meta.spigot().setUnbreakable(true);
         }
@@ -82,42 +78,47 @@ public class ItemSystem {
     public static void giveItems(Player p){
         Color color = findTeamColor(p);
         PlayerInventory playerInv = p.getInventory();
-        //()playerInv
+
         playerInv.clear();
-        MongoCollection collection = Main.getMongoClient().getDatabase("woolbattle").getCollection("playerInventories");
-        Document found = (Document) collection.find(eq("_id", "mapBlocks")).first();
-        int shearSlot;
-        int bowSlot ;
-        int enderpearlSlot;
+
+        int shearsSlot;
+        int bowSlot;
+        int enderPearlSlot;
         int perk1Slot;
         int perk2Slot;
-        if(found == null){
-            shearSlot = defaultSlots.get("shears"); //Is to be made modifiable by the user.
-            bowSlot = defaultSlots.get("bow"); //As above.
-            enderpearlSlot = defaultSlots.get("enderpearl");
+
+        MongoDatabase db = Main.getMongoDatabase();
+        MongoCollection<Document> collection = db.getCollection("playerInventories");
+
+        Document foundDocument = collection.find(eq("_id", p.getUniqueId().toString())).first();
+        if(foundDocument == null){
+            shearsSlot = defaultSlots.get("shears");
+            bowSlot = defaultSlots.get("bow");
+            enderPearlSlot = defaultSlots.get("enderpearl");
             perk1Slot = defaultSlots.get("perk1");
             perk2Slot = defaultSlots.get("perk2");
+        }
+        else{
+            shearsSlot = (int) foundDocument.get("shears");
+            bowSlot = (int) foundDocument.get("bow");
+            enderPearlSlot = (int) foundDocument.get("ender_pearl");
+            //perk1Slot = (int) foundDocument.get("perk1");
+            //perk2Slot = (int) foundDocument.get("perk2");
 
-        }else{
-            shearSlot = (found.get("shear") != null)? (Integer) found.get("shear") : defaultSlots.get("shear");
-            bowSlot = (found.get("bow") != null)? (Integer) found.get("bow") : defaultSlots.get("bow");
-            enderpearlSlot = (found.get("enderpearl") != null)? (Integer) found.get("enderpearl") : defaultSlots.get("enderpearl");
-            perk1Slot = (found.get("perk1") != null)? (Integer) found.get("perk1Slot") : defaultSlots.get("perk1");
-            perk2Slot = (found.get("perk") != null)? (Integer) found.get("perk2Slot") : defaultSlots.get("perk2");
         }
         ItemStack shears = new ItemStack(Material.SHEARS){
             {
                 this.setItemMeta(shearsMeta);
             }
         };
-        playerInv.setItem(shearSlotDefault, shears);
+        playerInv.setItem(shearsSlot, shears);
 
         ItemStack bow = new ItemStack(Material.BOW){
             {
                 this.setItemMeta(bowMeta);
             }
         };
-        playerInv.setItem(bowSlotDefault, bow);
+        playerInv.setItem(bowSlot, bow);
 
         ItemStack enderpearl = new ItemStack(Material.ENDER_PEARL){
             {
@@ -126,7 +127,7 @@ public class ItemSystem {
                 setItemMeta(meta);
             }
         };
-        playerInv.setItem(enderpearlSlot, enderpearl);
+        playerInv.setItem(enderPearlSlot, enderpearl);
         for(Integer index : armorStacks.keySet()){
             LeatherArmorMeta meta = (LeatherArmorMeta) armorStacks.get(index);
             meta.setColor(color);
@@ -212,10 +213,7 @@ public class ItemSystem {
         int modulo = woolAmount%64;
         inv.remove(Material.WOOL);
         //int amountToDistribute = woolAmount-amount;
-        ItemStack woolInstance =  new ItemStack(Material.WOOL);
-        MaterialData materialData = new MaterialData(Material.WOOL);
-        materialData.setData(color.getWoolData());
-        woolInstance.setData(materialData);
+        ItemStack woolInstance =  new Wool(color).toItemStack();
         int iterator =0;
         if(woolAmount%64 !=0){
             ItemStack wool = new ItemStack(woolInstance);
@@ -230,7 +228,6 @@ public class ItemSystem {
             woolStacks.add(wool);
             iterator++;
         }
-        p.sendMessage(woolStacks.toString());
 
         for(ItemStack woolStack : woolStacks){
             inv.addItem(woolStack);
