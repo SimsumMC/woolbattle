@@ -15,8 +15,6 @@ public class Cache {
 
     private static HashMap<Player, Long> lastDamage = new HashMap<>();
 
-    private static HashMap<Player, Long> lastDeath = new HashMap<>();
-
     private static HashMap<String, Integer> jumpCooldown = new HashMap<>();
 
     private static HashMap<UUID, Long> enderPearlCooldowns = new HashMap<>();
@@ -53,9 +51,6 @@ public class Cache {
     public static HashMap<Player, Long> getLastDamage() {return lastDamage;}
     public static void setLastDamage(HashMap<Player, Long> lastDamage) {Cache.lastDamage = lastDamage;}
 
-    public static HashMap<Player, Long> getLastDeath() {return lastDeath;}
-    public static void setLastDeath(HashMap<Player, Long> lastDeath) {Cache.lastDeath = lastDeath;}
-
     public static HashMap<String, Integer> getJumpCooldown() {return jumpCooldown;}
     public static void setJumpCooldown(HashMap<String, Integer> jumpCooldown) {Cache.jumpCooldown = jumpCooldown;}
 
@@ -80,8 +75,6 @@ public class Cache {
     public static void clear(){
 
         lastDamage = new HashMap<>();
-
-        lastDeath = new HashMap<>();
 
         killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
             put("Blue", new HashMap<>());
