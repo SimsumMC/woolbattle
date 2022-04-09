@@ -16,3 +16,5 @@ commands:
     aliases: [ ]
   blockregistration:
     aliases: [ blckreg ]
+  mapdefine:
+    aliases: [mdef]
