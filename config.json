@@ -1,7 +1,7 @@
 {
   "mapName": "Vimo",
   "mapSpawn": [0, 71, 28],
-  "lobbySpawn": [1000, 100, 1000],
+  "lobbySpawn": [1000, 101, 1000],
   "defaultLives": 10,
   "startCooldown": 60,
   "deathCooldown": 10,
