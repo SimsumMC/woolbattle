@@ -27,10 +27,8 @@ public class Base implements Listener {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE) {
             event.setCancelled(true);
         }
-        else{
-            Player player = (Player) event.getEntity();
-            player.setHealth(20);
-        }
+        Player player = (Player) event.getEntity();
+        player.setHealth(20);
     }
 
     /**
