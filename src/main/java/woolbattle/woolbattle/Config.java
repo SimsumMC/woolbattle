@@ -33,6 +33,7 @@ public class Config {
     public static final int givenWoolAmount = (int) (long) getValue("givenWoolAmount");
     public static final int maxStacks = (int) (long) getValue("maxStacks");
 
+
     public static final ArrayList<Long> lobbyCoordinates = (ArrayList<Long>) Config.getValue("lobbySpawn");
     public static final ArrayList<Long> midCoordinates = (ArrayList<Long>) Config.getValue("mapSpawn");
     public static final ArrayList<ArrayList<Long>> teamCoordinates = (ArrayList<ArrayList<Long>>) Config.getValue("teamSpawns");

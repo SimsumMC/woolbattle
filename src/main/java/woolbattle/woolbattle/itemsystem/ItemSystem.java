@@ -17,7 +17,6 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.material.Wool;
 import org.bukkit.scheduler.BukkitRunnable;
 import woolbattle.woolbattle.Main;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -265,6 +264,7 @@ public class ItemSystem {
 
                     @Override
                     public void run() {
+
                         if(loops == maxLoops){
                             if(item.getAmount()<1){
                                 item.setAmount(item.getAmount() +1);
@@ -281,5 +281,4 @@ public class ItemSystem {
             }
         }.runTaskAsynchronously(Main.getInstance());
     }
-
 }

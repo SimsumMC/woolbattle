@@ -14,7 +14,11 @@ import woolbattle.woolbattle.lives.LivesSystem;
 import woolbattle.woolbattle.lobby.LobbySystem;
 import woolbattle.woolbattle.lobby.StartGameCommand;
 import woolbattle.woolbattle.lobby.StopGameCommand;
+<<<<<<< Updated upstream
 import woolbattle.woolbattle.maprestaurationsystem.MapDefineCommand;
+=======
+import woolbattle.woolbattle.maprestaurationsystem.MapCommand;
+>>>>>>> Stashed changes
 import woolbattle.woolbattle.team.TeamSystem;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
@@ -36,9 +40,16 @@ import static com.mongodb.client.model.Filters.eq;
 public final class Main extends JavaPlugin {
 
     private static Main instance;
+<<<<<<< Updated upstream
     /*private static final ConnectionString connectionString = new ConnectionString(
             "mongodb://woolbattle:iloveminecraft@cluster0-shard-00-00.eqlbi.mongodb.net:27017," +
                     "cluster0-shard-00-01.eqlbi.mongodb.net:27017,cluster0-shard-00-02.eqlbi.mongodb.net:27017/" +
+=======
+
+    private static final ConnectionString connectionString = new ConnectionString(
+            "mongodb://woolbattle:iloveminecraft@cluster0-shard-00-00.eqlbi.mongodb.net:27017,"+
+                    "cluster0-shard-00-01.eqlbi.mongodb.net:27017,cluster0-shard-00-02.eqlbi.mongodb.net:27017/"+
+>>>>>>> Stashed changes
                     "myFirstDatabase?ssl=true&replicaSet=atlas-5qmtum-shard-0&authSource=admin&retryWrites=true&w=majority");
     private static final MongoClientSettings settings = MongoClientSettings.builder()
             .applyConnectionString(connectionString)
@@ -46,6 +57,19 @@ public final class Main extends JavaPlugin {
     private static final MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");/*MongoClients.create(settings)*/;
     private static final MongoDatabase db = mongoClient.getDatabase("woolbattle");
     private static final UUID worldUUID = readUUID(new File("/world/uid.dat"));
+<<<<<<< Updated upstream
+=======
+
+    public static Main getInstance(){
+        return instance;
+    }
+    public static MongoDatabase getMongoDatabase() {
+        return db;
+    }
+    public static MongoClient getMongoClient() {
+        return mongoClient;
+    }
+>>>>>>> Stashed changes
 
     @Override
     public void onEnable() {
@@ -62,26 +86,24 @@ public final class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);
         Bukkit.getPluginManager().registerEvents(new LivesSystem(), this);
 
-        if (!db.listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking")) {
-            db.createCollection("blockBreaking");
-
-        } else {
-        }
+        //Servaturus' belongings
+        Bukkit.getPluginManager().registerEvents(new Listener(), this);
+        getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
+        getCommand("mapblocks").setExecutor(new MapBlocksCommand());
+        getCommand("map").setExecutor(new MapCommand());
 
         Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
         if (found == null) {
-            HashMap<String, Object> mapBlocks = new HashMap<String, Object>(){
-                {
-                    put("mapBlocks", new ArrayList<ArrayList<Double>>());
-                    put("_id", "mapBlocks");
-                }
-            };
             db.getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
         }
+<<<<<<< Updated upstream
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
         getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
         getCommand("mapblocks").setExecutor(new MapBlocksCommand());
         getCommand("mapdefine").setExecutor(new MapDefineCommand());
+=======
+
+>>>>>>> Stashed changes
         BlockBreakingSystem.setCollectBrokenBlocks(false);
         BlockBreakingSystem.fetchMapBlocks();
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -118,17 +140,18 @@ public final class Main extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-    public static Main getInstance(){
-        return instance;
-    }
 
-    public static MongoDatabase getMongoDatabase() {
-        return db;
+    public static UUID readUUID(File file) {
+        try (DataInputStream dataInput = new DataInputStream(new FileInputStream(file))) {
+            return new UUID(dataInput.readLong(), dataInput.readLong());
+        } catch (IOException e) {
+            return null;
+        }
     }
-
-    public static MongoClient getMongoClient() {
-        return mongoClient;
+    public static UUID getWorldUUID(){
+        return worldUUID;
     }
+<<<<<<< Updated upstream
 
     public static UUID readUUID(File file) {
         try (DataInputStream dataInput = new DataInputStream(new FileInputStream(file))) {
@@ -143,3 +166,6 @@ public final class Main extends JavaPlugin {
 
 }
 
+=======
+}
+>>>>>>> Stashed changes

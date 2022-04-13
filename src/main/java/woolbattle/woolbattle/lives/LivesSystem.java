@@ -21,6 +21,33 @@ import java.util.HashMap;
 public class LivesSystem implements Listener {
 
     /**
+     * A Method that teleports the player to the team spawn.
+     * @param player the player that gets teleported
+     * @author SimsumMC & Beelzebub
+     */
+    public void teleportPlayertoTeamSpawn(Player player){
+        String team = TeamSystem.getPlayerTeam(player, true);
+
+        switch(team){
+            case "Blue":
+                player.teleport(Config.blueLocation);
+                break;
+            case "Red":
+                player.teleport(Config.redLocation);
+                break;
+            case "Green":
+                player.teleport(Config.greenLocation);
+                break;
+            case "Yellow":
+                player.teleport(Config.yellowLocation);
+                break;
+            default:
+                player.teleport(Config.midLocation);
+                break;
+        }
+    }
+
+    /**
      * An Event that gets executed whenever a Player moves to use it as a kill event when a player gets under a
      * specific y coordinate.
      *
@@ -35,26 +62,15 @@ public class LivesSystem implements Listener {
 
         Player player = event.getPlayer();
 
-        HashMap<Player, Long> lastDeath = Cache.getLastDeath();
         HashMap<Player, Long> lastDamage = Cache.getLastDamage();
 
         long unixTime = System.currentTimeMillis() / 1000L;
 
         if (player.getLocation().getY() <= Config.minHeight) {
-            if(lastDeath.containsKey(player)){
-                long realLastDeath = lastDeath.get(player);
-                if (unixTime - realLastDeath <= 5) {
-                    return;
-                }
-            }
-
-            lastDeath.put(player, unixTime);
-            Cache.setLastDeath(lastDeath);
-
             if (lastDamage.containsKey(player)) {
                 long realLastDamage = lastDamage.get(player);
                 if (unixTime - realLastDamage >= Config.deathCooldown) {
-                    // ignore deaths that are old enough
+                    teleportPlayertoTeamSpawn(player);
                     return;
                 }
             }
@@ -68,26 +84,8 @@ public class LivesSystem implements Listener {
                 TeamSystem.removePlayerTeam(player);
                 LobbySystem.setPlayerSpectator(player);
             } else {
-                System.out.println("teleporting");
 
-                //teleport player to spawn
-                switch(team){
-                    case "Blue":
-                        player.teleport(Config.blueLocation);
-                        break;
-                    case "Red":
-                        player.teleport(Config.redLocation);
-                        break;
-                    case "Green":
-                        player.teleport(Config.greenLocation);
-                        break;
-                    case "Yellow":
-                        player.teleport(Config.yellowLocation);
-                        break;
-                    default:
-                        player.teleport(Config.midLocation);
-                        break;
-                }
+                teleportPlayertoTeamSpawn(player);
 
 
                 EntityDamageEvent lastDamageEvent = event.getPlayer().getLastDamageCause();

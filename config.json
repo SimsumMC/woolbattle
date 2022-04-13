@@ -12,5 +12,5 @@
   "givenWoolAmount": 1,
   "maxStacks": 3,
   "jumpCooldown": 10,
-  "woolReplaceDelay" : 10
+  "woolReplaceDelay" : 40
 }

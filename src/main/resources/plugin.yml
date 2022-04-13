@@ -16,5 +16,10 @@ commands:
     aliases: [ ]
   blockregistration:
     aliases: [ blckreg ]
+<<<<<<< Updated upstream
   mapdefine:
     aliases: [mdef]
+=======
+  map:
+    aliases: [ m ]
+>>>>>>> Stashed changes
