@@ -1,11 +1,9 @@
 package woolbattle.woolbattle.lives;
 
 import org.bukkit.Bukkit;
-
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -13,8 +11,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Config;
+import woolbattle.woolbattle.lobby.*;
 import woolbattle.woolbattle.team.TeamSystem;
-import woolbattle.woolbattle.lobby.LobbySystem;
 
 import java.util.HashMap;
 

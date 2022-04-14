@@ -26,9 +26,9 @@ public class BlockBreakingSystem {
         BlockBreakingSystem.collectBlocksTroughDiff = collectBlocksTroughDiff;
     }
 
-    private static ArrayList<Location> mapBlocks = new ArrayList<Location>();
+    private static ArrayList<Location> mapBlocks = new ArrayList<>();
     private static boolean collectBrokenBlocks = false;
-    private static ArrayList<Location> removedBlocks = new ArrayList<Location>();
+    private static ArrayList<Location> removedBlocks = new ArrayList<>();
 
 
 //Setter and getter, concerning the previously defined private variables
@@ -66,7 +66,7 @@ public class BlockBreakingSystem {
 
         //Checks, whether the "map" collection and the "mapBlocks" documents exist in the db, creates them, if this is not the case.
 
-        if(!db.listCollectionNames().into(new ArrayList<String>()).contains("map")){
+        if(!db.listCollectionNames().into(new ArrayList<>()).contains("map")){
             db.createCollection("map");
         }else{}
         Document found = db.getCollection("map").find(eq("_id", "mapBlocks")).first();
@@ -114,15 +114,9 @@ public class BlockBreakingSystem {
 
         //Checks, whether the "map" collection and the "mapBlocks" documents exist in the db, creates them, if this is not the case.
 
-<<<<<<< Updated upstream
-        if(!db.listCollectionNames().into(new ArrayList<String>()).contains("map")){
+        if(!db.listCollectionNames().into(new ArrayList<>()).contains("map")){
             db.createCollection("map");
         }else{}
-=======
-        if(!db.listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking")){
-            db.createCollection("blockBreaking");
-        }
->>>>>>> Stashed changes
 
         Document found = db.getCollection("map").find(eq("_id", "mapBlocks")).first();
         if(found == null){
@@ -140,13 +134,9 @@ public class BlockBreakingSystem {
 
         //Fetches the stored mapBlocks from the db into a new array (update).
 
-<<<<<<< Updated upstream
+
         ArrayList<ArrayList<Double>> update = (ArrayList<ArrayList<Double>>) db.getCollection("map").find(eq("_id", "mapBlocks")).first().get("mapBlocks");
 
-=======
-        ArrayList<ArrayList<Double>> update = (ArrayList<ArrayList<Double>>) db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first().get("mapBlocks");
-        System.out.println(update);
->>>>>>> Stashed changes
         //Adds the cached blocks to the updated array, in case they are not already present in said collection.
 
         for(Location loc : mapBlocks){
@@ -206,7 +196,7 @@ public class BlockBreakingSystem {
 
             for(int i = 0; i<locs.size(); i++){
 
-                result.append("\n" + ChatColor.GREEN + "[" + ChatColor.RED + locs.get(i).getX() +", " + locs.get(i).getY() +", " +locs.get(i).getZ() + ChatColor.GREEN + "]");
+                result.append("\n" + ChatColor.GREEN + "[" + ChatColor.RED).append(locs.get(i).getX()).append(", ").append(locs.get(i).getY()).append(", ").append(locs.get(i).getZ()).append(ChatColor.GREEN).append("]");
 
                 if(i == (locs.size() -1)){
                     result.append(ChatColor.DARK_PURPLE + "\n]");
@@ -235,7 +225,7 @@ public class BlockBreakingSystem {
         }
         for(int i = 0; i<locs.size(); i++){
 
-            result.append("\n" + ChatColor.GREEN + "[" + ChatColor.RED + locs.get(i).get(0) +", " + locs.get(i).get(1) +", " +locs.get(i).get(2) + ChatColor.GREEN + "]");
+            result.append("\n" + ChatColor.GREEN + "[" + ChatColor.RED).append(locs.get(i).get(0)).append(", ").append(locs.get(i).get(1)).append(", ").append(locs.get(i).get(2)).append(ChatColor.GREEN).append("]");
 
             if(i == (locs.size() -1)){
                 result.append(ChatColor.DARK_PURPLE + "\n]");
@@ -263,9 +253,9 @@ public class BlockBreakingSystem {
         int zdiff = (int) a.getZ() - (int) b.getZ();
         ArrayList<Location> locs = new ArrayList<>();
         ArrayList<Integer>
-                xs = new ArrayList<Integer>(),
-                ys = new ArrayList<Integer>(),
-                zs = new ArrayList<Integer>();
+                xs = new ArrayList<>(),
+                ys = new ArrayList<>(),
+                zs = new ArrayList<>();
 
         //Adds every x value in the range of xdiff to the xs array.
         if(Integer.signum(xdiff) == 0){

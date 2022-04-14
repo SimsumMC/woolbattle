@@ -1,7 +1,5 @@
 package woolbattle.woolbattle;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -10,37 +8,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import woolbattle.woolbattle.base.Base;
-import woolbattle.woolbattle.lives.LivesSystem;
-import woolbattle.woolbattle.lobby.LobbySystem;
-import woolbattle.woolbattle.lobby.StartGameCommand;
-import woolbattle.woolbattle.lobby.StopGameCommand;
-<<<<<<< Updated upstream
-import woolbattle.woolbattle.maprestaurationsystem.MapDefineCommand;
-=======
-import woolbattle.woolbattle.maprestaurationsystem.MapCommand;
->>>>>>> Stashed changes
-import woolbattle.woolbattle.team.TeamSystem;
-import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
-import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
-import woolbattle.woolbattle.woolsystem.MapBlocksCommand;
-
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.UUID;
+import woolbattle.woolbattle.maprestaurationsystem.*;
+import woolbattle.woolbattle.woolsystem.*;
+import woolbattle.woolbattle.lobby.*;
+import woolbattle.woolbattle.team.*;
+import woolbattle.woolbattle.lives.*;
+import java.io.*;
+import java.util.*;
+import java.nio.file.*;
 
 import static com.mongodb.client.model.Filters.eq;
 
 public final class Main extends JavaPlugin {
 
     private static Main instance;
-<<<<<<< Updated upstream
     /*private static final ConnectionString connectionString = new ConnectionString(
             "mongodb://woolbattle:iloveminecraft@cluster0-shard-00-00.eqlbi.mongodb.net:27017," +
                     "cluster0-shard-00-01.eqlbi.mongodb.net:27017,cluster0-shard-00-02.eqlbi.mongodb.net:27017/" +
@@ -54,11 +35,9 @@ public final class Main extends JavaPlugin {
     private static final MongoClientSettings settings = MongoClientSettings.builder()
             .applyConnectionString(connectionString)
             .build();*/
-    private static final MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");/*MongoClients.create(settings)*/;
+    private static final MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");/*MongoClients.create(settings);*/
     private static final MongoDatabase db = mongoClient.getDatabase("woolbattle");
     private static final UUID worldUUID = readUUID(new File("/world/uid.dat"));
-<<<<<<< Updated upstream
-=======
 
     public static Main getInstance(){
         return instance;
@@ -69,7 +48,6 @@ public final class Main extends JavaPlugin {
     public static MongoClient getMongoClient() {
         return mongoClient;
     }
->>>>>>> Stashed changes
 
     @Override
     public void onEnable() {
@@ -96,14 +74,11 @@ public final class Main extends JavaPlugin {
         if (found == null) {
             db.getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
         }
-<<<<<<< Updated upstream
+
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
         getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
         getCommand("mapblocks").setExecutor(new MapBlocksCommand());
-        getCommand("mapdefine").setExecutor(new MapDefineCommand());
-=======
-
->>>>>>> Stashed changes
+        getCommand("mapdefine").setExecutor(new MapCommand());
         BlockBreakingSystem.setCollectBrokenBlocks(false);
         BlockBreakingSystem.fetchMapBlocks();
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -140,19 +115,6 @@ public final class Main extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-
-    public static UUID readUUID(File file) {
-        try (DataInputStream dataInput = new DataInputStream(new FileInputStream(file))) {
-            return new UUID(dataInput.readLong(), dataInput.readLong());
-        } catch (IOException e) {
-            return null;
-        }
-    }
-    public static UUID getWorldUUID(){
-        return worldUUID;
-    }
-<<<<<<< Updated upstream
-
     public static UUID readUUID(File file) {
         try (DataInputStream dataInput = new DataInputStream(new FileInputStream(file))) {
             return new UUID(dataInput.readLong(), dataInput.readLong());
@@ -166,6 +128,4 @@ public final class Main extends JavaPlugin {
 
 }
 
-=======
-}
->>>>>>> Stashed changes
+

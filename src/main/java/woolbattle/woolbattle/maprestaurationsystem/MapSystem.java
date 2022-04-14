@@ -17,12 +17,12 @@ public class MapSystem {
             wrapper.set("map", new Document("_id", "mapChunks").append("mapChunks", new ArrayList<ArrayList<Long>>()));
         }
 
-        ArrayList<ArrayList<Long>> dbChunks = null;
+        ArrayList<ArrayList<Long>> dbChunks;
         try{
             dbChunks = (ArrayList<ArrayList<Long>>) wrapper.get("map", "mapChunks").get("chunks");
         }catch(ClassCastException e){
             System.out.println("The value of the chunks, belonging to the map, stored in the database consists of a value, not capable of being cast to an ArrayList.");
-            dbChunks = new ArrayList<ArrayList<Long>>();
+            dbChunks = new ArrayList<>();
         }
 
         if(dbChunks != null && dbChunks.size() >0 ){
