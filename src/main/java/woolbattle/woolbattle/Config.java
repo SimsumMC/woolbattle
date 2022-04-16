@@ -20,6 +20,7 @@ public class Config {
 
     public static final String defaultMap = (String) Config.getValue("mapName");
     public static final int defaultLives = (int) (long) Config.getValue("defaultLives");
+    public static final int spawnProtectionLength = (int) (long) Config.getValue("spawnProtectionLength");
 
     public static final int startCooldown = (int) (long) Config.getValue("startCooldown");
     public static final int deathCooldown = (int) (long) Config.getValue("deathCooldown");
@@ -32,6 +33,7 @@ public class Config {
 
     public static final int givenWoolAmount = (int) (long) getValue("givenWoolAmount");
     public static final int maxStacks = (int) (long) getValue("maxStacks");
+    public static final int woolReplaceDelay = (int) (long) getValue("woolReplaceDelay");
 
     public static final ArrayList<Long> lobbyCoordinates = (ArrayList<Long>) Config.getValue("lobbySpawn");
     public static final ArrayList<Long> midCoordinates = (ArrayList<Long>) Config.getValue("mapSpawn");
