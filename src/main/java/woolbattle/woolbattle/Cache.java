@@ -15,9 +15,11 @@ public class Cache {
 
     private static HashMap<Player, Long> lastDamage = new HashMap<>();
 
+    private static HashMap<Player, Long> spawnProtection = new HashMap<>();
+
     private static HashMap<String, Integer> jumpCooldown = new HashMap<>();
 
-    private static HashMap<UUID, Long> enderPearlCooldowns = new HashMap<>();
+    private static HashMap<UUID, Long> enderPearlCooldown = new HashMap<>();
 
     private static HashMap<UUID, Boolean> bowFlags = new HashMap<>();
 
@@ -51,11 +53,14 @@ public class Cache {
     public static HashMap<Player, Long> getLastDamage() {return lastDamage;}
     public static void setLastDamage(HashMap<Player, Long> lastDamage) {Cache.lastDamage = lastDamage;}
 
+    public static HashMap<Player, Long> getSpawnProtection() {return spawnProtection;}
+    public static void setSpawnProtection(HashMap<Player, Long> spawnProtection) {Cache.spawnProtection = spawnProtection;}
+
     public static HashMap<String, Integer> getJumpCooldown() {return jumpCooldown;}
     public static void setJumpCooldown(HashMap<String, Integer> jumpCooldown) {Cache.jumpCooldown = jumpCooldown;}
 
-    public static HashMap<UUID, Long> getEnderPearlCooldowns() {return enderPearlCooldowns;}
-    public static void setEnderPearlCooldowns(HashMap<UUID, Long> enderPearlCooldowns) {Cache.enderPearlCooldowns = enderPearlCooldowns;}
+    public static HashMap<UUID, Long> getEnderPearlCooldown() {return enderPearlCooldown;}
+    public static void setEnderPearlCooldown(HashMap<UUID, Long> enderPearlCooldown) {Cache.enderPearlCooldown = enderPearlCooldown;}
 
     public static HashMap<UUID, Boolean> getBowFlags() {return bowFlags;}
     public static void setBowFlags(HashMap<UUID, Boolean> bowFlags) {Cache.bowFlags = bowFlags;}
@@ -105,7 +110,7 @@ public class Cache {
 
         jumpCooldown = new HashMap<>();
 
-        enderPearlCooldowns = new HashMap<>();
+        enderPearlCooldown = new HashMap<>();
 
         bowFlags = new HashMap<>();
     }
