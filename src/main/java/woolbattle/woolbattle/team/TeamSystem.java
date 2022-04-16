@@ -10,9 +10,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 import woolbattle.woolbattle.Cache;
+import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.lobby.LobbySystem;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import static woolbattle.woolbattle.Cache.getTeamMembers;
@@ -200,7 +202,7 @@ public class TeamSystem implements Listener {
     /**
      * An event that gets executed whenever an entity damages another entity to prevent hitting team members.
      * @param event - the EntityDamageByEntityEvent
-     * @author Beelzebub
+     * @author Beelzebub & SimsumMC
      */
     @EventHandler
     public void DamageProtection(EntityDamageByEntityEvent event){
@@ -216,6 +218,14 @@ public class TeamSystem implements Listener {
                 Vector velocity;
                 velocity = event.getEntity().getVelocity();
                 event.getEntity().setVelocity(velocity);
+                event.setCancelled(true);
+                return;
+            }
+            HashMap<Player, Long> spawnProtection = Cache.getSpawnProtection();
+            if(spawnProtection.containsKey(damager) && (unixTime - spawnProtection.get(damaged)) <= Config.spawnProtectionLength){
+                if(damager.getUniqueId() != damaged.getUniqueId()){
+                    damager.sendMessage("§cThe player has spawn protection!");
+                }
                 event.setCancelled(true);
             }
         }
