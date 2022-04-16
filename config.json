@@ -3,6 +3,7 @@
   "mapSpawn": [0, 71, 28],
   "lobbySpawn": [1000, 101, 1000],
   "defaultLives": 10,
+  "spawnProtectionLength": 5,
   "startCooldown": 60,
   "deathCooldown": 10,
   "maxHeight": 100,
