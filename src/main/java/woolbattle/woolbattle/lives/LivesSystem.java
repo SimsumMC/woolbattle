@@ -5,7 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -23,9 +22,9 @@ public class LivesSystem implements Listener {
     /**
      * A Method that teleports the player to the team spawn.
      * @param player the player that gets teleported
-     * @author SimsumMC & Beelzebub
+     * @author SimsumMC
      */
-    public void teleportPlayertoTeamSpawn(Player player){
+    public void teleportPlayerTeamSpawn(Player player){
         String team = TeamSystem.getPlayerTeam(player, true);
 
         switch(team){
@@ -45,6 +44,20 @@ public class LivesSystem implements Listener {
                 player.teleport(Config.midLocation);
                 break;
         }
+    }
+
+    /**
+     * A Method that updates the spawnProtection HashMap in the Cache with the current unix timestamp.
+     * @param player the player that gets teleported
+     * @param unixTime the current unix timestamp
+     * @author SimsumMC
+     */
+    public void setPlayerSpawnProtection(Player player, Long unixTime){
+        HashMap<Player, Long> spawnProtection = Cache.getSpawnProtection();
+
+        spawnProtection.put(player, unixTime);
+
+        Cache.setSpawnProtection(spawnProtection);
     }
 
     /**
@@ -70,7 +83,7 @@ public class LivesSystem implements Listener {
             if (lastDamage.containsKey(player)) {
                 long realLastDamage = lastDamage.get(player);
                 if (unixTime - realLastDamage >= Config.deathCooldown) {
-                    teleportPlayertoTeamSpawn(player);
+                    teleportPlayerTeamSpawn(player);
                     return;
                 }
             }
@@ -85,8 +98,8 @@ public class LivesSystem implements Listener {
                 LobbySystem.setPlayerSpectator(player);
             } else {
 
-                teleportPlayertoTeamSpawn(player);
-
+                teleportPlayerTeamSpawn(player);
+                setPlayerSpawnProtection(player, unixTime);
 
                 EntityDamageEvent lastDamageEvent = event.getPlayer().getLastDamageCause();
 
