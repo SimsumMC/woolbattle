@@ -113,5 +113,7 @@ public class Cache {
         enderPearlCooldown = new HashMap<>();
 
         bowFlags = new HashMap<>();
+
+        spawnProtection = new HashMap<>();
     }
 }

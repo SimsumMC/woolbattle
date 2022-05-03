@@ -1,6 +1,8 @@
 package woolbattle.woolbattle.team;
 
 import org.bukkit.*;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -205,15 +207,28 @@ public class TeamSystem implements Listener {
      * @author Beelzebub & SimsumMC
      */
     @EventHandler
-    public void DamageProtection(EntityDamageByEntityEvent event){
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event){
         HashMap<Player, Long> lastDamage = Cache.getLastDamage();
         long unixTime = System.currentTimeMillis() / 1000L;
         lastDamage.put((Player) event.getEntity(), unixTime);
         Cache.setLastDamage(lastDamage);
 
-        if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
-            Player damager = (Player) event.getDamager();
-            Player damaged = (Player) event.getEntity();
+        Player damager;
+        Player damaged = (Player) event.getEntity();
+
+        if(event.getDamager() instanceof Arrow){
+            Arrow arrow = (Arrow) event.getDamager();
+            damager = (Player) arrow.getShooter();
+
+        }
+        else{
+            if(!(event.getDamager() instanceof Player)){
+                return;
+            }
+            damager = (Player) event.getDamager();
+        }
+
+        if (damaged != null && damager != null) {
             if (TeamSystem.getPlayerTeam(damager, true).equals(TeamSystem.getPlayerTeam(damaged, true)) || !LobbySystem.gameStarted) {
                 Vector velocity;
                 velocity = event.getEntity().getVelocity();
@@ -222,7 +237,7 @@ public class TeamSystem implements Listener {
                 return;
             }
             HashMap<Player, Long> spawnProtection = Cache.getSpawnProtection();
-            if(spawnProtection.containsKey(damager) && (unixTime - spawnProtection.get(damaged)) <= Config.spawnProtectionLength){
+            if(spawnProtection.containsKey(damaged) && (unixTime - spawnProtection.get(damaged)) <= Config.spawnProtectionLength){
                 if(damager.getUniqueId() != damaged.getUniqueId()){
                     damager.sendMessage("§cThe player has spawn protection!");
                 }

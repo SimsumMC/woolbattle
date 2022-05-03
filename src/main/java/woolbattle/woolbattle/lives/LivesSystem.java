@@ -97,10 +97,6 @@ public class LivesSystem implements Listener {
                 TeamSystem.removePlayerTeam(player);
                 LobbySystem.setPlayerSpectator(player);
             } else {
-
-                teleportPlayerTeamSpawn(player);
-                setPlayerSpawnProtection(player, unixTime);
-
                 EntityDamageEvent lastDamageEvent = event.getPlayer().getLastDamageCause();
 
                 Entity damager;
@@ -122,6 +118,9 @@ public class LivesSystem implements Listener {
                     lives -= 1;
                     teamLives.put(team, lives);
                     Cache.setTeamLives(teamLives);
+
+                    lastDamage.remove(damager);
+                    Cache.setLastDamage(lastDamage);
 
                     String damagerTeam = TeamSystem.getPlayerTeam((Player) damager, true);
                     String damagerTeamColour = TeamSystem.getTeamColour(damagerTeam) ;
@@ -159,6 +158,9 @@ public class LivesSystem implements Listener {
                         Cache.setTeamLives(teamLives);
 
                     }
+
+                    teleportPlayerTeamSpawn(player);
+                    setPlayerSpawnProtection(player, unixTime);
 
                 }
                 LobbySystem.determinateWinnerTeam();
