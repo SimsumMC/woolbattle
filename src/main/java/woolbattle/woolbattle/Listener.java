@@ -52,9 +52,9 @@ public class Listener implements org.bukkit.event.Listener {
         boolean blockIsMap = false;
         int itemAmount = 0;
 
-        int givenWoolAmount = 2;
-        int maxStacks = 3;
-        int delayInTicks = 5;
+        int givenWoolAmount = Config.givenWoolAmount;
+        int maxStacks = Config.maxStacks;
+        int delayInTicks = Config.woolReplaceDelay;
 
         //Checks, whether the event's block is specified in the internal array of map-blocks, writes the value of the operation in the boolean blockIsMap.
         for(Location iterBlock : BlockBreakingSystem.getMapBlocks()){
@@ -270,7 +270,7 @@ public class Listener implements org.bukkit.event.Listener {
             }
 
             //player.sendMessage(ChatColor.GREEN + "You possess sufficient amounts of wool, to use this perk...");
-            HashMap<UUID, Long> enderPearlCooldowns = Cache.getEnderPearlCooldowns();
+            HashMap<UUID, Long> enderPearlCooldowns = Cache.getEnderPearlCooldown();
 
             if(enderPearlCooldowns.get(player.getUniqueId()) == null){
                 enderPearlCooldowns.put(player.getUniqueId(), new Date().getTime());
@@ -283,7 +283,7 @@ public class Listener implements org.bukkit.event.Listener {
             ItemSystem.setItemCooldown(player, slot, is, enderderPearlWoolCost);
             player.getInventory().setItem(slot, is);
             enderPearlCooldowns.replace(player.getUniqueId(), new Date().getTime());
-            Cache.setEnderPearlCooldowns(enderPearlCooldowns);
+            Cache.setEnderPearlCooldown(enderPearlCooldowns);
             ItemSystem.subtractWool(player, enderPearlWoolCost);
 
         }else if(is.getType().equals(Material.BOW)) {

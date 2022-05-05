@@ -1,6 +1,8 @@
 package woolbattle.woolbattle.team;
 
 import org.bukkit.*;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -10,9 +12,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 import woolbattle.woolbattle.Cache;
+import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.lobby.LobbySystem;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import static woolbattle.woolbattle.Cache.getTeamMembers;
@@ -200,22 +204,43 @@ public class TeamSystem implements Listener {
     /**
      * An event that gets executed whenever an entity damages another entity to prevent hitting team members.
      * @param event - the EntityDamageByEntityEvent
-     * @author Beelzebub
+     * @author Beelzebub & SimsumMC
      */
     @EventHandler
-    public void DamageProtection(EntityDamageByEntityEvent event){
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event){
         HashMap<Player, Long> lastDamage = Cache.getLastDamage();
         long unixTime = System.currentTimeMillis() / 1000L;
         lastDamage.put((Player) event.getEntity(), unixTime);
         Cache.setLastDamage(lastDamage);
 
-        if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
-            Player damager = (Player) event.getDamager();
-            Player damaged = (Player) event.getEntity();
+        Player damager;
+        Player damaged = (Player) event.getEntity();
+
+        if(event.getDamager() instanceof Arrow){
+            Arrow arrow = (Arrow) event.getDamager();
+            damager = (Player) arrow.getShooter();
+
+        }
+        else{
+            if(!(event.getDamager() instanceof Player)){
+                return;
+            }
+            damager = (Player) event.getDamager();
+        }
+
+        if (damaged != null && damager != null) {
             if (TeamSystem.getPlayerTeam(damager, true).equals(TeamSystem.getPlayerTeam(damaged, true)) || !LobbySystem.gameStarted) {
                 Vector velocity;
                 velocity = event.getEntity().getVelocity();
                 event.getEntity().setVelocity(velocity);
+                event.setCancelled(true);
+                return;
+            }
+            HashMap<Player, Long> spawnProtection = Cache.getSpawnProtection();
+            if(spawnProtection.containsKey(damaged) && (unixTime - spawnProtection.get(damaged)) <= Config.spawnProtectionLength){
+                if(damager.getUniqueId() != damaged.getUniqueId()){
+                    damager.sendMessage("§cThe player has spawn protection!");
+                }
                 event.setCancelled(true);
             }
         }
