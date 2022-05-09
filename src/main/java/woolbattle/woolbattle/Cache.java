@@ -1,6 +1,7 @@
 package woolbattle.woolbattle;
 
 import org.bukkit.entity.Player;
+import woolbattle.woolbattle.perks.ActivePerk;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +13,8 @@ public class Cache {
      * A Class that contains a few HashMaps with setters and getters to cache different things easily.
      * @author SimsumMC
      */
+
+    private static HashMap<String, ActivePerk> activePerks = new HashMap<>();
 
     private static HashMap<Player, Long> lastDamage = new HashMap<>();
 
@@ -49,6 +52,9 @@ public class Cache {
         put(10, new ArrayList<>());
         put(15, new ArrayList<>());
     }};
+
+    public static HashMap<String, ActivePerk> getActivePerks() {return activePerks;}
+    public static void setActivePerks(HashMap<String, ActivePerk> activePerks) {Cache.activePerks = activePerks;}
 
     public static HashMap<Player, Long> getLastDamage() {return lastDamage;}
     public static void setLastDamage(HashMap<Player, Long> lastDamage) {Cache.lastDamage = lastDamage;}
@@ -115,5 +121,7 @@ public class Cache {
         bowFlags = new HashMap<>();
 
         spawnProtection = new HashMap<>();
+
+        activePerks = new HashMap<>();
     }
 }

@@ -3,12 +3,11 @@ package woolbattle.woolbattle.itemsystem;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
+import org.bukkit.*;
+import org.bukkit.event.Event;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -185,36 +184,54 @@ public class ItemSystem {
     private static void addPerkItems(Inventory inv){
 
     }
+
     /**
      * Method that subtracts wool from a players inventory.
      * @author Servaturus
-     * @param p The player, to remove the wool from
-     * @param amount The wool amount to subtract
+     * @param player The player, to remove the wool from
+     * @param subtractWool The wool subtractWool to subtract
+     * @author Servaturus & SimsumMC
      */
-    public static void subtractWool(Player p, int amount){
+    public static boolean subtractWool(Player player, int subtractWool){
 
-        PlayerInventory inv = p.getInventory();
+        PlayerInventory inv = player.getInventory();
+
+        int existingWoolAmount = 0;
+
+        for(ItemStack iterStack : inv.getContents()){
+            if(iterStack != null && iterStack.getType().equals(Material.WOOL)){
+                existingWoolAmount += iterStack.getAmount();
+            }
+        }
+
+        if(existingWoolAmount - subtractWool < 0){
+            player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.C));
+            player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.B));
+            return false;
+        }
+
         int woolAmount = 0;
-        ArrayList<ItemStack> woolStacks = new ArrayList<>();
-        ArrayList<Integer> slots = new ArrayList<>();
-        DyeColor color = findTeamDyeColor(p);
 
-        int maximumStacks = 3;
+        ArrayList<ItemStack> woolStacks = new ArrayList<>();
+        DyeColor color = findTeamDyeColor(player);
+
         for(ItemStack is : inv.getContents()){
             if(is != null && is.getType().equals(Material.WOOL)){
                 woolAmount += is.getAmount();
             }
         }
-        if(woolAmount-amount <=0){
-            p.getInventory().remove(Material.WOOL);
-            return;
+        if(woolAmount - subtractWool <=0){
+            player.getInventory().remove(Material.WOOL);
+            return true;
         }
-        woolAmount = woolAmount-amount;
+        woolAmount = woolAmount-subtractWool;
+
         int modulo = woolAmount%64;
+
         inv.remove(Material.WOOL);
-        //int amountToDistribute = woolAmount-amount;
+
         ItemStack woolInstance =  new Wool(color).toItemStack();
-        int iterator =0;
+
         if(woolAmount%64 !=0){
             ItemStack wool = new ItemStack(woolInstance);
             wool.setAmount(modulo);
@@ -222,18 +239,20 @@ public class ItemSystem {
             woolAmount-=(woolAmount%64);
 
         }
+
         for(int i = 0; i<woolAmount/64;i++){
             ItemStack wool = new ItemStack(woolInstance);
             wool.setAmount(64);
             woolStacks.add(wool);
-            iterator++;
         }
 
         for(ItemStack woolStack : woolStacks){
             inv.addItem(woolStack);
         }
+        return true;
 
     }
+
     /**
      * Method that replaces the specified itemSlot with a gunpowder-itemstack, lowering it's amount every second by one,
      * until the specified cooldown has run out, which makes it replace said slot with the original item, illustrated by

@@ -14,6 +14,7 @@ import woolbattle.woolbattle.lives.LivesSystem;
 import woolbattle.woolbattle.lobby.LobbySystem;
 import woolbattle.woolbattle.lobby.StartGameCommand;
 import woolbattle.woolbattle.lobby.StopGameCommand;
+import woolbattle.woolbattle.perks.AllActivePerks;
 import woolbattle.woolbattle.team.TeamSystem;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
@@ -50,8 +51,11 @@ public final class Main extends JavaPlugin {
         // SimsumMC's Things
         Bukkit.getPluginManager().registerEvents(new LobbySystem(), this);
         Bukkit.getPluginManager().registerEvents(new Base(), this);
+
         this.getCommand("gstart").setExecutor(new StartGameCommand());
         this.getCommand("gstop").setExecutor(new StopGameCommand());
+
+        AllActivePerks.load();
 
         // Beelzebub's Stuff
         Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);

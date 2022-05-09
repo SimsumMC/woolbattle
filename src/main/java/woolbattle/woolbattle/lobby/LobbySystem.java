@@ -28,6 +28,7 @@ import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.itemsystem.ItemSystem;
 import woolbattle.woolbattle.Main;
+import woolbattle.woolbattle.perks.ActivePerk;
 import woolbattle.woolbattle.team.TeamSystem;
 
 import java.util.*;
@@ -276,22 +277,31 @@ public class LobbySystem implements Listener {
         if (event.getItem() == null || event.getItem().getItemMeta() == null || event.getItem().getItemMeta().getDisplayName() == null) return;
 
         Player player = event.getPlayer();
+        String displayName = event.getItem().getItemMeta().getDisplayName();
 
-        if (event.getItem().getItemMeta().getDisplayName().equals("§c§lLeave")){
-            player.kickPlayer("§c§lYou left the game.");
+        switch (displayName) {
+            case "§c§lLeave":
+                player.kickPlayer("§c§lYou left the game.");
+                break;
+            case "§a§lAmount of Lives":
+                showLifeAmountVoting(player);
+                break;
+            case "§b§lEdit Inventory":
+                showEditInventoryMenu(player);
+                break;
+            case "§d§lPerks":
+                player.sendMessage(ChatColor.RED + "This item isn't finished yet!");
+                break;
+            case "§e§lChoose Team":
+                TeamSystem.showTeamSelectionInventory(player);
+                break;
         }
-        else if (event.getItem().getItemMeta().getDisplayName().equals("§a§lAmount of Lives")){
-            showLifeAmountVoting(player);
+
+        ActivePerk activePerk = Cache.getActivePerks().get(displayName);
+        if(activePerk != null){
+            activePerk.execute(event, player);
         }
-        else if (event.getItem().getItemMeta().getDisplayName().equals("§b§lEdit Inventory")){
-            showEditInventoryMenu(player);
-        }
-        else if (event.getItem().getItemMeta().getDisplayName().equals("§d§lPerks")){
-            player.sendMessage(ChatColor.RED + "This item isn't finished yet!");
-        }
-        else if (event.getItem().getItemMeta().getDisplayName().equals("§e§lChoose Team")){
-            TeamSystem.showTeamSelectionInventory(player);
-        }
+
     }
 
     /**
@@ -549,7 +559,7 @@ public class LobbySystem implements Listener {
         inv.setChestplate(null);
         inv.setHelmet(null);
 
-        // Team Choose Item TODO: add interaction @Beelzebub
+        // Team Choose Item
         ItemStack teamStack = new ItemStack(Material.BED);
         ItemMeta teamMeta = teamStack.getItemMeta();
         teamMeta.setDisplayName("§e§lChoose Team");
@@ -800,7 +810,7 @@ public class LobbySystem implements Listener {
                         updateGameScoreBoard(player);
                     }
                 }            }
-        }.runTaskTimer(Main.getInstance(), 0, 20);
+        }.runTaskTimer(Main.getInstance(), 0, 1000);
 
     }
 
