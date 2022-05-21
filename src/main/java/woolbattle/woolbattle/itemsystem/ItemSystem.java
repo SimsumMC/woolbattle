@@ -4,18 +4,18 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bukkit.*;
-import org.bukkit.event.Event;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.material.Wool;
 import org.bukkit.scheduler.BukkitRunnable;
+import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Main;
+import woolbattle.woolbattle.lobby.LobbySystem;
+import woolbattle.woolbattle.perks.ActivePerk;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,9 +101,8 @@ public class ItemSystem {
             shearsSlot = (int) foundDocument.get("shears");
             bowSlot = (int) foundDocument.get("bow");
             enderPearlSlot = (int) foundDocument.get("ender_pearl");
-            //perk1Slot = (int) foundDocument.get("perk1");
-            //perk2Slot = (int) foundDocument.get("perk2");
-
+            perk1Slot = (int) foundDocument.get("active_perk1");
+            perk2Slot = (int) foundDocument.get("active_perk2");
         }
         ItemStack shears = new ItemStack(Material.SHEARS){
             {
@@ -126,7 +125,45 @@ public class ItemSystem {
                 setItemMeta(meta);
             }
         };
+
         playerInv.setItem(enderPearlSlot, enderpearl);
+
+        MongoCollection<Document> perksCollection = db.getCollection("playerPerks");
+
+        Document perksDocument = perksCollection.find(eq("_id", p.getUniqueId().toString())).first();
+
+        if(perksDocument != null) {
+
+            String activePerk1String = null;
+            String activePerk2String = null;
+
+
+            if (perksDocument.get("first_active") != null){
+                activePerk1String = (String) perksDocument.get("first_active");
+            }
+
+            if (perksDocument.get("second_active") != null){
+                activePerk2String = (String) perksDocument.get("second_active");
+            }
+
+            if(activePerk1String != null) {
+
+                ActivePerk activePerk1 = Cache.getActivePerks().get(activePerk1String);
+                if (activePerk1 != null) {
+                    playerInv.setItem(perk1Slot, activePerk1.getItemStack());
+                }
+            }
+
+            if(activePerk2String != null) {
+                ActivePerk activePerk2 = Cache.getActivePerks().get(activePerk2String);
+                if (activePerk2 != null) {
+                    playerInv.setItem(perk2Slot, activePerk2.getItemStack());
+                }
+            }
+
+
+        }
+
         for(Integer index : armorStacks.keySet()){
             LeatherArmorMeta meta = (LeatherArmorMeta) armorStacks.get(index);
             meta.setColor(color);
@@ -172,17 +209,12 @@ public class ItemSystem {
                     playerInv.setHelmet(armorPiece);
                     break;
 
-                //playerInv.setItem(index, armorPiece);//setItem(index, armorPiece);
             }
+
         }
         playerInv.setItem(9, new ItemStack(Material.ARROW));
-        addPerkItems(playerInv);
-        p.getInventory().setContents(playerInv.getContents());
-    }
-    //Method, in future to act as an augmentation to the giveItems method. The perks, to be added then should be fetched
-    //the plugin's db and added to the player's inventory's slots, specified there respectively.
-    private static void addPerkItems(Inventory inv){
 
+        p.getInventory().setContents(playerInv.getContents());
     }
 
     /**
@@ -261,15 +293,13 @@ public class ItemSystem {
      * @param slot The slot, to condone the cooldown in.
      * @param cooldownInSeconds The cooldown's duration.
      * @param item The item, to replace the specified slot with after the cooldown.
-     *
-     * @author Servaturus
+     * @author Servaturus & SimsumMC
      */
     public static void setItemCooldown(Player p, int slot, ItemStack item, int cooldownInSeconds){
         new BukkitRunnable(){
             @Override
             public void run() {
 
-                int maxLoops = cooldownInSeconds;
                 ItemStack expiredItem = new ItemStack(Material.SULPHUR){
                     {
                         ItemMeta meta = getItemMeta();
@@ -280,17 +310,23 @@ public class ItemSystem {
 
                 new BukkitRunnable(){
 
-                    volatile int loops = 0;
+                    int loops = 0;
 
                     @Override
                     public void run() {
-                        if(loops == maxLoops){
-                            if(item.getAmount()<1){
-                                item.setAmount(item.getAmount() +1);
-                                p.getInventory().setItem(slot, item);
+                        if(!LobbySystem.gameStarted){
+                            this.cancel();
+                            return;
+                        }
+
+                        if(loops == cooldownInSeconds){
+                            if(item.getAmount() < 1){
+                                item.setAmount(item.getAmount() + 1);
                             }
+                            p.getInventory().setItem(slot, item);
+                            this.cancel();
                         }else{
-                            expiredItem.setAmount((maxLoops-loops));
+                            expiredItem.setAmount((cooldownInSeconds - loops));
                             p.getInventory().setItem(slot,expiredItem);
                             loops++;
 

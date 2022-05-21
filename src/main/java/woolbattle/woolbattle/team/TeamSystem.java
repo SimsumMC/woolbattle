@@ -151,7 +151,7 @@ public class TeamSystem implements Listener {
         ArrayList<String> voteRedLore = new ArrayList<>();
         ItemMeta voteRedMeta = voteRed.getItemMeta();
         for (int i = getTeamMembers().get("Red").size() - 1; i >= 0; i--) {
-            voteRedLore.add("§7» " + getTeamMembers().get("Red").get(i).getDisplayName());
+            voteRedLore.add(ChatColor.GRAY + "» " + getTeamMembers().get("Red").get(i).getDisplayName());
         }
 
         voteRedMeta.setDisplayName(ChatColor.RED + "Team Red");
@@ -164,7 +164,7 @@ public class TeamSystem implements Listener {
         ArrayList<String> voteBlueLore = new ArrayList<>();
         ItemMeta voteBlueMeta = voteBlue.getItemMeta();
         for (int i = getTeamMembers().get("Blue").size() - 1; i >= 0; i--) {
-            voteBlueLore.add("§7» " + getTeamMembers().get("Blue").get(i).getDisplayName());
+            voteBlueLore.add(ChatColor.GRAY + "» " + getTeamMembers().get("Blue").get(i).getDisplayName());
         }
 
         voteBlueMeta.setDisplayName(ChatColor.BLUE + "Team Blue");
@@ -177,7 +177,7 @@ public class TeamSystem implements Listener {
         ArrayList<String> voteGreenLore = new ArrayList<>();
         ItemMeta voteGreenMeta = voteGreen.getItemMeta();
         for (int i = getTeamMembers().get("Green").size() - 1; i >= 0; i--) {
-            voteGreenLore.add("§7» " + getTeamMembers().get("Green").get(i).getDisplayName());
+            voteGreenLore.add(ChatColor.GRAY + "» " + getTeamMembers().get("Green").get(i).getDisplayName());
         }
 
         voteGreenMeta.setDisplayName(ChatColor.GREEN + "Team Green");
@@ -190,7 +190,7 @@ public class TeamSystem implements Listener {
         ArrayList<String> voteYellowLore = new ArrayList<>();
         ItemMeta voteYellowMeta = voteYellow.getItemMeta();
         for (int i = getTeamMembers().get("Yellow").size() - 1; i >= 0; i--) {
-            voteYellowLore.add("§7» " + getTeamMembers().get("Yellow").get(i).getDisplayName());
+            voteYellowLore.add(ChatColor.GRAY + "» " + getTeamMembers().get("Yellow").get(i).getDisplayName());
         }
 
         voteYellowMeta.setDisplayName(ChatColor.YELLOW + "Team Yellow");
@@ -255,14 +255,14 @@ public class TeamSystem implements Listener {
      */
     public static String getPlayerTeam(Player player, boolean raw) {
 
-        String teamName = "§cNot selected";
+        String teamName = ChatColor.RED + "Not selected";
         HashMap<String, ArrayList<Player>> data = getTeamMembers();
 
         for(String key : data.keySet()){
             ArrayList<Player> players = data.get(key);
             if(players.contains(player)){
                 if(!raw){
-                    teamName = getTeamColour(key);
+                    teamName = getTeamColour(key).toString();
                 }
                 else{
                     teamName = "";
@@ -295,21 +295,21 @@ public class TeamSystem implements Listener {
     }
 
     /**
-     * A Method that returns the team of the player with the colour as a string.
+     * A Method that returns the team of the player with the colour as a ChatColor Enum.
      * @param team a S
      * @return the colour of the team
      * @author SimsumMC
      */
-    public static String getTeamColour(String team) {
+    public static ChatColor getTeamColour(String team) {
         switch(team){
             case "Blue":
-                return "§1";
+                return ChatColor.DARK_BLUE;
             case "Green":
-                return "§2";
+                return ChatColor.DARK_GREEN;
             case "Yellow":
-                return "§e";
+                return ChatColor.YELLOW;
             default:
-                return "§4";
+                return ChatColor.DARK_RED;
         }
     }
 

@@ -1,0 +1,4 @@
+-> fixed weird displaying of game scoreboard (lagging)
+-> fixed the setItemCooldown method to work properly
+-> implemented all the active perks logic
+-> rewrote/shortened some stuff

@@ -2,6 +2,7 @@ package woolbattle.woolbattle.lives;
 
 import org.bukkit.Bukkit;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -123,10 +124,10 @@ public class LivesSystem implements Listener {
                     Cache.setLastDamage(lastDamage);
 
                     String damagerTeam = TeamSystem.getPlayerTeam((Player) damager, true);
-                    String damagerTeamColour = TeamSystem.getTeamColour(damagerTeam) ;
-                    String killMessage = "§7The player " + TeamSystem.getTeamColour(team)
-                            + player.getDisplayName() + "§7 was killed by " +
-                            damagerTeamColour + ((Player) damager).getDisplayName() + "§7.";
+                    ChatColor damagerTeamColour = TeamSystem.getTeamColour(damagerTeam) ;
+                    String killMessage = ChatColor.GRAY + "The player " + TeamSystem.getTeamColour(team)
+                            + player.getDisplayName() + ChatColor.GRAY + " was killed by " +
+                            damagerTeamColour + ((Player) damager).getDisplayName() + ChatColor.GRAY + ".";
 
                     Bukkit.broadcastMessage(killMessage);
                     HashMap<String, HashMap<Player, Integer>> killStreaks = Cache.getKillStreaks();
@@ -144,7 +145,8 @@ public class LivesSystem implements Listener {
                     kills.put((Player) damager, amKills);
 
                     if(amKills == 5){
-                        String streakMessage = "§7The player " + damagerTeamColour + ((Player) damager).getDisplayName() + "§7 has a 5er kill streak!";
+                        String streakMessage = ChatColor.GRAY + "The player " + damagerTeamColour +
+                                ((Player) damager).getDisplayName() + ChatColor.GRAY + " has a 5er kill streak!";
                         Bukkit.broadcastMessage(streakMessage);
 
                         //reset deaths

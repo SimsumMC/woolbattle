@@ -20,8 +20,6 @@ public class Cache {
 
     private static HashMap<Player, Long> spawnProtection = new HashMap<>();
 
-    private static HashMap<String, Integer> jumpCooldown = new HashMap<>();
-
     private static HashMap<UUID, Long> enderPearlCooldown = new HashMap<>();
 
     private static HashMap<UUID, Boolean> bowFlags = new HashMap<>();
@@ -61,9 +59,6 @@ public class Cache {
 
     public static HashMap<Player, Long> getSpawnProtection() {return spawnProtection;}
     public static void setSpawnProtection(HashMap<Player, Long> spawnProtection) {Cache.spawnProtection = spawnProtection;}
-
-    public static HashMap<String, Integer> getJumpCooldown() {return jumpCooldown;}
-    public static void setJumpCooldown(HashMap<String, Integer> jumpCooldown) {Cache.jumpCooldown = jumpCooldown;}
 
     public static HashMap<UUID, Long> getEnderPearlCooldown() {return enderPearlCooldown;}
     public static void setEnderPearlCooldown(HashMap<UUID, Long> enderPearlCooldown) {Cache.enderPearlCooldown = enderPearlCooldown;}
@@ -114,14 +109,10 @@ public class Cache {
             put(15, new ArrayList<>());
         }};
 
-        jumpCooldown = new HashMap<>();
-
         enderPearlCooldown = new HashMap<>();
 
         bowFlags = new HashMap<>();
 
         spawnProtection = new HashMap<>();
-
-        activePerks = new HashMap<>();
     }
 }

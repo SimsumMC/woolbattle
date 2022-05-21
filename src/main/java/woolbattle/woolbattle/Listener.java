@@ -19,6 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import woolbattle.woolbattle.itemsystem.ItemSystem;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -324,9 +325,15 @@ public class Listener implements org.bukkit.event.Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
-        int bowWoolCost = 1;
         Projectile projectile = event.getEntity();
-        Player player = null;
+        if(projectile.getType() == EntityType.SNOWBALL){
+            // Exchanger
+            projectile.remove();
+            return;
+        }
+
+        int bowWoolCost = 1;
+        Player player;
         if(!(event.getEntity().getShooter() instanceof Player)){
             return;
         }
@@ -335,7 +342,7 @@ public class Listener implements org.bukkit.event.Listener {
             return;
         }
         HashMap<UUID, Boolean> bowFlags = Cache.getBowFlags();
-        if(bowFlags.keySet().contains(player.getUniqueId())){
+        if(bowFlags.containsKey(player.getUniqueId())){
             bowFlags.put(player.getUniqueId(), false);
         }else{
             bowFlags.replace(player.getUniqueId(), false);

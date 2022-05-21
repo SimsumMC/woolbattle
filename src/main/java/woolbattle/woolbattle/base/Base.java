@@ -10,6 +10,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.weather.WeatherChangeEvent;
 import woolbattle.woolbattle.Config;
 
 public class Base implements Listener {
@@ -81,6 +82,16 @@ public class Base implements Listener {
      */
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event){
+        event.setCancelled(true);
+    }
+
+    /**
+     * An Event that gets executed whenever the weather changes to prevent the changing of weather.
+     * @param event the InventoryDragEvent event
+     * @author SimsumMC
+     */
+    @EventHandler
+    public void onWeatherChange(WeatherChangeEvent event){
         event.setCancelled(true);
     }
 

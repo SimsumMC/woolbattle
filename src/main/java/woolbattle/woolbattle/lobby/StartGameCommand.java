@@ -1,5 +1,6 @@
 package woolbattle.woolbattle.lobby;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,9 +22,9 @@ public class StartGameCommand implements CommandExecutor {
                 return false;
             }
             if (startGame()){
-                player.sendMessage("§aStarted the game.");
+                player.sendMessage(ChatColor.GREEN + "Started the game.");
             } else{
-                player.sendMessage("§cThe game has already been started!");
+                player.sendMessage(ChatColor.RED + "The game has already been started!");
             }
             return true;
         }
