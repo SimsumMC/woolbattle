@@ -1,7 +1,6 @@
 package woolbattle.woolbattle.lives;
 
 import org.bukkit.Bukkit;
-
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -12,8 +11,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Config;
+import woolbattle.woolbattle.lobby.*;
 import woolbattle.woolbattle.team.TeamSystem;
-import woolbattle.woolbattle.lobby.LobbySystem;
 
 import java.util.HashMap;
 
@@ -22,7 +21,7 @@ public class LivesSystem implements Listener {
     /**
      * A Method that teleports the player to the team spawn.
      * @param player the player that gets teleported
-     * @author SimsumMC
+     * @author SimsumMC & Beelzebub
      */
     public void teleportPlayerTeamSpawn(Player player){
         String team = TeamSystem.getPlayerTeam(player, true);
@@ -97,6 +96,7 @@ public class LivesSystem implements Listener {
                 TeamSystem.removePlayerTeam(player);
                 LobbySystem.setPlayerSpectator(player);
             } else {
+                teleportPlayerTeamSpawn(player);
                 EntityDamageEvent lastDamageEvent = event.getPlayer().getLastDamageCause();
 
                 Entity damager;

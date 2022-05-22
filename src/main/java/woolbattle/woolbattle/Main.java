@@ -1,7 +1,5 @@
 package woolbattle.woolbattle;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -10,22 +8,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import woolbattle.woolbattle.base.Base;
-import woolbattle.woolbattle.lives.LivesSystem;
-import woolbattle.woolbattle.lobby.LobbySystem;
-import woolbattle.woolbattle.lobby.StartGameCommand;
-import woolbattle.woolbattle.lobby.StopGameCommand;
-import woolbattle.woolbattle.team.TeamSystem;
-import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
-import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
-import woolbattle.woolbattle.woolsystem.MapBlocksCommand;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import woolbattle.woolbattle.maprestaurationsystem.*;
+import woolbattle.woolbattle.woolsystem.*;
+import woolbattle.woolbattle.lobby.*;
+import woolbattle.woolbattle.team.*;
+import woolbattle.woolbattle.lives.*;
+import java.io.*;
+import java.util.*;
+import java.nio.file.*;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -41,6 +31,17 @@ public final class Main extends JavaPlugin {
             .build();
     private static final MongoClient mongoClient = MongoClients.create(settings);
     private static final MongoDatabase db = mongoClient.getDatabase("woolbattle");
+    private static final UUID worldUUID = readUUID(new File("/world/uid.dat"));
+
+    public static Main getInstance(){
+        return instance;
+    }
+    public static MongoDatabase getMongoDatabase() {
+        return db;
+    }
+    public static MongoClient getMongoClient() {
+        return mongoClient;
+    }
 
     @Override
     public void onEnable() {
@@ -57,27 +58,21 @@ public final class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);
         Bukkit.getPluginManager().registerEvents(new LivesSystem(), this);
 
-        //Servaturus' Stuff
-
-        if (!db.listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking")) {
-            db.createCollection("blockBreaking");
-
-        } else {
-        }
-
-        Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
-        if (found == null) {
-            HashMap<String, Object> mapBlocks = new HashMap<String, Object>(){
-                {
-                    put("mapBlocks", new ArrayList<ArrayList<Double>>());
-                    put("_id", "mapBlocks");
-                }
-            };
-            db.getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
-        }
+        //Servaturus' belongings
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
         getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
         getCommand("mapblocks").setExecutor(new MapBlocksCommand());
+        getCommand("map").setExecutor(new MapCommand());
+
+        Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
+        if (found == null) {
+            db.getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
+        }
+
+        Bukkit.getPluginManager().registerEvents(new Listener(), this);
+        getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
+        getCommand("mapblocks").setExecutor(new MapBlocksCommand());
+        getCommand("mapdefine").setExecutor(new MapCommand());
         BlockBreakingSystem.setCollectBrokenBlocks(false);
         BlockBreakingSystem.fetchMapBlocks();
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -114,17 +109,17 @@ public final class Main extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-    public static Main getInstance(){
-        return instance;
+    public static UUID readUUID(File file) {
+        try (DataInputStream dataInput = new DataInputStream(new FileInputStream(file))) {
+            return new UUID(dataInput.readLong(), dataInput.readLong());
+        } catch (IOException e) {
+            return null;
+        }
     }
-
-    public static MongoDatabase getMongoDatabase() {
-        return db;
-    }
-
-    public static MongoClient getMongoClient() {
-        return mongoClient;
+    public static UUID getWorldUUID(){
+        return worldUUID;
     }
 
 }
+
 

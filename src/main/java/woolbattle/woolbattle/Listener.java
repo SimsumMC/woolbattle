@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
@@ -158,12 +159,7 @@ public class Listener implements org.bukkit.event.Listener {
      */
     @EventHandler
     public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
-        long jumpCooldown = 40;
-        try{
-            jumpCooldown = Config.jumpCooldown;
-        }catch(ExceptionInInitializerError e){
-            jumpCooldown = 40;
-        }
+
         Player p = event.getPlayer();
         p.setFlying(false);
         event.setCancelled(true);
@@ -183,7 +179,12 @@ public class Listener implements org.bukkit.event.Listener {
             p.setAllowFlight(true);
             return;
         }
-
+        long jumpCooldown = 40;
+        try{
+            jumpCooldown = Config.jumpCooldown;
+        }catch(ExceptionInInitializerError e){
+            jumpCooldown = 40;
+        }
         event.setCancelled(true);
         p.setFlying(false);
         p.setAllowFlight(false);
@@ -216,10 +217,8 @@ public class Listener implements org.bukkit.event.Listener {
     @EventHandler
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
         Player p = event.getPlayer();
-        if(event.getNewGameMode().equals(GameMode.SURVIVAL) || event.getNewGameMode().equals(GameMode.ADVENTURE)){
-            p.setAllowFlight(true);
-            p.setFlying(false);
-        }
+        p.setAllowFlight(true);
+        p.setFlying(false);
     }
 
     @EventHandler
@@ -269,13 +268,11 @@ public class Listener implements org.bukkit.event.Listener {
                 return;
             }
 
-            //player.sendMessage(ChatColor.GREEN + "You possess sufficient amounts of wool, to use this perk...");
-            HashMap<UUID, Long> enderPearlCooldowns = Cache.getEnderPearlCooldown();
+            HashMap<UUID, Long> enderPearlCooldowns = Cache.getEnderPearlCooldowns();
 
             if(enderPearlCooldowns.get(player.getUniqueId()) == null){
                 enderPearlCooldowns.put(player.getUniqueId(), new Date().getTime());
             }else if(new Date().getTime()-enderPearlCooldowns.get(player.getUniqueId())<enderderPearlWoolCost){
-                //player.sendMessage("\nThe time differences is too small for the item, to be thrown.\n");
                 player.getInventory().setItem(slot, is);
                 event.setCancelled(true);
                 return;
@@ -287,7 +284,7 @@ public class Listener implements org.bukkit.event.Listener {
             ItemSystem.subtractWool(player, enderPearlWoolCost);
 
         }else if(is.getType().equals(Material.BOW)) {
-            //player.sendMessage("Bow is called");
+
             int woolAmount = 0;
             int bowWoolCost = 1;
             for(ItemStack iterStack : inv.getContents()){
@@ -296,7 +293,6 @@ public class Listener implements org.bukkit.event.Listener {
                 }
             }
             if(woolAmount-bowWoolCost < 0){
-                //player.sendMessage(ChatColor.RED + "You possess to little amounts of wool, to use this perk...");
                 player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.C));
                 player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.B));
 
@@ -335,7 +331,7 @@ public class Listener implements org.bukkit.event.Listener {
             return;
         }
         HashMap<UUID, Boolean> bowFlags = Cache.getBowFlags();
-        if(bowFlags.keySet().contains(player.getUniqueId())){
+        if(bowFlags.containsKey(player.getUniqueId())){
             bowFlags.put(player.getUniqueId(), false);
         }else{
             bowFlags.replace(player.getUniqueId(), false);
@@ -344,5 +340,12 @@ public class Listener implements org.bukkit.event.Listener {
         ItemSystem.subtractWool(player, bowWoolCost);
     }
 
-
+    @EventHandler(ignoreCancelled = true)
+    public void onProjectileHit(ProjectileHitEvent event) {
+        Projectile proj = event.getEntity();
+        if(!proj.getType().equals(EntityType.ARROW)){
+            return;
+        }
+        proj.remove();
+    }
 }
