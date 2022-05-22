@@ -35,6 +35,7 @@ import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 import static woolbattle.woolbattle.itemsystem.ItemSystem.defaultSlots;
+import static woolbattle.woolbattle.woolsystem.BlockBreakingSystem.resetMap;
 
 public class LobbySystem implements Listener {
 
@@ -495,6 +496,8 @@ public class LobbySystem implements Listener {
         }
 
         updateScoreBoard();
+
+        resetMap();
 
         return true;
     }

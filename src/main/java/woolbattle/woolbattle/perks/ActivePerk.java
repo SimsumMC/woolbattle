@@ -58,9 +58,9 @@ public class ActivePerk {
         return this;
     }
 
-    public ActivePerk addEnchantment(Enchantment enchantment, boolean invisible){
+    public ActivePerk addEnchantment(Enchantment enchantment, int level, boolean invisible){
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.addEnchant(enchantment, 1, true);
+        itemMeta.addEnchant(enchantment, level, true);
 
         if(invisible){
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -71,8 +71,8 @@ public class ActivePerk {
         return this;
     }
 
-    public ActivePerk addEnchantment(Enchantment enchantment){
-        return addEnchantment(enchantment, false);
+    public ActivePerk addEnchantment(Enchantment enchantment, boolean invisible){
+        return addEnchantment(enchantment,1, invisible);
     }
 
     public void register(){
@@ -89,6 +89,7 @@ public class ActivePerk {
             return;
         }
         if(!subtractWool(player, woolCost)){
+            event.setCancelled(true);
             player.sendMessage(ChatColor.RED +  "You don't have enough wool to use this item!");
             return;
         }

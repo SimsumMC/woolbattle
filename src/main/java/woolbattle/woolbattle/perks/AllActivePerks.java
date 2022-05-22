@@ -3,24 +3,19 @@ package woolbattle.woolbattle.perks;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.util.Vector;
 import woolbattle.woolbattle.Cache;
-import woolbattle.woolbattle.lobby.LobbySystem;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import static woolbattle.woolbattle.itemsystem.ItemSystem.setItemCooldown;
 import static woolbattle.woolbattle.itemsystem.ItemSystem.subtractWool;
@@ -61,35 +56,25 @@ public class AllActivePerks implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onProjectileHit(ProjectileHitEvent event) {
-        Projectile projectile = event.getEntity();
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if(!(event.getDamager() instanceof Projectile)){
+            return;
+        }
+        Projectile projectile = (Projectile) event.getDamager();
         if(projectile.getType() == EntityType.SNOWBALL) {
-            // Exchanger
+            event.setCancelled(true);
             Player shooterPlayer;
             if (!(projectile.getShooter() instanceof Player)) {
                 return;
             }
             shooterPlayer = (Player) projectile.getShooter();
 
-            Entity hitEntity;
-
-            try{
-                hitEntity = event.getHitEntity();
-            }catch (NoSuchMethodError error){
-                Collection<Entity> nearbyEntities = Bukkit.getWorlds().get(0).getNearbyEntities(shooterPlayer.getLocation(), 0.25, 0.25, 0.25);
-                if(nearbyEntities.isEmpty()){
-                    return;
-                }
-                hitEntity = nearbyEntities.iterator().next();
-            }
-
-
             Player hitPlayer;
 
-            if(!(hitEntity instanceof Player)){
+            if(!(event.getEntity() instanceof Player)){
                 return;
             }
-            hitPlayer = (Player) hitEntity;
+            hitPlayer = (Player) event.getEntity();
 
             Location hitPlayerLocation = hitPlayer.getLocation();
             Location shooterPlayerLocation = shooterPlayer.getLocation();
@@ -149,15 +134,57 @@ public class AllActivePerks implements Listener {
                     block.setData(teamColor.getWoolData());
                 }
             }
-        }.setItemName(ChatColor.RED + "Rescue Platform").addEnchantment(Enchantment.KNOCKBACK, true);
+        }.setItemName(ChatColor.AQUA + "Rescue Platform").addEnchantment(Enchantment.KNOCKBACK, true);
 
         rescuePlatform.register();
 
         ActivePerk exchanger = new ActivePerk(new ItemStack(Material.SNOW_BALL), 10, 10, false)
-                .setItemName(ChatColor.WHITE + "Exchanger").addEnchantment(Enchantment.KNOCKBACK, true);
+                .setItemName(ChatColor.AQUA + "Exchanger").addEnchantment(Enchantment.KNOCKBACK, true);
         //no onExecute method here, see onProjectileLaunch event
 
         exchanger.register();
+
+        ActivePerk knockbackStick = new ActivePerk(new ItemStack(Material.STICK), 15, 64, true)
+                .setItemName(ChatColor.AQUA + "Knockback Stick")
+                .addEnchantment(Enchantment.KNOCKBACK,100, false)
+                .setTriggerActions(new ArrayList<Action>(){{
+                    add(Action.LEFT_CLICK_AIR);
+                }});
+
+        knockbackStick.register();
+
+        ActivePerk jumpPlatform = new ActivePerk(new ItemStack(Material.SLIME_BALL), 15, 25, true){
+            @Override
+            public void onExecute(PlayerInteractEvent event, Player player){
+                Location playerLocation = player.getLocation();
+                DyeColor teamColor = findTeamDyeColor(player);
+
+                World world = playerLocation.getWorld();
+                double x = playerLocation.getX();
+                double y = playerLocation.getY();
+                double z = playerLocation.getZ();
+
+                ArrayList<Location> locations = new ArrayList<Location>(){{
+                    add(new Location(world, x, y -5, z));
+                    add(new Location(world, x, y -5, z+1));
+                    add(new Location(world, x, y -5, z-1));
+                    add(new Location(world, x+1, y -5, z));
+                    add(new Location(world, x-1, y -5, z));
+                }};
+
+                for(Location location : locations){
+                    Block block = location.getBlock();
+                    Material material = block.getType();
+                    if(material != Material.AIR){
+                        continue;
+                    }
+                    block.setType(Material.WOOL);
+                    block.setData(teamColor.getWoolData());
+                }
+            }
+        }.setItemName(ChatColor.AQUA + "Jump Platform").addEnchantment(Enchantment.KNOCKBACK, true);
+
+        jumpPlatform.register();
     }
 
 }

@@ -81,6 +81,7 @@ public class LivesSystem implements Listener {
         long unixTime = System.currentTimeMillis() / 1000L;
 
         if (player.getLocation().getY() <= Config.minHeight) {
+            System.out.println(Config.minHeight);
             if (lastDamage.containsKey(player)) {
                 long realLastDamage = lastDamage.get(player);
                 if (unixTime - realLastDamage >= Config.deathCooldown) {
