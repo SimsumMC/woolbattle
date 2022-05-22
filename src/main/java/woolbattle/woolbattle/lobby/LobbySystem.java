@@ -10,7 +10,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -32,12 +31,10 @@ import woolbattle.woolbattle.itemsystem.ItemSystem;
 import woolbattle.woolbattle.perks.ActivePerk;
 import woolbattle.woolbattle.team.TeamSystem;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
+import static woolbattle.woolbattle.itemsystem.ItemSystem.defaultSlots;
 
 public class LobbySystem implements Listener {
 
@@ -140,6 +137,10 @@ public class LobbySystem implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
+        if(event.getCurrentItem() == null){
+            return;
+        }
+
         if(event.getCurrentItem().getType() == Material.SULPHUR){
             player.sendMessage(ChatColor.RED + "You can't move items that are on cooldown!");
             event.setCancelled(true);
@@ -232,12 +233,22 @@ public class LobbySystem implements Listener {
 
                 break;
             case "Active Perk #1":
-                savePerkSelection(player, rawItemName, PerkType.FIRST_ACTIVE);
-                showActivePerkMenu(player, PerkType.FIRST_ACTIVE);
+                if(rawItemName.equals("Go Back")){
+                    showPerkMenu(player);
+                }
+                else{
+                    savePerkSelection(player, rawItemName, PerkType.FIRST_ACTIVE);
+                    showActivePerkMenu(player, PerkType.FIRST_ACTIVE);
+                }
                 break;
             case "Active Perk #2":
-                savePerkSelection(player, rawItemName, PerkType.SECOND_ACTIVE);
-                showActivePerkMenu(player, PerkType.SECOND_ACTIVE);
+                if(rawItemName.equals("Go Back")){
+                    showPerkMenu(player);
+                }
+                else {
+                    savePerkSelection(player, rawItemName, PerkType.SECOND_ACTIVE);
+                    showActivePerkMenu(player, PerkType.SECOND_ACTIVE);
+                }
                 break;
         }
     }
@@ -704,6 +715,7 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that shows / updates the inventar to change the inventory sort.
+     * @param player - the Player that gets the inventory opened
      * @author SimsumMC
      */
     private static void showEditInventoryMenu(Player player) {
@@ -790,6 +802,7 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that shows the inventar to choose between the different perk types to change them.
+     * @param player - The player gets an inventory opened to choose the perks.
      * @author SimsumMC
      */
     private static void showPerkMenu(Player player) {
@@ -827,6 +840,64 @@ public class LobbySystem implements Listener {
         inv.setItem(15, passiveStack);
 
         player.openInventory(inv);
+    }
+
+    /**
+     * A Method that returns the Slot of the Active Perk.
+     * @param player - the player of the perk
+     * @param activePerkName - the name of the active perk
+     * @author SimsumMC
+     */
+    public static int getActivePerkSlot(Player player, String activePerkName) {
+
+        MongoDatabase database = Main.getMongoDatabase();
+
+        MongoCollection<Document> collection = database.getCollection("playerInventories");
+
+        Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
+
+        int perk1Slot;
+        int perk2Slot;
+
+        if(foundDocument == null){
+            perk1Slot = defaultSlots.get("perk1");
+            perk2Slot = defaultSlots.get("perk2");
+        }
+        else{
+            perk1Slot = (int) foundDocument.get("active_perk1");
+            perk2Slot = (int) foundDocument.get("active_perk2");
+        }
+
+        MongoCollection<Document> perksCollection = database.getCollection("playerPerks");
+
+        Document perksDocument = perksCollection.find(eq("_id", player.getUniqueId().toString())).first();
+
+        if(perksDocument != null) {
+
+            String activePerk1String = null;
+            String activePerk2String = null;
+
+
+            if (perksDocument.get("first_active") != null){
+                activePerk1String = (String) perksDocument.get("first_active");
+            }
+
+            if (perksDocument.get("second_active") != null){
+                activePerk2String = (String) perksDocument.get("second_active");
+            }
+
+            if(activePerk1String != null && activePerk1String.equals(activePerkName)) {
+                return perk1Slot;
+            }
+
+            if(activePerk2String != null && activePerk2String.equals(activePerkName)) {
+                return perk2Slot;
+            }
+
+            return perk1Slot;
+
+        }
+        return perk1Slot;
     }
 
     /**
@@ -871,6 +942,13 @@ public class LobbySystem implements Listener {
 
             inv.addItem(itemStack);
         }
+
+        // Back Item
+        ItemStack backStack = new ItemStack(Material.WOOD_DOOR);
+        ItemMeta backMeta = backStack.getItemMeta();
+        backMeta.setDisplayName(ChatColor.RED + "Go Back");
+        backStack.setItemMeta(backMeta);
+        inv.setItem(26, backStack);
 
         player.openInventory(inv);
     }

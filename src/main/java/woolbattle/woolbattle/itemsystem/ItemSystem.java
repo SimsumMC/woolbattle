@@ -38,7 +38,7 @@ public class ItemSystem {
             put(3, new ItemStack(Material.LEATHER_HELMET).getItemMeta());
         }
     };
-    private static final HashMap<String, Integer> defaultSlots = new HashMap<String, Integer>(){
+    public static final HashMap<String, Integer> defaultSlots = new HashMap<String, Integer>(){
         {
             put("shears", 0);
             put("bow", 1);

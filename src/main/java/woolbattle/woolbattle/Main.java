@@ -51,6 +51,7 @@ public final class Main extends JavaPlugin {
         // SimsumMC's Things
         Bukkit.getPluginManager().registerEvents(new LobbySystem(), this);
         Bukkit.getPluginManager().registerEvents(new Base(), this);
+        Bukkit.getPluginManager().registerEvents(new AllActivePerks(), this);
 
         this.getCommand("gstart").setExecutor(new StartGameCommand());
         this.getCommand("gstop").setExecutor(new StopGameCommand());

@@ -134,6 +134,8 @@ public class LivesSystem implements Listener {
 
                     HashMap<Player, Integer> kills = killStreaks.get(damagerTeam);
 
+                    killStreaks.put(team, new HashMap<Player, Integer>(){{put(player, 0);}});
+
                     int amKills;
                     if(kills.containsKey(damager)){
                         amKills = kills.get(damager) + 1;
