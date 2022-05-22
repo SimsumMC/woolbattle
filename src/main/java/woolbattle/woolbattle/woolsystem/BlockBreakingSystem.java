@@ -301,8 +301,6 @@ public class BlockBreakingSystem {
         }
     }
     public static void resetMap(){
-        MongoDbWrapper wrapper = new MongoDbWrapper(Main.getMongoDatabase());
-
         Document doc = Main.getMongoDatabase().getCollection("map").find(eq("_id", "chunks")).first();
         if(doc == null){
             System.out.println("There are no chunks, belonging to the map, specified in the database");
