@@ -77,6 +77,10 @@ public class Cache {
 
         lastDamage = new HashMap<>();
 
+        spawnProtection = new HashMap<>();
+
+        jumpPlatformBlocks = new HashMap<>();
+
         killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
             put("Blue", new HashMap<>());
             put("Red", new HashMap<>());
@@ -103,9 +107,5 @@ public class Cache {
             put(10, new ArrayList<>());
             put(15, new ArrayList<>());
         }};
-
-        spawnProtection = new HashMap<>();
-
-        jumpPlatformBlocks = new HashMap<>();
     }
 }

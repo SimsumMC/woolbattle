@@ -669,7 +669,7 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that shows / updates the inventar to vote for the life count.
-     * @param player the player that gets the life amoutn voting inventory opened
+     * @param player the player that gets the life amount voting inventory opened
      * @author SimsumMC
      */
     private static void showLifeAmountVoting(Player player) {
