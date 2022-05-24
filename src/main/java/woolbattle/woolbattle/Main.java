@@ -69,9 +69,9 @@ public final class Main extends JavaPlugin {
         getCommand("mapblocks").setExecutor(new MapBlocksCommand());
         getCommand("map").setExecutor(new MapCommand());
 
-        Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
+        Document found = db.getCollection("map").find(eq("_id", "mapBlocks")).first();
         if (found == null) {
-            db.getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
+            db.getCollection("map").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
         }
 
         Bukkit.getPluginManager().registerEvents(new Listener(), this);

@@ -18,18 +18,18 @@ public class Config {
      * @author SimsumMC & Servaturus
      */
 
-    public static final String defaultMap = (String) Config.getValue("mapName");
-    public static final int defaultLives = (int) (long) Config.getValue("defaultLives");
-    public static final int spawnProtectionLength = (int) (long) Config.getValue("spawnProtectionLength");
+    public static final String defaultMap = (String) getValue("mapName");
+    public static final int defaultLives = (int) (long) getValue("defaultLives");
+    public static final int spawnProtectionLength = (int) (long) getValue("spawnProtectionLength");
 
-    public static final int startCooldown = (int) (long) Config.getValue("startCooldown");
-    public static final int deathCooldown = (int) (long) Config.getValue("deathCooldown");
+    public static final int startCooldown = (int) (long) getValue("startCooldown");
+    public static final int deathCooldown = (int) (long) getValue("deathCooldown");
     public static final int jumpCooldown = (int) (long) getValue("jumpCooldown");
 
     public static final int minHeight = (int) (long) getValue("minHeight");
-    public static final int maxHeight = (int) (long) Config.getValue("maxHeight");
+    public static final int maxHeight = (int) (long) getValue("maxHeight");
 
-    public static final int teamSize = (int) (long) Config.getValue("teamSize");
+    public static final int teamSize = (int) (long) getValue("teamSize");
 
     public static final int givenWoolAmount = (int) (long) getValue("givenWoolAmount");
     public static final int maxStacks = (int) (long) getValue("maxStacks");

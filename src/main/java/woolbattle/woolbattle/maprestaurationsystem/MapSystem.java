@@ -19,7 +19,7 @@ public class MapSystem {
 
         ArrayList<ArrayList<Long>> dbChunks;
         try{
-            dbChunks = (ArrayList<ArrayList<Long>>) Main.getMongoDatabase().getCollection("map").find(eq("_id", "mapChunks")).first().get("mapChunks");
+            dbChunks = (ArrayList<ArrayList<Long>>) Main.getMongoDatabase().getCollection("map").find(eq("_id", "mapChunks")).first().get("chunks");
         }catch(ClassCastException e){
             System.out.println("The value of the chunks, belonging to the map, stored in the database consists of a value, not capable of being cast to an ArrayList.");
             dbChunks = new ArrayList<>();

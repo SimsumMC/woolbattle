@@ -300,7 +300,7 @@ public class BlockBreakingSystem {
         }
     }
     public static void resetMap(){
-        Document doc = Main.getMongoDatabase().getCollection("map").find(eq("_id", "chunks")).first();
+        Document doc = Main.getMongoDatabase().getCollection("map").find(eq("_id", "mapChunks")).first();
         if(doc == null){
             System.out.println("There are no chunks, belonging to the map, specified in the database");
             return;
@@ -329,6 +329,7 @@ public class BlockBreakingSystem {
                         }
 
                         block.setType(Material.AIR);
+                        System.out.println("[" + x + y  + z + "]");
                     }
                 }
             }

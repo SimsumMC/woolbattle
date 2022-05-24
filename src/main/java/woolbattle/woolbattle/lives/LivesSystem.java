@@ -81,15 +81,14 @@ public class LivesSystem implements Listener {
         long unixTime = System.currentTimeMillis() / 1000L;
 
         if (player.getLocation().getY() <= Config.minHeight) {
-            System.out.println(Config.minHeight);
             if (lastDamage.containsKey(player)) {
                 long realLastDamage = lastDamage.get(player);
                 if (unixTime - realLastDamage >= Config.deathCooldown) {
                     teleportPlayerTeamSpawn(player);
+                    setPlayerSpawnProtection(player, unixTime);
                     return;
                 }
             }
-
             String team = TeamSystem.getPlayerTeam(player, true);
 
             HashMap<String, Integer> teamLives = Cache.getTeamLives();
@@ -108,6 +107,11 @@ public class LivesSystem implements Listener {
                 }
                 else{
                     damager = null;
+                }
+
+                if(damager == null){
+                    teleportPlayerTeamSpawn(player);
+                    setPlayerSpawnProtection(player, unixTime);
                 }
 
                 if(damager instanceof Arrow){
@@ -152,8 +156,6 @@ public class LivesSystem implements Listener {
                                 ((Player) damager).getDisplayName() + ChatColor.GRAY + " has a 5er kill streak!";
                         Bukkit.broadcastMessage(streakMessage);
 
-                        //reset deaths
-
                         kills.put((Player) damager, 0);
                         killStreaks.put(damagerTeam, kills);
                         Cache.setKillStreaks(killStreaks);
@@ -161,9 +163,9 @@ public class LivesSystem implements Listener {
                         teamLives = Cache.getTeamLives();
                         teamLives.put(damagerTeam, (teamLives.get(damagerTeam) + 1));
                         Cache.setTeamLives(teamLives);
+                        System.out.println(10);
 
                     }
-
                     teleportPlayerTeamSpawn(player);
                     setPlayerSpawnProtection(player, unixTime);
 

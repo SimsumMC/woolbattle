@@ -1,9 +1,10 @@
 package woolbattle.woolbattle.perks;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Instrument;
+import org.bukkit.Note;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -11,19 +12,27 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import woolbattle.woolbattle.Cache;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static woolbattle.woolbattle.itemsystem.ItemSystem.setItemCooldown;
 import static woolbattle.woolbattle.itemsystem.ItemSystem.subtractWool;
 
 public class ActivePerk {
-    private final ItemStack itemStack;
+    private ItemStack itemStack;
     private String itemName;
     private final boolean useOnExecute;
+    private final boolean selectable;
     private final int cooldown;
     private final int woolCost;
-    private ArrayList<Action> triggerActions = new ArrayList<>();
+
+    public ActivePerk(ItemStack itemStack, int cooldown, int woolCost, boolean useOnExecute, boolean selectable) {
+        this.itemStack = itemStack;
+        this.itemName = itemStack.getItemMeta().getDisplayName();
+        this.useOnExecute = useOnExecute;
+        this.cooldown = cooldown;
+        this.woolCost = woolCost;
+        this.selectable = selectable;
+    }
 
     public ActivePerk(ItemStack itemStack, int cooldown, int woolCost, boolean useOnExecute) {
         this.itemStack = itemStack;
@@ -31,18 +40,27 @@ public class ActivePerk {
         this.useOnExecute = useOnExecute;
         this.cooldown = cooldown;
         this.woolCost = woolCost;
+        this.selectable = true;
     }
 
     public ItemStack getItemStack(){
         return itemStack;
     }
 
+    public void setItemStack(ItemStack newItemStack){
+        itemStack = newItemStack;
+    }
+
     public int getWoolCost(){
-        return cooldown;
+        return woolCost;
     }
 
     public int getCooldown(){
         return cooldown;
+    }
+
+    public boolean getSelectableStatus(){
+        return selectable;
     }
 
     public ActivePerk setItemName(String name){
@@ -50,11 +68,6 @@ public class ActivePerk {
         itemMeta.setDisplayName(name);
         itemStack.setItemMeta(itemMeta);
         itemName = name;
-        return this;
-    }
-
-    public ActivePerk setTriggerActions(ArrayList<Action> newTriggerActions) {
-        triggerActions = newTriggerActions;
         return this;
     }
 
@@ -85,19 +98,20 @@ public class ActivePerk {
         if(!useOnExecute){
             return;
         }
-        if(!triggerActions.isEmpty() && !triggerActions.contains(event.getAction())){
-            return;
-        }
-        if(!subtractWool(player, woolCost)){
-            event.setCancelled(true);
-            player.sendMessage(ChatColor.RED +  "You don't have enough wool to use this item!");
-            return;
-        }
 
         Inventory inventory = player.getInventory();
         int slot = inventory.first(event.getItem());
 
-        setItemCooldown(player, slot, itemStack, cooldown);
+        if(!subtractWool(player, woolCost)){
+            event.setCancelled(true);
+            player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.C));
+            player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.B));
+            player.sendMessage(ChatColor.RED +  "You don't have enough wool to use this item!");
+            return;
+        }
+        if(cooldown != 0){
+            setItemCooldown(player, slot, itemStack, cooldown);
+        }
 
         onExecute(event, player);
     }

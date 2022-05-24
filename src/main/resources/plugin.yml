@@ -12,11 +12,9 @@ commands:
     usage: /gstop
   mapblocks:
     aliases: [ mb ]
-  test:
-    aliases: [ ]
   blockregistration:
     aliases: [ blckreg ]
   mapdefine:
-    aliases: [mdef]
+    aliases: [ mdef ]
   map:
     aliases: [ m ]

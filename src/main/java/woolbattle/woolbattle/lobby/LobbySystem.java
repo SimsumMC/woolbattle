@@ -34,7 +34,6 @@ import woolbattle.woolbattle.team.TeamSystem;
 import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
-import static woolbattle.woolbattle.itemsystem.ItemSystem.defaultSlots;
 import static woolbattle.woolbattle.woolsystem.BlockBreakingSystem.resetMap;
 
 public class LobbySystem implements Listener {
@@ -474,9 +473,9 @@ public class LobbySystem implements Listener {
             return false;
         }
 
-        cooldown = 60;
-
         gameStarted = false;
+
+        cooldown = 60;
 
         Cache.clear();
 
@@ -846,64 +845,6 @@ public class LobbySystem implements Listener {
     }
 
     /**
-     * A Method that returns the Slot of the Active Perk.
-     * @param player - the player of the perk
-     * @param activePerkName - the name of the active perk
-     * @author SimsumMC
-     */
-    public static int getActivePerkSlot(Player player, String activePerkName) {
-
-        MongoDatabase database = Main.getMongoDatabase();
-
-        MongoCollection<Document> collection = database.getCollection("playerInventories");
-
-        Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
-
-        int perk1Slot;
-        int perk2Slot;
-
-        if(foundDocument == null){
-            perk1Slot = defaultSlots.get("perk1");
-            perk2Slot = defaultSlots.get("perk2");
-        }
-        else{
-            perk1Slot = (int) foundDocument.get("active_perk1");
-            perk2Slot = (int) foundDocument.get("active_perk2");
-        }
-
-        MongoCollection<Document> perksCollection = database.getCollection("playerPerks");
-
-        Document perksDocument = perksCollection.find(eq("_id", player.getUniqueId().toString())).first();
-
-        if(perksDocument != null) {
-
-            String activePerk1String = null;
-            String activePerk2String = null;
-
-
-            if (perksDocument.get("first_active") != null){
-                activePerk1String = (String) perksDocument.get("first_active");
-            }
-
-            if (perksDocument.get("second_active") != null){
-                activePerk2String = (String) perksDocument.get("second_active");
-            }
-
-            if(activePerk1String != null && activePerk1String.equals(activePerkName)) {
-                return perk1Slot;
-            }
-
-            if(activePerk2String != null && activePerk2String.equals(activePerkName)) {
-                return perk2Slot;
-            }
-
-            return perk1Slot;
-
-        }
-        return perk1Slot;
-    }
-
-    /**
      * A Method that shows the inventar to choose between the different perk types to change them.
      * @author SimsumMC
      */
@@ -926,6 +867,10 @@ public class LobbySystem implements Listener {
 
         HashMap<String, ActivePerk> activePerks = Cache.getActivePerks();
         for(ActivePerk perk : activePerks.values()){
+            if(!perk.getSelectableStatus()){
+                continue;
+            }
+
             ItemStack itemStack = perk.getItemStack();
             ItemMeta itemMeta = itemStack.getItemMeta();
 
@@ -975,8 +920,8 @@ public class LobbySystem implements Listener {
                         if (playerAmount >= (Config.teamSize * 2)) {
                             if (cooldown == 0) {
                                 startGame();
-                            } else if (cooldown > 15 && playerAmount >= (Config.teamSize * 2)) {
-                                cooldown = 15;
+                            } else if (cooldown > 20) {
+                                cooldown = 20;
                             }
                             cooldown -= 1;
                         } else {

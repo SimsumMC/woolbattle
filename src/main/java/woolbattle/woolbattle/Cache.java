@@ -1,11 +1,11 @@
 package woolbattle.woolbattle;
 
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import woolbattle.woolbattle.perks.ActivePerk;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.UUID;
 
 public class Cache {
 
@@ -20,9 +20,7 @@ public class Cache {
 
     private static HashMap<Player, Long> spawnProtection = new HashMap<>();
 
-    private static HashMap<UUID, Long> enderPearlCooldown = new HashMap<>();
-
-    private static HashMap<UUID, Boolean> bowFlags = new HashMap<>();
+    private static HashMap<Player, ArrayList<ArrayList<Block>>> jumpPlatformBlocks = new HashMap<>();
 
     private static HashMap<String, HashMap<Player, Integer>> killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
         put("Blue", new HashMap<>());
@@ -60,11 +58,8 @@ public class Cache {
     public static HashMap<Player, Long> getSpawnProtection() {return spawnProtection;}
     public static void setSpawnProtection(HashMap<Player, Long> spawnProtection) {Cache.spawnProtection = spawnProtection;}
 
-    public static HashMap<UUID, Long> getEnderPearlCooldown() {return enderPearlCooldown;}
-    public static void setEnderPearlCooldown(HashMap<UUID, Long> enderPearlCooldown) {Cache.enderPearlCooldown = enderPearlCooldown;}
-
-    public static HashMap<UUID, Boolean> getBowFlags() {return bowFlags;}
-    public static void setBowFlags(HashMap<UUID, Boolean> bowFlags) {Cache.bowFlags = bowFlags;}
+    public static HashMap<Player, ArrayList<ArrayList<Block>>> getJumpPlatformBlocks() {return jumpPlatformBlocks;}
+    public static void setJumpPlatformBlocks(HashMap<Player, ArrayList<ArrayList<Block>>> jumpPlatformBlocks) {Cache.jumpPlatformBlocks = jumpPlatformBlocks;}
 
     public static HashMap<String, HashMap<Player, Integer>> getKillStreaks() {return killStreaks;}
     public static void setKillStreaks(HashMap<String, HashMap<Player, Integer>> killStreaks) {Cache.killStreaks = killStreaks;}
@@ -109,10 +104,8 @@ public class Cache {
             put(15, new ArrayList<>());
         }};
 
-        enderPearlCooldown = new HashMap<>();
-
-        bowFlags = new HashMap<>();
-
         spawnProtection = new HashMap<>();
+
+        jumpPlatformBlocks = new HashMap<>();
     }
 }
