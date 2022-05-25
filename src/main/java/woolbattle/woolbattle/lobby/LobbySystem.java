@@ -28,13 +28,14 @@ import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.Enums.PerkType;
 import woolbattle.woolbattle.Main;
 import woolbattle.woolbattle.itemsystem.ItemSystem;
+import woolbattle.woolbattle.lives.LivesSystem;
 import woolbattle.woolbattle.perks.ActivePerk;
 import woolbattle.woolbattle.team.TeamSystem;
 
 import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
-import static woolbattle.woolbattle.woolsystem.BlockBreakingSystem.resetMap;
+import static woolbattle.woolbattle.lives.LivesSystem.setPlayerSpawnProtection;
 
 public class LobbySystem implements Listener {
 
@@ -422,6 +423,8 @@ public class LobbySystem implements Listener {
 
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 
+        long unixTime = (System.currentTimeMillis() / 1000L) + Config.spawnProtectionLengthAtGameStart;
+
         for(Player player: players){
             String team = TeamSystem.getPlayerTeam(player, true);
             teamLives.put(team, topVotedLifeAmount);
@@ -447,6 +450,8 @@ public class LobbySystem implements Listener {
 
             ItemSystem.giveItems(player);
             player.teleport(location);
+
+            setPlayerSpawnProtection(player, Config.spawnProtectionLengthAtGameStart);
 
             if(player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.CREATIVE){
                 player.setGameMode(GameMode.SURVIVAL);
@@ -495,8 +500,6 @@ public class LobbySystem implements Listener {
         }
 
         updateScoreBoard();
-
-        resetMap();
 
         return true;
     }
@@ -865,13 +868,15 @@ public class LobbySystem implements Listener {
 
         Inventory inv = Bukkit.createInventory(null, 3*9, "§dActive Perk #" + perkType.value);
 
+        ArrayList<String> newLore;
+
         HashMap<String, ActivePerk> activePerks = Cache.getActivePerks();
         for(ActivePerk perk : activePerks.values()){
             if(!perk.getSelectableStatus()){
                 continue;
             }
 
-            ItemStack itemStack = perk.getItemStack();
+            ItemStack itemStack = perk.getItemStack().clone();
             ItemMeta itemMeta = itemStack.getItemMeta();
 
             if(selectedPerk != null && itemMeta.getDisplayName().substring(2).equals(selectedPerk)){
@@ -885,6 +890,16 @@ public class LobbySystem implements Listener {
                     }
                 }
             }
+
+
+            newLore = new ArrayList<>();
+
+            newLore.add(ChatColor.WHITE + perk.getDescription());
+            newLore.add("\u1CBC");
+            newLore.add(ChatColor.GOLD + "WoolCost: " + ChatColor.DARK_PURPLE + perk.getWoolCost());
+            newLore.add(ChatColor.GOLD + "Cooldown: " + ChatColor.DARK_PURPLE + perk.getCooldown());
+
+            itemMeta.setLore(newLore);
 
             itemStack.setItemMeta(itemMeta);
 
@@ -920,8 +935,8 @@ public class LobbySystem implements Listener {
                         if (playerAmount >= (Config.teamSize * 2)) {
                             if (cooldown == 0) {
                                 startGame();
-                            } else if (cooldown > 20) {
-                                cooldown = 20;
+                            } else if (cooldown > Config.skipCooldown) {
+                                cooldown = Config.skipCooldown;
                             }
                             cooldown -= 1;
                         } else {

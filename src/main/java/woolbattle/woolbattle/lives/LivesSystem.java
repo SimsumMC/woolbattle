@@ -50,10 +50,12 @@ public class LivesSystem implements Listener {
     /**
      * A Method that updates the spawnProtection HashMap in the Cache with the current unix timestamp.
      * @param player the player that gets teleported
-     * @param unixTime the current unix timestamp
+     * @param length the length of the spawn protection in seconds
      * @author SimsumMC
      */
-    public void setPlayerSpawnProtection(Player player, Long unixTime){
+    public static void setPlayerSpawnProtection(Player player, int length){
+        long unixTime = (System.currentTimeMillis() / 1000L) + length;
+
         HashMap<Player, Long> spawnProtection = Cache.getSpawnProtection();
 
         spawnProtection.put(player, unixTime);
@@ -85,7 +87,7 @@ public class LivesSystem implements Listener {
                 long realLastDamage = lastDamage.get(player);
                 if (unixTime - realLastDamage >= Config.deathCooldown) {
                     teleportPlayerTeamSpawn(player);
-                    setPlayerSpawnProtection(player, unixTime);
+                    setPlayerSpawnProtection(player, Config.spawnProtectionLengthAfterDeath);
                     return;
                 }
             }
@@ -111,7 +113,7 @@ public class LivesSystem implements Listener {
 
                 if(damager == null){
                     teleportPlayerTeamSpawn(player);
-                    setPlayerSpawnProtection(player, unixTime);
+                    setPlayerSpawnProtection(player, Config.spawnProtectionLengthAfterDeath);
                 }
 
                 if(damager instanceof Arrow){
@@ -163,11 +165,10 @@ public class LivesSystem implements Listener {
                         teamLives = Cache.getTeamLives();
                         teamLives.put(damagerTeam, (teamLives.get(damagerTeam) + 1));
                         Cache.setTeamLives(teamLives);
-                        System.out.println(10);
 
                     }
                     teleportPlayerTeamSpawn(player);
-                    setPlayerSpawnProtection(player, unixTime);
+                    setPlayerSpawnProtection(player, Config.spawnProtectionLengthAfterDeath);
 
                 }
                 LobbySystem.determinateWinnerTeam();

@@ -2,7 +2,6 @@ package woolbattle.woolbattle.team;
 
 import org.bukkit.*;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,7 +15,6 @@ import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.lobby.LobbySystem;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 import static woolbattle.woolbattle.Cache.getTeamMembers;
@@ -237,7 +235,7 @@ public class TeamSystem implements Listener {
                 return;
             }
             HashMap<Player, Long> spawnProtection = Cache.getSpawnProtection();
-            if(spawnProtection.containsKey(damaged) && (unixTime - spawnProtection.get(damaged)) <= Config.spawnProtectionLength){
+            if(spawnProtection.containsKey(damaged) && (unixTime < spawnProtection.get(damaged))){
                 if(damager.getUniqueId() != damaged.getUniqueId()){
                     damager.sendMessage("§cThe player has spawn protection!");
                 }
@@ -305,7 +303,7 @@ public class TeamSystem implements Listener {
             case "Blue":
                 return ChatColor.DARK_BLUE;
             case "Green":
-                return ChatColor.DARK_GREEN;
+                return ChatColor.GREEN;
             case "Yellow":
                 return ChatColor.YELLOW;
             default:
@@ -326,7 +324,7 @@ public class TeamSystem implements Listener {
             case "Red":
                 return DyeColor.RED;
             case "Green":
-                return DyeColor.GREEN;
+                return DyeColor.LIME;
             case "Yellow":
                 return DyeColor.YELLOW;
             default:
@@ -347,7 +345,7 @@ public class TeamSystem implements Listener {
             case "Red":
                 return Color.RED;
             case "Green":
-                return Color.GREEN;
+                return Color.LIME;
             case "Yellow":
                 return Color.YELLOW;
             default:

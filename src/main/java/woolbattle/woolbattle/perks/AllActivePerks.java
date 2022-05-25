@@ -4,16 +4,19 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fish;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.Vector;
 import woolbattle.woolbattle.Cache;
 
 import java.util.ArrayList;
@@ -109,6 +112,64 @@ public class AllActivePerks implements Listener {
             projectile.remove();
         }
 
+    }
+
+    @EventHandler
+    public void onPlayerFish(final PlayerFishEvent event) {
+        final Player player = event.getPlayer();
+        final Fish hook = event.getHook();
+        if ((
+                event.getState().equals(PlayerFishEvent.State.IN_GROUND) ||
+                        event.getState().equals(PlayerFishEvent.State.CAUGHT_ENTITY) ||
+                        event.getState().equals(PlayerFishEvent.State.FAILED_ATTEMPT)) &&
+                Bukkit.getWorld(event.getPlayer().getWorld().getName()).getBlockAt(hook.getLocation().getBlockX(),
+                        hook.getLocation().getBlockY() - 1, hook.getLocation().getBlockZ()).getType() != Material.AIR
+                && Bukkit.getWorld(event.getPlayer().getWorld().getName()).getBlockAt(hook.getLocation().getBlockX(),
+                hook.getLocation().getBlockY() - 1, hook.getLocation().getBlockZ()).getType() != Material.STATIONARY_WATER) {
+            {
+
+            ActivePerk perk = Cache.getActivePerks().get("Grappling Hook");
+            ItemStack itemStack = perk.getItemStack();
+
+            int woolCost = perk.getWoolCost();
+            int cooldown = perk.getCooldown();
+            int perkSlot;
+
+            perkSlot = perk.getSlot(player);
+
+            if(!subtractWool(player, woolCost)){
+                event.setCancelled(true);
+                hook.remove();
+                player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.C));
+                player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.B));
+                player.sendMessage(ChatColor.RED +  "You don't have enough wool to use this item!");
+                return;
+            }
+            else{
+                if(cooldown != 0) {
+                    setItemCooldown(player, perkSlot, itemStack, cooldown);
+                }
+            }
+
+            final Location lc = player.getLocation();
+            final Location to = event.getHook().getLocation();
+
+            lc.setY(lc.getY() + 0.8);
+            player.teleport(lc);
+
+            final double t = to.distance(lc);
+            final double v_x = (1.0 + 0.07 * t) * (to.getX() - lc.getX()) / t;
+            final double v_y = (1.0 + 0.03 * t) * (to.getY() - lc.getY()) / t - -0.04 * t;
+            final double v_z = (1.0 + 0.07 * t) * (to.getZ() - lc.getZ()) / t;
+            final Vector v = player.getVelocity();
+
+            v.setX(v_x);
+            v.setY(v_y);
+            v.setZ(v_z);
+
+            player.setVelocity(v);
+        }
+    }
     }
 
     /**
@@ -257,19 +318,22 @@ public class AllActivePerks implements Listener {
                     block.setData(teamColor.getWoolData());
                 }
             }
-        }.setItemName(ChatColor.AQUA + "Rescue Platform").addEnchantment(Enchantment.DURABILITY, true);
+        }.setItemName(ChatColor.AQUA + "Rescue Platform").addEnchantment(Enchantment.DURABILITY, true)
+         .setDescription("Places blocks under you.");
 
         rescuePlatform.register();
 
         ActivePerk exchanger = new ActivePerk(new ItemStack(Material.SNOW_BALL), 15, 10, false)
-                .setItemName(ChatColor.AQUA + "Exchanger").addEnchantment(Enchantment.DURABILITY, true);
+                .setItemName(ChatColor.AQUA + "Exchanger").addEnchantment(Enchantment.DURABILITY, true)
+                .setDescription("Swap your Location with another player.");
         //no onExecute method here, see onProjectileLaunch event
 
         exchanger.register();
 
         ActivePerk knockbackStick = new ActivePerk(new ItemStack(Material.STICK), 0, 0, false)
                 .setItemName(ChatColor.AQUA + "Knockback Stick")
-                .addEnchantment(Enchantment.KNOCKBACK,100, false);
+                .addEnchantment(Enchantment.KNOCKBACK,100, false)
+                .setDescription("Best weapon in the game.");
 
         knockbackStick.register();
 
@@ -321,9 +385,22 @@ public class AllActivePerks implements Listener {
                 Cache.setJumpPlatformBlocks(jumpPlatformBlocks);
 
             }
-        }.setItemName(ChatColor.AQUA + "Jump Platform").addEnchantment(Enchantment.DURABILITY, true);
+        }.setItemName(ChatColor.AQUA + "Jump Platform").addEnchantment(Enchantment.DURABILITY, true)
+         .setDescription("Boosts yourself up.");
 
         jumpPlatform.register();
+
+        ActivePerk grapplingHook = new ActivePerk(new ItemStack(Material.FISHING_ROD), 5, 10, false)
+                .setItemName(ChatColor.AQUA + "Grappling Hook").addEnchantment(Enchantment.DURABILITY, true)
+                .setDescription("Helps you go fast from one point to another.");
+
+        grapplingHook.register();
+
+        ActivePerk homeTeleport = new ActivePerk(new ItemStack(Material.CLOCk), 5, 10, false)
+                .setItemName(ChatColor.AQUA + "Home Teleport").addEnchantment(Enchantment.DURABILITY, true)
+                .setDescription("Teleports you home.");
+
+        homeTeleport.register();
     }
 
 }

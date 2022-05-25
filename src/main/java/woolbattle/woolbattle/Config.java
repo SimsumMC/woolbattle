@@ -20,9 +20,11 @@ public class Config {
 
     public static final String defaultMap = (String) getValue("mapName");
     public static final int defaultLives = (int) (long) getValue("defaultLives");
-    public static final int spawnProtectionLength = (int) (long) getValue("spawnProtectionLength");
+    public static final int spawnProtectionLengthAfterDeath = (int) (long) getValue("spawnProtectionAfterDeath");
+    public static final int spawnProtectionLengthAtGameStart = (int) (long) getValue("spawnProtectionAtGameStart");
 
     public static final int startCooldown = (int) (long) getValue("startCooldown");
+    public static final int skipCooldown = (int) (long) getValue("skipCooldown");
     public static final int deathCooldown = (int) (long) getValue("deathCooldown");
     public static final int jumpCooldown = (int) (long) getValue("jumpCooldown");
 

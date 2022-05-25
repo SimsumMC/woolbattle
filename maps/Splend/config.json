@@ -1,0 +1,19 @@
+{
+  "mapName": "Splend",
+  "mapSpawn": [0, 100, 0],
+  "lobbySpawn": [1000, 101, 1000],
+  "defaultLives": 10,
+  "spawnProtectionAfterDeath": 5,
+  "spawnProtectionAtGameStart": 15,
+  "startCooldown": 60,
+  "skipCooldown": 30,
+  "deathCooldown": 10,
+  "maxHeight": 120,
+  "minHeight": 0,
+  "teamSize": 2,
+  "teamSpawns": [[-29, 93, 0], [0, 93, 30], [0, 93, -29], [30, 93, 0]],
+  "givenWoolAmount": 2,
+  "maxStacks": 4,
+  "jumpCooldown": 60,
+  "woolReplaceDelay" : 10
+}

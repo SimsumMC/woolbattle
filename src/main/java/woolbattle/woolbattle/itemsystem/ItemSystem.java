@@ -194,7 +194,6 @@ public class ItemSystem {
      * @author Servaturus & SimsumMC
      */
     public static boolean subtractWool(Player player, int subtractWool){
-        System.out.println(subtractWool);
 
         PlayerInventory inv = player.getInventory();
 
