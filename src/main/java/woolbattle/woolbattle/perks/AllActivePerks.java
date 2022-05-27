@@ -4,7 +4,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Fish;
+import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -170,19 +170,10 @@ public class AllActivePerks implements Listener {
     }
 
     @EventHandler
-    public void onPlayerFish(final PlayerFishEvent event) {
-        final Player player = event.getPlayer();
-        final Fish hook = event.getHook();
-        if ((
-                event.getState().equals(PlayerFishEvent.State.IN_GROUND) ||
-                        event.getState().equals(PlayerFishEvent.State.CAUGHT_ENTITY) ||
-                        event.getState().equals(PlayerFishEvent.State.FAILED_ATTEMPT)) &&
-                Bukkit.getWorld(event.getPlayer().getWorld().getName()).getBlockAt(hook.getLocation().getBlockX(),
-                        hook.getLocation().getBlockY() - 1, hook.getLocation().getBlockZ()).getType() != Material.AIR
-                && Bukkit.getWorld(event.getPlayer().getWorld().getName()).getBlockAt(hook.getLocation().getBlockX(),
-                hook.getLocation().getBlockY() - 1, hook.getLocation().getBlockZ()).getType() != Material.STATIONARY_WATER) {
-            {
-
+    public void onPlayerFish(PlayerFishEvent event) {
+        Player player = event.getPlayer();
+        if (event.getState() == PlayerFishEvent.State.FAILED_ATTEMPT || event.getState() == PlayerFishEvent.State.IN_GROUND) {
+            FishHook hook = event.getHook();
             ActivePerk perk = Cache.getActivePerks().get("Grappling Hook");
             ItemStack itemStack = perk.getItemStack();
 
@@ -205,25 +196,11 @@ public class AllActivePerks implements Listener {
                 }
             }
 
-            final Location lc = player.getLocation();
-            final Location to = event.getHook().getLocation();
-
-            lc.setY(lc.getY() + 0.8);
-            player.teleport(lc);
-
-            final double t = to.distance(lc);
-            final double v_x = (1.0 + 0.07 * t) * (to.getX() - lc.getX()) / t;
-            final double v_y = (1.0 + 0.03 * t) * (to.getY() - lc.getY()) / t - -0.04 * t;
-            final double v_z = (1.0 + 0.07 * t) * (to.getZ() - lc.getZ()) / t;
-            final Vector v = player.getVelocity();
-
-            v.setX(v_x);
-            v.setY(v_y);
-            v.setZ(v_z);
-
-            player.setVelocity(v);
+            Location playerLocation = player.getLocation();
+            Location hookLocation = hook.getLocation();
+            Vector vector = new Vector(hookLocation.getX() - playerLocation.getX(), 1.0, hookLocation.getZ() - playerLocation.getZ());
+            player.setVelocity(vector);
         }
-    }
     }
 
     /**
