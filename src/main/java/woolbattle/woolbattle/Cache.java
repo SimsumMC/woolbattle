@@ -16,6 +16,8 @@ public class Cache {
 
     private static HashMap<String, ActivePerk> activePerks = new HashMap<>();
 
+    private static HashMap<Player, Player> playerDuels = new HashMap<>();
+
     private static HashMap<Player, Long> lastDamage = new HashMap<>();
 
     private static HashMap<Player, Long> spawnProtection = new HashMap<>();
@@ -52,6 +54,9 @@ public class Cache {
     public static HashMap<String, ActivePerk> getActivePerks() {return activePerks;}
     public static void setActivePerks(HashMap<String, ActivePerk> activePerks) {Cache.activePerks = activePerks;}
 
+    public static HashMap<Player, Player> getPlayerDuels() {return playerDuels;}
+    public static void setPlayerDuels(HashMap<Player, Player> playerDuels) {Cache.playerDuels = playerDuels;}
+
     public static HashMap<Player, Long> getLastDamage() {return lastDamage;}
     public static void setLastDamage(HashMap<Player, Long> lastDamage) {Cache.lastDamage = lastDamage;}
 
@@ -74,6 +79,7 @@ public class Cache {
     public static void setLifeVoting(HashMap<Integer, ArrayList<Player>> lifeVoting) {Cache.lifeVoting = lifeVoting;}
 
     public static void clear(){
+        playerDuels = new HashMap<>();
 
         lastDamage = new HashMap<>();
 

@@ -24,6 +24,9 @@ public class Base implements Listener {
      */
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
+        if(!(event.getEntity() instanceof Player)){
+            return;
+        }
         //disable fall damage
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE) {
             event.setCancelled(true);

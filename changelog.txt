@@ -6,3 +6,5 @@
 -> added the active perk menu
 -> rewrote/shortened some stuff
 -> added a new map named Splend
+-> made the skip cooldown (when enough players are on) configurable
+-> Spawn Protection at the beginning (Configurable)

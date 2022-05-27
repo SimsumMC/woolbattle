@@ -120,7 +120,6 @@ public class ActivePerk {
             event.setCancelled(true);
             player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.C));
             player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.B));
-            player.sendMessage(ChatColor.RED +  "You don't have enough wool to use this item!");
             return;
         }
         if(cooldown != 0){

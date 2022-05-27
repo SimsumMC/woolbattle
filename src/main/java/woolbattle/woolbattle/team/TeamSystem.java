@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -206,6 +207,19 @@ public class TeamSystem implements Listener {
      */
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event){
+        if(!(event.getEntity() instanceof Player)){
+            return;
+        }
+        if(event.getDamager() instanceof Player){
+            HashMap<Player, Player> playerDuels = Cache.getPlayerDuels();
+            if(playerDuels.containsKey((Player) event.getEntity())){
+                event.setCancelled(true);
+                String duelPlayerName = getTeamColour(getPlayerTeam((Player) event.getEntity(), true)) +
+                        ((Player) event.getEntity()).getDisplayName();
+                event.getDamager().sendMessage(ChatColor.RED + "This player is in a duel with " +
+                        duelPlayerName + ChatColor.RED + "!");
+            }
+        }
         HashMap<Player, Long> lastDamage = Cache.getLastDamage();
         long unixTime = System.currentTimeMillis() / 1000L;
         lastDamage.put((Player) event.getEntity(), unixTime);

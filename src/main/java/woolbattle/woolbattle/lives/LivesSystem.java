@@ -18,6 +18,9 @@ import woolbattle.woolbattle.lobby.LobbySystem;
 
 import java.util.HashMap;
 
+import static woolbattle.woolbattle.team.TeamSystem.getPlayerTeam;
+import static woolbattle.woolbattle.team.TeamSystem.getTeamColour;
+
 public class LivesSystem implements Listener {
 
     /**
@@ -25,7 +28,7 @@ public class LivesSystem implements Listener {
      * @param player the player that gets teleported
      * @author SimsumMC
      */
-    public void teleportPlayerTeamSpawn(Player player){
+    public static void teleportPlayerTeamSpawn(Player player){
         String team = TeamSystem.getPlayerTeam(player, true);
 
         switch(team){
@@ -91,6 +94,21 @@ public class LivesSystem implements Listener {
                     return;
                 }
             }
+
+            HashMap<Player, Player> playerDuels = Cache.getPlayerDuels();
+            Player otherPlayer = playerDuels.get(player);
+            if(otherPlayer != null){
+                playerDuels.remove(player);
+                playerDuels.remove(otherPlayer);
+                Cache.setPlayerDuels(playerDuels);
+
+                String otherPlayerName = getTeamColour(getPlayerTeam(otherPlayer, true)) + otherPlayer.getDisplayName();
+                String playerName = getTeamColour(getPlayerTeam(player, true)) + player.getDisplayName();
+
+                player.sendMessage(ChatColor.GOLD + "You are now in a duel with " + otherPlayerName + ChatColor.GOLD + "!");
+                otherPlayer.sendMessage(ChatColor.GOLD + "You are now in a duel with " + playerName + ChatColor.GOLD + "!");
+            }
+
             String team = TeamSystem.getPlayerTeam(player, true);
 
             HashMap<String, Integer> teamLives = Cache.getTeamLives();
