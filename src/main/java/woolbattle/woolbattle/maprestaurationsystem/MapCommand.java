@@ -13,9 +13,10 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class MapCommand implements CommandExecutor {
-    private  final String usage = "/mapdefine <reset/def> <uuid> <beginning[x,y]> <end[x,y]>";
+
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
+        final String usage = "/mapdefine <reset/def> <uuid> <beginning[x,y]> <end[x,y]>";
         if(!(args.length > 0)){
 
             return false;
@@ -42,7 +43,7 @@ public class MapCommand implements CommandExecutor {
                             + " parsed. Usage: " + usage);
                     return false;
                 }
-                ArrayList<ArrayList<Long>> chunks = null;
+                ArrayList<ArrayList<Long>> chunks;
                 try{
 
                     if(args.length == 6){
@@ -62,7 +63,7 @@ public class MapCommand implements CommandExecutor {
                         );
                     }
                 }catch(NumberFormatException e){
-                    commandSender.sendMessage(ChatColor.RED + "On of the latter 4 arguments does not seem to possess the right format (integer), to be parsed properly.");
+                    commandSender.sendMessage(ChatColor.RED + "One of the latter 4 arguments does not seem to possess the right format (integer), to be parsed properly.");
                     return false;
                 }
 
