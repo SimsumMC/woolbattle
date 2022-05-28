@@ -6,7 +6,6 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.Main;
-import woolbattle.woolbattle.MongoDbWrapper;
 import java.util.ArrayList;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
