@@ -5,6 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -18,6 +19,8 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.material.Colorable;
 import org.bukkit.scheduler.BukkitRunnable;
 import woolbattle.woolbattle.itemsystem.ItemSystem;
+import woolbattle.woolbattle.perks.AllPassivePerks;
+import woolbattle.woolbattle.perks.PassivePerk;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 
 import java.util.ArrayList;
@@ -30,13 +33,14 @@ import static woolbattle.woolbattle.team.TeamSystem.findTeamDyeColor;
 public class Listener implements org.bukkit.event.Listener {
 
     /**
-     * @param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
+     * @param event  of the spigot-api's event class, specifying, to which occasion the method is called and delivering
      * information, concerning these circumstances.
      */
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-
         Player p = event.getPlayer();
+
+
         //Checks, whether the player, having broken the event's block is in the creative, or spectator mode, returns if
         //this is the case
         if(p.getGameMode().equals(GameMode.CREATIVE) || p.getGameMode().equals(GameMode.SPECTATOR)){
@@ -48,7 +52,7 @@ public class Listener implements org.bukkit.event.Listener {
         DyeColor teamColor = findTeamDyeColor(p);//Is to be implemented in the team-system, being created
         Inventory inventory = p.getInventory();
         Block block = event.getBlock();
-        ItemStack itemStack = new ItemStack(Material.WOOL, 0, (byte) teamColor.getWoolData()){};
+        ItemStack itemStack = new ItemStack(Material.WOOL, 0, teamColor.getWoolData()){};
         Material type = block.getType();
         boolean blockIsMap = false;
         int itemAmount = 0;
@@ -96,7 +100,7 @@ public class Listener implements org.bukkit.event.Listener {
                 if(itemAmount < maxStacks*64){
                     itemStack.setAmount(givenWoolAmount);
                     inventory.addItem(itemStack);
-                }else{}
+                }
 
                 Colorable data = (Colorable) block.getState().getData();
                 block.setType(Material.AIR);
@@ -118,13 +122,14 @@ public class Listener implements org.bukkit.event.Listener {
 
     @EventHandler
     public void onPlayerItemDamage(PlayerItemDamageEvent event) {
-        event.getItem().setDurability((short) event.getItem().getType().getMaxDurability());
+
+        event.getItem().setDurability( event.getItem().getType().getMaxDurability());
     }
 
     /**
      *  The block, placed, in case a block-scanning-process is occurring, is, if it is contained by either the array of
      *  map blocks or the array of removed blocks, purged from the latter and added to the first one.
-     *@param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
+     *@param event An instance of a class implementing an implementation  of the spigot-api's event class, specifying, to which occasion the method is called and delivering
      *              information, concerning these circumstances.
      */
     @EventHandler
@@ -136,9 +141,7 @@ public class Listener implements org.bukkit.event.Listener {
 
             BlockBreakingSystem.setMapBlocks(mapBlocks);
             ArrayList<Location> removedBlocks = BlockBreakingSystem.getRemovedBlocks();
-            if(removedBlocks.contains(event.getBlock().getLocation())){
-                removedBlocks.remove(event.getBlock().getLocation());
-            }
+            removedBlocks.remove(event.getBlock().getLocation());
             Bukkit.broadcastMessage(BlockBreakingSystem.locArrayToString(mapBlocks) + "\n" + BlockBreakingSystem.locArrayToString(removedBlocks));
         }
     }
@@ -153,7 +156,7 @@ public class Listener implements org.bukkit.event.Listener {
      * After a delay, specified by the config.json file, this permission however is once again granted to them, to allow
      * for another double-jump after this period of time.
      *
-     * @param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
+     * @param event An instance of a class implementing an implementation  of the spigot-api's event class, specifying, to which occasion the method is called and delivering
      *              information, concerning these circumstances.
      * @author Servaturus
      */
@@ -168,18 +171,11 @@ public class Listener implements org.bukkit.event.Listener {
 
             event.setCancelled(false);
 
-            if(!p.isFlying()){
-
-                p.setFlying(true);
-            }else{
-
-                p.setFlying(false);
-            }
-
+            p.setFlying(!p.isFlying());
             p.setAllowFlight(true);
             return;
         }
-        long jumpCooldown = 40;
+        long jumpCooldown;
         try{
             jumpCooldown = Config.jumpCooldown;
         }catch(ExceptionInInitializerError e){
@@ -208,7 +204,7 @@ public class Listener implements org.bukkit.event.Listener {
      * default does not guarantee for the player to be capable of using the movement-option of flying, this permission,
      * in order to allow for the onPlayerToggleFlight method to be called, is given to them.
      *
-     * @param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
+     * @param event An instance of a class implementing an implementation  of the spigot-api's event class, specifying, to which occasion the method is called and delivering
      *              information, concerning these circumstances.
      * @author Servaturus
      *
@@ -223,7 +219,7 @@ public class Listener implements org.bukkit.event.Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-
+        //Checking, whether the registered click portraits a right click
         if(event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)){
             event.setCancelled(false);
             return;
@@ -231,12 +227,14 @@ public class Listener implements org.bukkit.event.Listener {
 
         ItemStack is = event.getItem();
 
-        Player player = event.getPlayer();
-        PlayerInventory inv = player.getInventory();
+
         if(is == null){
             event.setCancelled(false);
             return;
         }
+        Player player = event.getPlayer();
+        PlayerInventory inv = player.getInventory();
+
         int slot = inv.first(is);
         ArrayList<String> itemNames = new ArrayList<String>() {
             {
@@ -245,14 +243,31 @@ public class Listener implements org.bukkit.event.Listener {
                 add(ChatColor.DARK_PURPLE + "EnderPearl");
             }
         };
+
+        //Checks, whether the item used is one of the game items, by comparing its name to a list of the game items' names
+
         if(!itemNames.contains(is.getItemMeta().getDisplayName())){
             event.setCancelled(false);
             return;
         }
-        else if(is.getType().equals(Material.ENDER_PEARL)){
-            int enderderPearlWoolCost = 8;
+        int woolAmount = 0;
+        int bowWoolCost = 1;
+        for(ItemStack iterStack : inv.getContents()){
+            if(iterStack != null && iterStack.getType().equals(Material.WOOL)){
+                woolAmount += iterStack.getAmount();
+            }
+        }
+        if(woolAmount-bowWoolCost < 0){
+            player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.C));
+            player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.B));
+
             player.getInventory().setItem(slot, is);
-            int woolAmount = 0;
+            event.setCancelled(true);
+        }
+        else if(is.getType().equals(Material.ENDER_PEARL)){
+
+            player.getInventory().setItem(slot, is);
+            woolAmount = 0;
             int enderPearlWoolCost = 8;
             for(ItemStack iterStack : inv.getContents()){
                 if(iterStack != null && iterStack.getType().equals(Material.WOOL)){
@@ -272,12 +287,12 @@ public class Listener implements org.bukkit.event.Listener {
 
             if(enderPearlCooldowns.get(player.getUniqueId()) == null){
                 enderPearlCooldowns.put(player.getUniqueId(), new Date().getTime());
-            }else if(new Date().getTime()-enderPearlCooldowns.get(player.getUniqueId())<enderderPearlWoolCost){
+            }else if(new Date().getTime()-enderPearlCooldowns.get(player.getUniqueId())<enderPearlWoolCost){
                 player.getInventory().setItem(slot, is);
                 event.setCancelled(true);
                 return;
             }
-            ItemSystem.setItemCooldown(player, slot, is, enderderPearlWoolCost);
+            ItemSystem.setItemCooldown(player, slot, is, enderPearlWoolCost);
             player.getInventory().setItem(slot, is);
             enderPearlCooldowns.replace(player.getUniqueId(), new Date().getTime());
             Cache.setEnderPearlCooldowns(enderPearlCooldowns);
@@ -285,8 +300,7 @@ public class Listener implements org.bukkit.event.Listener {
 
         }else if(is.getType().equals(Material.BOW)) {
 
-            int woolAmount = 0;
-            int bowWoolCost = 1;
+            woolAmount = 0;
             for(ItemStack iterStack : inv.getContents()){
                 if(iterStack != null && iterStack.getType().equals(Material.WOOL)){
                     woolAmount += iterStack.getAmount();
@@ -322,7 +336,7 @@ public class Listener implements org.bukkit.event.Listener {
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
         int bowWoolCost = 1;
         Projectile projectile = event.getEntity();
-        Player player = null;
+        Player player;
         if(!(event.getEntity().getShooter() instanceof Player)){
             return;
         }
@@ -340,6 +354,13 @@ public class Listener implements org.bukkit.event.Listener {
         ItemSystem.subtractWool(player, bowWoolCost);
     }
 
+    /**
+     * Meant to remove potential entities having hit a block
+     *
+     * @author Servaturus
+     * @param event An instance of a class implementing an implementation of the spigot-api's event class, specifying, to which occasion the method is called and delivering
+     *              information, concerning these circumstances
+     */
     @EventHandler(ignoreCancelled = true)
     public void onProjectileHit(ProjectileHitEvent event) {
         Projectile proj = event.getEntity();

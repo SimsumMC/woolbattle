@@ -329,4 +329,19 @@ public class TeamSystem implements Listener {
                 return Color.WHITE;
         }
     }
+    public static ChatColor findTeamChatColor(Player p){
+        String team = getPlayerTeam(p, true);
+        switch(team){
+            case "Blue":
+                return ChatColor.BLUE;
+            case "Red":
+                return ChatColor.RED;
+            case "Green":
+                return ChatColor.GREEN;
+            case "Yellow":
+                return ChatColor.YELLOW;
+            default:
+                return ChatColor.WHITE;
+        }
+    }
 }

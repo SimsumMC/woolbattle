@@ -3,10 +3,7 @@ package woolbattle.woolbattle.itemsystem;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -17,6 +14,8 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.material.Wool;
 import org.bukkit.scheduler.BukkitRunnable;
 import woolbattle.woolbattle.Main;
+import woolbattle.woolbattle.team.TeamSystem;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -29,7 +28,7 @@ public class ItemSystem {
     // method
     private static final ItemMeta shearsMeta = new ItemStack(Material.SHEARS).getItemMeta();
     private static final ItemMeta bowMeta = new ItemStack(Material.BOW).getItemMeta();
-
+    
     private static final HashMap<Integer, ItemMeta> armorStacks = new HashMap<Integer, ItemMeta>(){
         {
             put(0, new ItemStack(Material.LEATHER_BOOTS).getItemMeta());
@@ -55,13 +54,13 @@ public class ItemSystem {
         shearsMeta.addEnchant(Enchantment.DURABILITY, 10, true);
         shearsMeta.spigot().setUnbreakable(true);
         shearsMeta.setDisplayName(ChatColor.DARK_PURPLE + "Shears");
-
         bowMeta.addEnchant(Enchantment.KNOCKBACK, 5, true);
         bowMeta.addEnchant(Enchantment.DURABILITY, 10, true);
         bowMeta.addEnchant(Enchantment.ARROW_KNOCKBACK, 5, true);
         bowMeta.spigot().setUnbreakable(true);
         bowMeta.setDisplayName(ChatColor.DARK_PURPLE + "Bow");
         bowMeta.addEnchant(Enchantment.ARROW_INFINITE, 1, true);
+
         for(ItemMeta meta : armorStacks.values()){
             meta.addEnchant(Enchantment.DURABILITY, 10, true);
             meta.spigot().setUnbreakable(true);
@@ -117,6 +116,7 @@ public class ItemSystem {
                 this.setItemMeta(bowMeta);
             }
         };
+
         playerInv.setItem(bowSlot, bow);
 
         ItemStack enderpearl = new ItemStack(Material.ENDER_PEARL){
@@ -151,7 +151,15 @@ public class ItemSystem {
                     }
                     setItemMeta(meta);
                     ((LeatherArmorMeta) getItemMeta()).setColor(color);
-                    meta.setDisplayName(ChatColor.DARK_PURPLE + getType().toString());
+                    String name = getType().toString().split("_")[1];
+                    String[] letters = name.split("");
+                    for(int i = 0; i<name.split("").length;i++){
+                        if(i==0){
+                            continue;
+                        }
+                        letters[i] = letters[i].toLowerCase();
+                    }
+                    meta.setDisplayName(TeamSystem.findTeamChatColor(p) + name);
                     setItemMeta(meta);
                     setAmount(1);
                 }
@@ -280,5 +288,36 @@ public class ItemSystem {
                 }.runTaskTimer(Main.getInstance(), 0, 20);
             }
         }.runTaskAsynchronously(Main.getInstance());
+    }
+
+    /**
+     *
+     * @param p The player to subtract the wool from
+     * @param cost The wool to be subtracted
+     * @param slot The slot, the item has to return to, if not enough wool is possessed
+     * @param is The item-stack to replace the item, in case not enough wool is possessed
+     * @return  true: The player to subtract wool from possessed a sufficient amount of wool, to use the item,
+     *          specified
+     *          false: The player to subtract wool from did not possess sufficient amounts of wool, to use the
+     *          item, specified
+     */
+
+    public static boolean hasSufficientWool(Player p, int cost, int slot, ItemStack is){
+        int possessedAmount = 0;
+        for(ItemStack iterStack : p.getInventory().getContents()){
+            if(iterStack != null && iterStack.getType().equals(Material.WOOL)){
+                possessedAmount += iterStack.getAmount();
+            }
+        }
+        if(possessedAmount-cost < 0){
+
+            p.playNote(p.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.C));
+            p.playNote(p.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.B));
+            p.getInventory().setItem(slot, is);
+
+            return false;
+        }
+
+        return true;
     }
 }
