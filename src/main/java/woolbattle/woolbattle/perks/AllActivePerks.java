@@ -12,9 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.event.player.PlayerFishEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
@@ -92,19 +90,20 @@ public class AllActivePerks implements Listener {
         if(event.getDamager() instanceof Player && event.getEntity() instanceof Player){
             Player player = (Player) event.getDamager();
             Player damagedPlayer = (Player) event.getEntity();
-            if(player.getItemInHand().hasItemMeta() && player.getItemInHand().getItemMeta().getDisplayName().equals("Leash")){
+            if(player.getItemInHand().hasItemMeta() && player.getItemInHand().getItemMeta().getDisplayName().substring(2).equals("Duel")){
                 HashMap<Player, Player> playerDuels = Cache.getPlayerDuels();
-                String damagedPlayerName = getTeamColour(getPlayerTeam(damagedPlayer, true)) + damagedPlayer.getDisplayName();
 
                 if(playerDuels.containsKey(damagedPlayer)){
+                    String damagedPlayerDuelName = getTeamColour(getPlayerTeam(playerDuels.get(damagedPlayer), true)) + damagedPlayer.getDisplayName();
                     player.sendMessage(
-                            ChatColor.RED +  "This player is already in a duel with " + ChatColor.RED + "!");
+                            ChatColor.RED +  "This player is already in a duel with " + damagedPlayerDuelName + ChatColor.RED + "!");
                     return;
                 }
-                String playerName = getTeamColour(getPlayerTeam(player, true)) + player.getDisplayName();
+
                 if(playerDuels.containsKey(player)){
+                    String playerDuelName = getTeamColour(getPlayerTeam(playerDuels.get(player), true)) + player.getDisplayName();
                     player.sendMessage(
-                            ChatColor.RED +  "You are already in a duel with " + playerName + ChatColor.RED + "!");
+                            ChatColor.RED +  "You are already in a duel with " + playerDuelName + ChatColor.RED + "!");
                     return;
                 }
 
@@ -127,7 +126,11 @@ public class AllActivePerks implements Listener {
 
                     playerDuels.put(damagedPlayer, player);
                     playerDuels.put(player, damagedPlayer);
+
                     Cache.setPlayerDuels(playerDuels);
+
+                    String playerName = getTeamColour(getPlayerTeam(player, true)) + player.getDisplayName();
+                    String damagedPlayerName = getTeamColour(getPlayerTeam(damagedPlayer, true)) + damagedPlayer.getDisplayName();
 
                     player.sendMessage(ChatColor.GOLD + "You are now in a duel with " + damagedPlayerName + ChatColor.GOLD + "!");
                     damagedPlayer.sendMessage(ChatColor.GOLD + "You are now in a duel with " + playerName + ChatColor.GOLD + "!");
@@ -167,6 +170,12 @@ public class AllActivePerks implements Listener {
             projectile.setVelocity(velocity);
         }
 
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerItemBreak(PlayerItemBreakEvent event) {
+        System.out.println("PlayerItemBreakEvent");
+        event.getBrokenItem().setAmount(1);
     }
 
     @EventHandler
