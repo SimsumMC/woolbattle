@@ -7,6 +7,7 @@ import woolbattle.woolbattle.Main;
 import java.util.ArrayList;
 import static com.mongodb.client.model.Filters.eq;
 
+
 public class MapSystem {
 
     public static void defineMapChunks(ArrayList<ArrayList<Long>> chunks){
@@ -18,6 +19,7 @@ public class MapSystem {
         ArrayList<ArrayList<Long>> dbChunks;
         try{
             dbChunks = (ArrayList<ArrayList<Long>>) Main.getMongoDatabase().getCollection("map").find(eq("_id", "mapChunks")).first().get("chunks");
+
         }catch(ClassCastException e){
             System.out.println("The value of the chunks, belonging to the map, stored in the database consists of a value, not capable of being cast to an ArrayList.");
             dbChunks = new ArrayList<>();
