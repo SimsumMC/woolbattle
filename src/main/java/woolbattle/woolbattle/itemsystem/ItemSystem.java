@@ -3,8 +3,10 @@ package woolbattle.woolbattle.itemsystem;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.bukkit.*;
-import org.bukkit.enchantments.Enchantment;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -158,6 +160,7 @@ public class ItemSystem {
                     }
                     setItemMeta(meta);
                     ((LeatherArmorMeta) getItemMeta()).setColor(color);
+                    meta.spigot().setUnbreakable(true);
                     setItemMeta(meta);
                     setAmount(1);
                 }
@@ -166,7 +169,6 @@ public class ItemSystem {
             switch(index){
                 case 0:
                     inventory.setBoots(armorPiece);
-
                     break;
                 case 1:
                     inventory.setLeggings(armorPiece);
