@@ -28,7 +28,6 @@ import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.Enums.PerkType;
 import woolbattle.woolbattle.Main;
 import woolbattle.woolbattle.itemsystem.ItemSystem;
-import woolbattle.woolbattle.lives.LivesSystem;
 import woolbattle.woolbattle.perks.ActivePerk;
 import woolbattle.woolbattle.team.TeamSystem;
 
@@ -36,8 +35,6 @@ import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 import static woolbattle.woolbattle.lives.LivesSystem.setPlayerSpawnProtection;
-import static woolbattle.woolbattle.woolsystem.BlockBreakingSystem.resetMap;
-
 public class LobbySystem implements Listener {
 
     public static boolean gameStarted = false;
@@ -509,8 +506,6 @@ public class LobbySystem implements Listener {
         }
 
         updateScoreBoard();
-
-        resetMap();
 
         return true;
     }
