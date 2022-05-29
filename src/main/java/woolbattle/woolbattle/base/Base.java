@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -31,6 +32,17 @@ public class Base implements Listener {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE) {
             event.setCancelled(true);
         }
+        Player player = (Player) event.getEntity();
+        player.setHealth(20);
+    }
+
+    /**
+     * An event that gets executed whenever an entity damages another entity to prevent damaging each other.
+     * @param event - the EntityDamageByEntityEvent
+     * @author SimsumMC
+     */
+    @EventHandler
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event){
         Player player = (Player) event.getEntity();
         player.setHealth(20);
     }

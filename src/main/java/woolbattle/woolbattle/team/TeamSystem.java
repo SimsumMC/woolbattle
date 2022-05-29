@@ -213,10 +213,19 @@ public class TeamSystem implements Listener {
 
         if(event.getDamager() instanceof Player){
             HashMap<Player, Player> playerDuels = Cache.getPlayerDuels();
-            Player player = (Player) event.getDamager();
+            Player player = (Player) event.getEntity();
+            if(playerDuels.containsKey(player) && (playerDuels.get(player) != event.getDamager())){
+                event.setCancelled(true);
+                String duelPlayerName = getTeamColour(getPlayerTeam(playerDuels.get(player), true)) +
+                        ((Player) event.getEntity()).getDisplayName();
+                event.getDamager().sendMessage(ChatColor.RED + "This player is in a duel with " +
+                        duelPlayerName + ChatColor.RED + "!");
+                return;
+            }
+            player = (Player) event.getDamager();
             if(playerDuels.containsKey(player) && (playerDuels.get(player) != event.getEntity())){
                 event.setCancelled(true);
-                String duelPlayerName = getTeamColour(getPlayerTeam((Player) event.getEntity(), true)) +
+                String duelPlayerName = getTeamColour(getPlayerTeam(playerDuels.get(player), true)) +
                         ((Player) event.getEntity()).getDisplayName();
                 event.getDamager().sendMessage(ChatColor.RED + "This player is in a duel with " +
                         duelPlayerName + ChatColor.RED + "!");

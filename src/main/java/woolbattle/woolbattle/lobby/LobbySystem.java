@@ -36,6 +36,7 @@ import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 import static woolbattle.woolbattle.lives.LivesSystem.setPlayerSpawnProtection;
+import static woolbattle.woolbattle.woolsystem.BlockBreakingSystem.resetMap;
 
 public class LobbySystem implements Listener {
 
@@ -280,7 +281,7 @@ public class LobbySystem implements Listener {
             case "§d§lPerks":
                 showPerkMenu(player);
                 break;
-            case "§e§lChoose Team":
+            case "§e§lTeam Selecting":
                 TeamSystem.showTeamSelectionInventory(player);
                 break;
         }
@@ -356,6 +357,14 @@ public class LobbySystem implements Listener {
             }
         }
         if(notDefined >= 2){
+            new BukkitRunnable(){
+
+                @Override
+                public void run() {
+                    giveLobbyItems(player);
+                }
+
+            }.runTaskLaterAsynchronously(Main.getInstance(), 10);
             player.sendMessage(ChatColor.RED + "Something went wrong!");
             return;
         }
@@ -501,6 +510,8 @@ public class LobbySystem implements Listener {
 
         updateScoreBoard();
 
+        resetMap();
+
         return true;
     }
 
@@ -631,10 +642,10 @@ public class LobbySystem implements Listener {
         inv.setChestplate(null);
         inv.setHelmet(null);
 
-        // Team Choose Item
+        // Team Selecting Item
         ItemStack teamStack = new ItemStack(Material.BED);
         ItemMeta teamMeta = teamStack.getItemMeta();
-        teamMeta.setDisplayName("§e§lChoose Team");
+        teamMeta.setDisplayName("§e§lTeam Selecting");
         teamStack.setItemMeta(teamMeta);
         inv.setItem(0, teamStack);
 

@@ -87,10 +87,21 @@ public class AllActivePerks implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if(event.getDamager() instanceof Player && event.getEntity() instanceof Player){
+        if(!(event.getEntity() instanceof Player)){
+            return;
+        }
+        if(event.getDamager() instanceof Player){
             Player player = (Player) event.getDamager();
             Player damagedPlayer = (Player) event.getEntity();
             if(player.getItemInHand().hasItemMeta() && player.getItemInHand().getItemMeta().getDisplayName().substring(2).equals("Duel")){
+                event.setCancelled(true);
+                ActivePerk perk = Cache.getActivePerks().get("Duel");
+
+                ItemStack itemStack = perk.getItemStack();
+                itemStack.setAmount(1);
+                int perkSlot = perk.getSlot(player);
+                player.getInventory().setItem(perkSlot, itemStack);
+
                 HashMap<Player, Player> playerDuels = Cache.getPlayerDuels();
 
                 if(playerDuels.containsKey(damagedPlayer)){
@@ -107,11 +118,6 @@ public class AllActivePerks implements Listener {
                     return;
                 }
 
-                ActivePerk perk = Cache.getActivePerks().get("Duel");
-                ItemStack itemStack = perk.getItemStack();
-                itemStack.setAmount(1);
-
-                int perkSlot = perk.getSlot(player);
                 int woolCost = perk.getWoolCost();
                 int cooldown = perk.getCooldown();
 
@@ -152,9 +158,6 @@ public class AllActivePerks implements Listener {
 
             Player hitPlayer;
 
-            if(!(event.getEntity() instanceof Player)){
-                return;
-            }
             hitPlayer = (Player) event.getEntity();
 
             Location hitPlayerLocation = hitPlayer.getLocation();
@@ -166,8 +169,9 @@ public class AllActivePerks implements Listener {
             projectile.remove();
         }
         if(projectile.getType() == EntityType.EGG) {
-            Vector velocity = projectile.getVelocity().multiply(2);
-            projectile.setVelocity(velocity);
+            Player player = (Player) event.getEntity();
+            Vector velocity = player.getVelocity().multiply(2);
+            player.setVelocity(velocity);
         }
 
     }
@@ -494,7 +498,7 @@ public class AllActivePerks implements Listener {
 
         rescuePod.register();
 
-        ActivePerk duel = new ActivePerk(new ItemStack(Material.WOOD_SWORD), 90, 30, false)
+        ActivePerk duel = new ActivePerk(new ItemStack(Material.WOOD_SWORD), 30, 10, false)
                 .setItemName(ChatColor.AQUA + "Duel").addEnchantment(Enchantment.DURABILITY, true)
                 .setDescription("Puts you in a 1V1 with the hit player.");
 
