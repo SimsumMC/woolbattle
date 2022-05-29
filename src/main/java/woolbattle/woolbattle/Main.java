@@ -14,7 +14,6 @@ import woolbattle.woolbattle.lives.LivesSystem;
 import woolbattle.woolbattle.lobby.LobbySystem;
 import woolbattle.woolbattle.lobby.StartGameCommand;
 import woolbattle.woolbattle.lobby.StopGameCommand;
-import woolbattle.woolbattle.maprestaurationsystem.MapCommand;
 import woolbattle.woolbattle.perks.AllActivePerks;
 import woolbattle.woolbattle.team.TeamSystem;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
@@ -66,7 +65,6 @@ public final class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
         getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
         getCommand("mapblocks").setExecutor(new MapBlocksCommand());
-        getCommand("map").setExecutor(new MapCommand());
 
         Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
         if (found == null) {
@@ -76,7 +74,6 @@ public final class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
         getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
         getCommand("mapblocks").setExecutor(new MapBlocksCommand());
-        getCommand("mapdefine").setExecutor(new MapCommand());
         BlockBreakingSystem.setCollectBrokenBlocks(false);
         BlockBreakingSystem.fetchMapBlocks();
         for (Player p : Bukkit.getOnlinePlayers()) {
