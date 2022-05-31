@@ -14,6 +14,7 @@ import woolbattle.woolbattle.lives.LivesSystem;
 import woolbattle.woolbattle.lobby.LobbySystem;
 import woolbattle.woolbattle.lobby.StartGameCommand;
 import woolbattle.woolbattle.lobby.StopGameCommand;
+import woolbattle.woolbattle.perks.AllActivePerks;
 import woolbattle.woolbattle.team.TeamSystem;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
@@ -25,7 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -50,31 +50,27 @@ public final class Main extends JavaPlugin {
         // SimsumMC's Things
         Bukkit.getPluginManager().registerEvents(new LobbySystem(), this);
         Bukkit.getPluginManager().registerEvents(new Base(), this);
+        Bukkit.getPluginManager().registerEvents(new AllActivePerks(), this);
+
         this.getCommand("gstart").setExecutor(new StartGameCommand());
         this.getCommand("gstop").setExecutor(new StopGameCommand());
+
+        AllActivePerks.load();
 
         // Beelzebub's Stuff
         Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);
         Bukkit.getPluginManager().registerEvents(new LivesSystem(), this);
 
-        //Servaturus' Stuff
-
-        if (!db.listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking")) {
-            db.createCollection("blockBreaking");
-
-        } else {
-        }
+        //Servaturus' belongings
+        Bukkit.getPluginManager().registerEvents(new Listener(), this);
+        getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
+        getCommand("mapblocks").setExecutor(new MapBlocksCommand());
 
         Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
         if (found == null) {
-            HashMap<String, Object> mapBlocks = new HashMap<String, Object>(){
-                {
-                    put("mapBlocks", new ArrayList<ArrayList<Double>>());
-                    put("_id", "mapBlocks");
-                }
-            };
             db.getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
         }
+
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
         getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
         getCommand("mapblocks").setExecutor(new MapBlocksCommand());

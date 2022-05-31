@@ -1,5 +1,6 @@
 package woolbattle.woolbattle.lobby;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,10 +21,10 @@ public class StopGameCommand implements CommandExecutor {
             if(!player.isOp()){
                 return false;
             }
-            if(endGame("§cUnknown")){
+            if(endGame(ChatColor.RED + "Unknown")){
                 player.sendMessage("§aStopped the game successfully.");
             } else{
-                player.sendMessage("§cThere is no running game!");
+                player.sendMessage(ChatColor.RED + "There is no running game!");
             }
             return true;
         }

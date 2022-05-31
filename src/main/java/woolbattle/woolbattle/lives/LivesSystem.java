@@ -2,6 +2,7 @@ package woolbattle.woolbattle.lives;
 
 import org.bukkit.Bukkit;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -17,6 +18,9 @@ import woolbattle.woolbattle.lobby.LobbySystem;
 
 import java.util.HashMap;
 
+import static woolbattle.woolbattle.team.TeamSystem.getPlayerTeam;
+import static woolbattle.woolbattle.team.TeamSystem.getTeamColour;
+
 public class LivesSystem implements Listener {
 
     /**
@@ -24,7 +28,7 @@ public class LivesSystem implements Listener {
      * @param player the player that gets teleported
      * @author SimsumMC
      */
-    public void teleportPlayerTeamSpawn(Player player){
+    public static void teleportPlayerTeamSpawn(Player player){
         String team = TeamSystem.getPlayerTeam(player, true);
 
         switch(team){
@@ -49,10 +53,12 @@ public class LivesSystem implements Listener {
     /**
      * A Method that updates the spawnProtection HashMap in the Cache with the current unix timestamp.
      * @param player the player that gets teleported
-     * @param unixTime the current unix timestamp
+     * @param length the length of the spawn protection in seconds
      * @author SimsumMC
      */
-    public void setPlayerSpawnProtection(Player player, Long unixTime){
+    public static void setPlayerSpawnProtection(Player player, int length){
+        long unixTime = (System.currentTimeMillis() / 1000L) + length;
+
         HashMap<Player, Long> spawnProtection = Cache.getSpawnProtection();
 
         spawnProtection.put(player, unixTime);
@@ -84,8 +90,23 @@ public class LivesSystem implements Listener {
                 long realLastDamage = lastDamage.get(player);
                 if (unixTime - realLastDamage >= Config.deathCooldown) {
                     teleportPlayerTeamSpawn(player);
+                    setPlayerSpawnProtection(player, Config.spawnProtectionLengthAfterDeath);
                     return;
                 }
+            }
+
+            HashMap<Player, Player> playerDuels = Cache.getPlayerDuels();
+            Player otherPlayer = playerDuels.get(player);
+            if(otherPlayer != null){
+                playerDuels.remove(player);
+                playerDuels.remove(otherPlayer);
+                Cache.setPlayerDuels(playerDuels);
+
+                String otherPlayerName = getTeamColour(getPlayerTeam(otherPlayer, true)) + otherPlayer.getDisplayName();
+                String playerName = getTeamColour(getPlayerTeam(player, true)) + player.getDisplayName();
+
+                player.sendMessage(ChatColor.GOLD + "You are now in a duel with " + otherPlayerName + ChatColor.GOLD + "!");
+                otherPlayer.sendMessage(ChatColor.GOLD + "You are now in a duel with " + playerName + ChatColor.GOLD + "!");
             }
 
             String team = TeamSystem.getPlayerTeam(player, true);
@@ -108,6 +129,11 @@ public class LivesSystem implements Listener {
                     damager = null;
                 }
 
+                if(damager == null){
+                    teleportPlayerTeamSpawn(player);
+                    setPlayerSpawnProtection(player, Config.spawnProtectionLengthAfterDeath);
+                }
+
                 if(damager instanceof Arrow){
                     Arrow arrow = (Arrow) damager;
                     damager = (Entity) arrow.getShooter();
@@ -123,15 +149,17 @@ public class LivesSystem implements Listener {
                     Cache.setLastDamage(lastDamage);
 
                     String damagerTeam = TeamSystem.getPlayerTeam((Player) damager, true);
-                    String damagerTeamColour = TeamSystem.getTeamColour(damagerTeam) ;
-                    String killMessage = "§7The player " + TeamSystem.getTeamColour(team)
-                            + player.getDisplayName() + "§7 was killed by " +
-                            damagerTeamColour + ((Player) damager).getDisplayName() + "§7.";
+                    ChatColor damagerTeamColour = TeamSystem.getTeamColour(damagerTeam) ;
+                    String killMessage = ChatColor.GRAY + "The player " + TeamSystem.getTeamColour(team)
+                            + player.getDisplayName() + ChatColor.GRAY + " was killed by " +
+                            damagerTeamColour + ((Player) damager).getDisplayName() + ChatColor.GRAY + ".";
 
                     Bukkit.broadcastMessage(killMessage);
                     HashMap<String, HashMap<Player, Integer>> killStreaks = Cache.getKillStreaks();
 
                     HashMap<Player, Integer> kills = killStreaks.get(damagerTeam);
+
+                    killStreaks.put(team, new HashMap<Player, Integer>(){{put(player, 0);}});
 
                     int amKills;
                     if(kills.containsKey(damager)){
@@ -144,10 +172,9 @@ public class LivesSystem implements Listener {
                     kills.put((Player) damager, amKills);
 
                     if(amKills == 5){
-                        String streakMessage = "§7The player " + damagerTeamColour + ((Player) damager).getDisplayName() + "§7 has a 5er kill streak!";
+                        String streakMessage = ChatColor.GRAY + "The player " + damagerTeamColour +
+                                ((Player) damager).getDisplayName() + ChatColor.GRAY + " has a 5er kill streak!";
                         Bukkit.broadcastMessage(streakMessage);
-
-                        //reset deaths
 
                         kills.put((Player) damager, 0);
                         killStreaks.put(damagerTeam, kills);
@@ -158,9 +185,8 @@ public class LivesSystem implements Listener {
                         Cache.setTeamLives(teamLives);
 
                     }
-
                     teleportPlayerTeamSpawn(player);
-                    setPlayerSpawnProtection(player, unixTime);
+                    setPlayerSpawnProtection(player, Config.spawnProtectionLengthAfterDeath);
 
                 }
                 LobbySystem.determinateWinnerTeam();

@@ -2,11 +2,11 @@ package woolbattle.woolbattle.team;
 
 import org.bukkit.*;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -16,7 +16,6 @@ import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.lobby.LobbySystem;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 import static woolbattle.woolbattle.Cache.getTeamMembers;
@@ -151,7 +150,7 @@ public class TeamSystem implements Listener {
         ArrayList<String> voteRedLore = new ArrayList<>();
         ItemMeta voteRedMeta = voteRed.getItemMeta();
         for (int i = getTeamMembers().get("Red").size() - 1; i >= 0; i--) {
-            voteRedLore.add("§7» " + getTeamMembers().get("Red").get(i).getDisplayName());
+            voteRedLore.add(ChatColor.GRAY + "» " + getTeamMembers().get("Red").get(i).getDisplayName());
         }
 
         voteRedMeta.setDisplayName(ChatColor.RED + "Team Red");
@@ -164,7 +163,7 @@ public class TeamSystem implements Listener {
         ArrayList<String> voteBlueLore = new ArrayList<>();
         ItemMeta voteBlueMeta = voteBlue.getItemMeta();
         for (int i = getTeamMembers().get("Blue").size() - 1; i >= 0; i--) {
-            voteBlueLore.add("§7» " + getTeamMembers().get("Blue").get(i).getDisplayName());
+            voteBlueLore.add(ChatColor.GRAY + "» " + getTeamMembers().get("Blue").get(i).getDisplayName());
         }
 
         voteBlueMeta.setDisplayName(ChatColor.BLUE + "Team Blue");
@@ -177,7 +176,7 @@ public class TeamSystem implements Listener {
         ArrayList<String> voteGreenLore = new ArrayList<>();
         ItemMeta voteGreenMeta = voteGreen.getItemMeta();
         for (int i = getTeamMembers().get("Green").size() - 1; i >= 0; i--) {
-            voteGreenLore.add("§7» " + getTeamMembers().get("Green").get(i).getDisplayName());
+            voteGreenLore.add(ChatColor.GRAY + "» " + getTeamMembers().get("Green").get(i).getDisplayName());
         }
 
         voteGreenMeta.setDisplayName(ChatColor.GREEN + "Team Green");
@@ -190,7 +189,7 @@ public class TeamSystem implements Listener {
         ArrayList<String> voteYellowLore = new ArrayList<>();
         ItemMeta voteYellowMeta = voteYellow.getItemMeta();
         for (int i = getTeamMembers().get("Yellow").size() - 1; i >= 0; i--) {
-            voteYellowLore.add("§7» " + getTeamMembers().get("Yellow").get(i).getDisplayName());
+            voteYellowLore.add(ChatColor.GRAY + "» " + getTeamMembers().get("Yellow").get(i).getDisplayName());
         }
 
         voteYellowMeta.setDisplayName(ChatColor.YELLOW + "Team Yellow");
@@ -208,6 +207,32 @@ public class TeamSystem implements Listener {
      */
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event){
+        if(!(event.getEntity() instanceof Player)){
+            return;
+        }
+
+        if(event.getDamager() instanceof Player){
+            HashMap<Player, Player> playerDuels = Cache.getPlayerDuels();
+            Player player = (Player) event.getEntity();
+            if(playerDuels.containsKey(player) && (playerDuels.get(player) != event.getDamager())){
+                event.setCancelled(true);
+                String duelPlayerName = getTeamColour(getPlayerTeam(playerDuels.get(player), true)) +
+                        ((Player) event.getEntity()).getDisplayName();
+                event.getDamager().sendMessage(ChatColor.RED + "This player is in a duel with " +
+                        duelPlayerName + ChatColor.RED + "!");
+                return;
+            }
+            player = (Player) event.getDamager();
+            if(playerDuels.containsKey(player) && (playerDuels.get(player) != event.getEntity())){
+                event.setCancelled(true);
+                String duelPlayerName = getTeamColour(getPlayerTeam(playerDuels.get(player), true)) +
+                        ((Player) event.getEntity()).getDisplayName();
+                event.getDamager().sendMessage(ChatColor.RED + "This player is in a duel with " +
+                        duelPlayerName + ChatColor.RED + "!");
+                return;
+            }
+        }
+
         HashMap<Player, Long> lastDamage = Cache.getLastDamage();
         long unixTime = System.currentTimeMillis() / 1000L;
         lastDamage.put((Player) event.getEntity(), unixTime);
@@ -237,7 +262,7 @@ public class TeamSystem implements Listener {
                 return;
             }
             HashMap<Player, Long> spawnProtection = Cache.getSpawnProtection();
-            if(spawnProtection.containsKey(damaged) && (unixTime - spawnProtection.get(damaged)) <= Config.spawnProtectionLength){
+            if(spawnProtection.containsKey(damaged) && (unixTime < spawnProtection.get(damaged))){
                 if(damager.getUniqueId() != damaged.getUniqueId()){
                     damager.sendMessage("§cThe player has spawn protection!");
                 }
@@ -255,14 +280,14 @@ public class TeamSystem implements Listener {
      */
     public static String getPlayerTeam(Player player, boolean raw) {
 
-        String teamName = "§cNot selected";
+        String teamName = ChatColor.RED + "Not selected";
         HashMap<String, ArrayList<Player>> data = getTeamMembers();
 
         for(String key : data.keySet()){
             ArrayList<Player> players = data.get(key);
             if(players.contains(player)){
                 if(!raw){
-                    teamName = getTeamColour(key);
+                    teamName = getTeamColour(key).toString();
                 }
                 else{
                     teamName = "";
@@ -295,21 +320,21 @@ public class TeamSystem implements Listener {
     }
 
     /**
-     * A Method that returns the team of the player with the colour as a string.
+     * A Method that returns the team of the player with the colour as a ChatColor Enum.
      * @param team a S
      * @return the colour of the team
      * @author SimsumMC
      */
-    public static String getTeamColour(String team) {
+    public static ChatColor getTeamColour(String team) {
         switch(team){
             case "Blue":
-                return "§1";
+                return ChatColor.DARK_BLUE;
             case "Green":
-                return "§2";
+                return ChatColor.GREEN;
             case "Yellow":
-                return "§e";
+                return ChatColor.YELLOW;
             default:
-                return "§4";
+                return ChatColor.DARK_RED;
         }
     }
 
@@ -326,7 +351,7 @@ public class TeamSystem implements Listener {
             case "Red":
                 return DyeColor.RED;
             case "Green":
-                return DyeColor.GREEN;
+                return DyeColor.LIME;
             case "Yellow":
                 return DyeColor.YELLOW;
             default:
@@ -347,7 +372,7 @@ public class TeamSystem implements Listener {
             case "Red":
                 return Color.RED;
             case "Green":
-                return Color.GREEN;
+                return Color.LIME;
             case "Yellow":
                 return Color.YELLOW;
             default:

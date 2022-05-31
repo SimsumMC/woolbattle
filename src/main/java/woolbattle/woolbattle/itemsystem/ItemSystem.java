@@ -7,16 +7,17 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.material.Wool;
 import org.bukkit.scheduler.BukkitRunnable;
+import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Main;
+import woolbattle.woolbattle.lobby.LobbySystem;
+import woolbattle.woolbattle.perks.ActivePerk;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,11 +27,9 @@ import static woolbattle.woolbattle.team.TeamSystem.findTeamColor;
 import static woolbattle.woolbattle.team.TeamSystem.findTeamDyeColor;
 
 public class ItemSystem {
+
     //Creates the item-meta-specific values that are known, before a potential player is passed into the giveItems
     // method
-    private static final ItemMeta shearsMeta = new ItemStack(Material.SHEARS).getItemMeta();
-    private static final ItemMeta bowMeta = new ItemStack(Material.BOW).getItemMeta();
-
     private static final HashMap<Integer, ItemMeta> armorStacks = new HashMap<Integer, ItemMeta>(){
         {
             put(0, new ItemStack(Material.LEATHER_BOOTS).getItemMeta());
@@ -39,7 +38,7 @@ public class ItemSystem {
             put(3, new ItemStack(Material.LEATHER_HELMET).getItemMeta());
         }
     };
-    private static final HashMap<String, Integer> defaultSlots = new HashMap<String, Integer>(){
+    public static final HashMap<String, Integer> defaultSlots = new HashMap<String, Integer>(){
         {
             put("shears", 0);
             put("bow", 1);
@@ -49,37 +48,17 @@ public class ItemSystem {
         }
     };
 
-    //Modifies these values further, once again according to information known before giveItems is called
-    static{
-        shearsMeta.addEnchant(Enchantment.KNOCKBACK, 5, true);
-        shearsMeta.addEnchant(Enchantment.DIG_SPEED, 5,  true);
-        shearsMeta.addEnchant(Enchantment.DURABILITY, 10, true);
-        shearsMeta.spigot().setUnbreakable(true);
-        shearsMeta.setDisplayName(ChatColor.DARK_PURPLE + "Shears");
-
-        bowMeta.addEnchant(Enchantment.KNOCKBACK, 5, true);
-        bowMeta.addEnchant(Enchantment.DURABILITY, 10, true);
-        bowMeta.addEnchant(Enchantment.ARROW_KNOCKBACK, 5, true);
-        bowMeta.spigot().setUnbreakable(true);
-        bowMeta.setDisplayName(ChatColor.DARK_PURPLE + "Bow");
-        bowMeta.addEnchant(Enchantment.ARROW_INFINITE, 1, true);
-        for(ItemMeta meta : armorStacks.values()){
-            meta.addEnchant(Enchantment.DURABILITY, 10, true);
-            meta.spigot().setUnbreakable(true);
-        }
-    }
-
     /**
      * Method to add the game's base items, additionally to this the individual player's perk-items into their
      * inventory, colours colour-able fragments of this equipment according to the player's team-colour.
-     * @param p The player to be given the items specified above
+     * @param player The player to be given the items specified above
      * @author Servaturus
      */
-    public static void giveItems(Player p){
-        Color color = findTeamColor(p);
-        PlayerInventory playerInv = p.getInventory();
+    public static void giveItems(Player player){
+        Color color = findTeamColor(player);
+        PlayerInventory inventory = player.getInventory();
 
-        playerInv.clear();
+        inventory.clear();
 
         int shearsSlot;
         int bowSlot;
@@ -90,7 +69,7 @@ public class ItemSystem {
         MongoDatabase db = Main.getMongoDatabase();
         MongoCollection<Document> collection = db.getCollection("playerInventories");
 
-        Document foundDocument = collection.find(eq("_id", p.getUniqueId().toString())).first();
+        Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
         if(foundDocument == null){
             shearsSlot = defaultSlots.get("shears");
             bowSlot = defaultSlots.get("bow");
@@ -102,32 +81,58 @@ public class ItemSystem {
             shearsSlot = (int) foundDocument.get("shears");
             bowSlot = (int) foundDocument.get("bow");
             enderPearlSlot = (int) foundDocument.get("ender_pearl");
-            //perk1Slot = (int) foundDocument.get("perk1");
-            //perk2Slot = (int) foundDocument.get("perk2");
+            perk1Slot = (int) foundDocument.get("active_perk1");
+            perk2Slot = (int) foundDocument.get("active_perk2");
+        }
+
+        ItemStack shears = Cache.getActivePerks().get("Shears").getItemStack();
+
+        inventory.setItem(shearsSlot, shears);
+
+        ItemStack bow = Cache.getActivePerks().get("Bow").getItemStack();
+
+        inventory.setItem(bowSlot, bow);
+
+        ItemStack enderPearl = Cache.getActivePerks().get("Ender Pearl").getItemStack();
+
+        inventory.setItem(enderPearlSlot, enderPearl);
+
+        MongoCollection<Document> perksCollection = db.getCollection("playerPerks");
+
+        Document perksDocument = perksCollection.find(eq("_id", player.getUniqueId().toString())).first();
+
+        if(perksDocument != null) {
+
+            String activePerk1String = null;
+            String activePerk2String = null;
+
+
+            if (perksDocument.get("first_active") != null){
+                activePerk1String = (String) perksDocument.get("first_active");
+            }
+
+            if (perksDocument.get("second_active") != null){
+                activePerk2String = (String) perksDocument.get("second_active");
+            }
+
+            if(activePerk1String != null) {
+
+                ActivePerk activePerk1 = Cache.getActivePerks().get(activePerk1String);
+                if (activePerk1 != null) {
+                    inventory.setItem(perk1Slot, activePerk1.getItemStack());
+                }
+            }
+
+            if(activePerk2String != null) {
+                ActivePerk activePerk2 = Cache.getActivePerks().get(activePerk2String);
+                if (activePerk2 != null) {
+                    inventory.setItem(perk2Slot, activePerk2.getItemStack());
+                }
+            }
+
 
         }
-        ItemStack shears = new ItemStack(Material.SHEARS){
-            {
-                this.setItemMeta(shearsMeta);
-            }
-        };
-        playerInv.setItem(shearsSlot, shears);
 
-        ItemStack bow = new ItemStack(Material.BOW){
-            {
-                this.setItemMeta(bowMeta);
-            }
-        };
-        playerInv.setItem(bowSlot, bow);
-
-        ItemStack enderpearl = new ItemStack(Material.ENDER_PEARL){
-            {
-                ItemMeta meta = getItemMeta();
-                meta.setDisplayName(ChatColor.DARK_PURPLE + "EnderPearl");
-                setItemMeta(meta);
-            }
-        };
-        playerInv.setItem(enderPearlSlot, enderpearl);
         for(Integer index : armorStacks.keySet()){
             LeatherArmorMeta meta = (LeatherArmorMeta) armorStacks.get(index);
             meta.setColor(color);
@@ -137,22 +142,25 @@ public class ItemSystem {
                     switch(index){
                         case 0:
                             this.setType(Material.LEATHER_BOOTS);
-
+                            meta.setDisplayName(ChatColor.AQUA + "Leather Boots");
                             break;
                         case 1:
                             this.setType(Material.LEATHER_LEGGINGS);
+                            meta.setDisplayName(ChatColor.AQUA + "Leather Leggings");
                             break;
                         case 2:
                             this.setType(Material.LEATHER_CHESTPLATE);
+                            meta.setDisplayName(ChatColor.AQUA + "Leather Chestplate");
                             break;
                         case 3:
                             this.setType(Material.LEATHER_HELMET);
+                            meta.setDisplayName(ChatColor.AQUA + "Leather Helmet");
                             break;
 
                     }
                     setItemMeta(meta);
                     ((LeatherArmorMeta) getItemMeta()).setColor(color);
-                    meta.setDisplayName(ChatColor.DARK_PURPLE + getType().toString());
+                    meta.spigot().setUnbreakable(true);
                     setItemMeta(meta);
                     setAmount(1);
                 }
@@ -160,61 +168,71 @@ public class ItemSystem {
             armorPiece.setAmount(1);
             switch(index){
                 case 0:
-                    playerInv.setBoots(armorPiece);
-
+                    inventory.setBoots(armorPiece);
                     break;
                 case 1:
-                    playerInv.setLeggings(armorPiece);
+                    inventory.setLeggings(armorPiece);
                     break;
                 case 2:
-                    playerInv.setChestplate(armorPiece);
+                    inventory.setChestplate(armorPiece);
                     break;
                 case 3:
-                    playerInv.setHelmet(armorPiece);
+                    inventory.setHelmet(armorPiece);
                     break;
 
-                //playerInv.setItem(index, armorPiece);//setItem(index, armorPiece);
             }
-        }
-        playerInv.setItem(9, new ItemStack(Material.ARROW));
-        addPerkItems(playerInv);
-        p.getInventory().setContents(playerInv.getContents());
-    }
-    //Method, in future to act as an augmentation to the giveItems method. The perks, to be added then should be fetched
-    //the plugin's db and added to the player's inventory's slots, specified there respectively.
-    private static void addPerkItems(Inventory inv){
 
+        }
+        inventory.setItem(9, new ItemStack(Material.ARROW));
+
+        player.getInventory().setContents(inventory.getContents());
     }
+
     /**
      * Method that subtracts wool from a players inventory.
      * @author Servaturus
-     * @param p The player, to remove the wool from
-     * @param amount The wool amount to subtract
+     * @param player The player, to remove the wool from
+     * @param subtractWool The wool subtractWool to subtract
+     * @author Servaturus & SimsumMC
      */
-    public static void subtractWool(Player p, int amount){
+    public static boolean subtractWool(Player player, int subtractWool){
 
-        PlayerInventory inv = p.getInventory();
+        PlayerInventory inv = player.getInventory();
+
+        int existingWoolAmount = 0;
+
+        for(ItemStack iterStack : inv.getContents()){
+            if(iterStack != null && iterStack.getType().equals(Material.WOOL)){
+                existingWoolAmount += iterStack.getAmount();
+            }
+        }
+
+        if(existingWoolAmount - subtractWool < 0){
+            return false;
+        }
+
         int woolAmount = 0;
-        ArrayList<ItemStack> woolStacks = new ArrayList<>();
-        ArrayList<Integer> slots = new ArrayList<>();
-        DyeColor color = findTeamDyeColor(p);
 
-        int maximumStacks = 3;
+        ArrayList<ItemStack> woolStacks = new ArrayList<>();
+        DyeColor color = findTeamDyeColor(player);
+
         for(ItemStack is : inv.getContents()){
             if(is != null && is.getType().equals(Material.WOOL)){
                 woolAmount += is.getAmount();
             }
         }
-        if(woolAmount-amount <=0){
-            p.getInventory().remove(Material.WOOL);
-            return;
+        if(woolAmount - subtractWool ==0){
+            player.getInventory().remove(Material.WOOL);
+            return true;
         }
-        woolAmount = woolAmount-amount;
+        woolAmount = woolAmount - subtractWool;
+
         int modulo = woolAmount%64;
+
         inv.remove(Material.WOOL);
-        //int amountToDistribute = woolAmount-amount;
+
         ItemStack woolInstance =  new Wool(color).toItemStack();
-        int iterator =0;
+
         if(woolAmount%64 !=0){
             ItemStack wool = new ItemStack(woolInstance);
             wool.setAmount(modulo);
@@ -222,18 +240,20 @@ public class ItemSystem {
             woolAmount-=(woolAmount%64);
 
         }
+
         for(int i = 0; i<woolAmount/64;i++){
             ItemStack wool = new ItemStack(woolInstance);
             wool.setAmount(64);
             woolStacks.add(wool);
-            iterator++;
         }
 
         for(ItemStack woolStack : woolStacks){
             inv.addItem(woolStack);
         }
+        return true;
 
     }
+
     /**
      * Method that replaces the specified itemSlot with a gunpowder-itemstack, lowering it's amount every second by one,
      * until the specified cooldown has run out, which makes it replace said slot with the original item, illustrated by
@@ -242,15 +262,13 @@ public class ItemSystem {
      * @param slot The slot, to condone the cooldown in.
      * @param cooldownInSeconds The cooldown's duration.
      * @param item The item, to replace the specified slot with after the cooldown.
-     *
-     * @author Servaturus
+     * @author Servaturus & SimsumMC
      */
     public static void setItemCooldown(Player p, int slot, ItemStack item, int cooldownInSeconds){
         new BukkitRunnable(){
             @Override
             public void run() {
 
-                int maxLoops = cooldownInSeconds;
                 ItemStack expiredItem = new ItemStack(Material.SULPHUR){
                     {
                         ItemMeta meta = getItemMeta();
@@ -261,17 +279,23 @@ public class ItemSystem {
 
                 new BukkitRunnable(){
 
-                    volatile int loops = 0;
+                    int loops = 0;
 
                     @Override
                     public void run() {
-                        if(loops == maxLoops){
-                            if(item.getAmount()<1){
-                                item.setAmount(item.getAmount() +1);
-                                p.getInventory().setItem(slot, item);
+                        if(!LobbySystem.gameStarted){
+                            this.cancel();
+                            return;
+                        }
+
+                        if(loops == cooldownInSeconds){
+                            if(item.getAmount() < 1){
+                                item.setAmount(item.getAmount() + 1);
                             }
+                            p.getInventory().setItem(slot, item);
+                            this.cancel();
                         }else{
-                            expiredItem.setAmount((maxLoops-loops));
+                            expiredItem.setAmount((cooldownInSeconds - loops));
                             p.getInventory().setItem(slot,expiredItem);
                             loops++;
 

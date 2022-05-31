@@ -1,10 +1,11 @@
 package woolbattle.woolbattle;
 
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import woolbattle.woolbattle.perks.ActivePerk;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.UUID;
 
 public class Cache {
 
@@ -13,15 +14,15 @@ public class Cache {
      * @author SimsumMC
      */
 
+    private static HashMap<String, ActivePerk> activePerks = new HashMap<>();
+
+    private static HashMap<Player, Player> playerDuels = new HashMap<>();
+
     private static HashMap<Player, Long> lastDamage = new HashMap<>();
 
     private static HashMap<Player, Long> spawnProtection = new HashMap<>();
 
-    private static HashMap<String, Integer> jumpCooldown = new HashMap<>();
-
-    private static HashMap<UUID, Long> enderPearlCooldown = new HashMap<>();
-
-    private static HashMap<UUID, Boolean> bowFlags = new HashMap<>();
+    private static HashMap<Player, ArrayList<ArrayList<Block>>> jumpPlatformBlocks = new HashMap<>();
 
     private static HashMap<String, HashMap<Player, Integer>> killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
         put("Blue", new HashMap<>());
@@ -50,20 +51,20 @@ public class Cache {
         put(15, new ArrayList<>());
     }};
 
+    public static HashMap<String, ActivePerk> getActivePerks() {return activePerks;}
+    public static void setActivePerks(HashMap<String, ActivePerk> activePerks) {Cache.activePerks = activePerks;}
+
+    public static HashMap<Player, Player> getPlayerDuels() {return playerDuels;}
+    public static void setPlayerDuels(HashMap<Player, Player> playerDuels) {Cache.playerDuels = playerDuels;}
+
     public static HashMap<Player, Long> getLastDamage() {return lastDamage;}
     public static void setLastDamage(HashMap<Player, Long> lastDamage) {Cache.lastDamage = lastDamage;}
 
     public static HashMap<Player, Long> getSpawnProtection() {return spawnProtection;}
     public static void setSpawnProtection(HashMap<Player, Long> spawnProtection) {Cache.spawnProtection = spawnProtection;}
 
-    public static HashMap<String, Integer> getJumpCooldown() {return jumpCooldown;}
-    public static void setJumpCooldown(HashMap<String, Integer> jumpCooldown) {Cache.jumpCooldown = jumpCooldown;}
-
-    public static HashMap<UUID, Long> getEnderPearlCooldown() {return enderPearlCooldown;}
-    public static void setEnderPearlCooldown(HashMap<UUID, Long> enderPearlCooldown) {Cache.enderPearlCooldown = enderPearlCooldown;}
-
-    public static HashMap<UUID, Boolean> getBowFlags() {return bowFlags;}
-    public static void setBowFlags(HashMap<UUID, Boolean> bowFlags) {Cache.bowFlags = bowFlags;}
+    public static HashMap<Player, ArrayList<ArrayList<Block>>> getJumpPlatformBlocks() {return jumpPlatformBlocks;}
+    public static void setJumpPlatformBlocks(HashMap<Player, ArrayList<ArrayList<Block>>> jumpPlatformBlocks) {Cache.jumpPlatformBlocks = jumpPlatformBlocks;}
 
     public static HashMap<String, HashMap<Player, Integer>> getKillStreaks() {return killStreaks;}
     public static void setKillStreaks(HashMap<String, HashMap<Player, Integer>> killStreaks) {Cache.killStreaks = killStreaks;}
@@ -78,8 +79,13 @@ public class Cache {
     public static void setLifeVoting(HashMap<Integer, ArrayList<Player>> lifeVoting) {Cache.lifeVoting = lifeVoting;}
 
     public static void clear(){
+        playerDuels = new HashMap<>();
 
         lastDamage = new HashMap<>();
+
+        spawnProtection = new HashMap<>();
+
+        jumpPlatformBlocks = new HashMap<>();
 
         killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
             put("Blue", new HashMap<>());
@@ -107,13 +113,5 @@ public class Cache {
             put(10, new ArrayList<>());
             put(15, new ArrayList<>());
         }};
-
-        jumpCooldown = new HashMap<>();
-
-        enderPearlCooldown = new HashMap<>();
-
-        bowFlags = new HashMap<>();
-
-        spawnProtection = new HashMap<>();
     }
 }
