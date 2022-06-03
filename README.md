@@ -48,9 +48,9 @@ Passive Perks:
 _The passive perks are very different, you can't actually use them, but they perform things in specific cases. For example,
 give you double the wool amount when breaking one or let you jump higher._
 
-Pick-Up Items:
+Power-Ups:
 
-_The pickup items spawn at random locations on the map - if you pick them up you will get random, good effects 
+_The Power-Ups in form of items spawn at random locations on the map - if you pick them up you will get random, good effects 
 for a limited period of time._
 
 
@@ -60,7 +60,7 @@ Just try it out with your friends, it's a hilarious game: _Join the Minecraft Se
 
 - many values are configurable by using the config.json
 - exciting active and passive perks
-- peerless so-called "pick-up items", which give effects on pick-up
+- peerless so-called "Power-Ups", which give effects on pick-up
 - inventory-sort function
 - already 2 wonderful maps included - only 5 minutes to set up
 
