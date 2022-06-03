@@ -1,4 +1,5 @@
 {
+  "mongodb": "ADD the connection string HERE",
   "mapName": "Vimo",
   "mapSpawn": [0, 71, 28],
   "lobbySpawn": [1000, 101, 1000],

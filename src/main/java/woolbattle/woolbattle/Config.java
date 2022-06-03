@@ -18,6 +18,8 @@ public class Config {
      * @author SimsumMC & Servaturus
      */
 
+    public static final String connectionString = (String) getValue("connectionString");
+
     public static final String defaultMap = (String) getValue("mapName");
     public static final int defaultLives = (int) (long) getValue("defaultLives");
     public static final int spawnProtectionLengthAfterDeath = (int) (long) getValue("spawnProtectionAfterDeath");

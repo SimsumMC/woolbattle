@@ -32,10 +32,7 @@ import static com.mongodb.client.model.Filters.eq;
 public final class Main extends JavaPlugin {
 
     private static Main instance;
-    private static final ConnectionString connectionString = new ConnectionString(
-            "mongodb://woolbattle:iloveminecraft@cluster0-shard-00-00.eqlbi.mongodb.net:27017," +
-            "cluster0-shard-00-01.eqlbi.mongodb.net:27017,cluster0-shard-00-02.eqlbi.mongodb.net:27017/" +
-            "myFirstDatabase?ssl=true&replicaSet=atlas-5qmtum-shard-0&authSource=admin&retryWrites=true&w=majority");
+    private static final ConnectionString connectionString = new ConnectionString(Config.connectionString);
     private static final MongoClientSettings settings = MongoClientSettings.builder()
             .applyConnectionString(connectionString)
             .build();

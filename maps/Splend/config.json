@@ -1,4 +1,5 @@
 {
+  "mongodb": "ADD the connection string HERE",
   "mapName": "Splend",
   "mapSpawn": [0, 100, 0],
   "lobbySpawn": [1000, 101, 1000],
