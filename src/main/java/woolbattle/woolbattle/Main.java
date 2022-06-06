@@ -37,8 +37,6 @@ public final class Main extends JavaPlugin {
         // Plugin startup logic
         instance = this;
 
-        System.out.println(Config.mongoDatabase);
-
         ConnectionString connectionString = new ConnectionString(Config.mongoDatabase);
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
