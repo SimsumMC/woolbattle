@@ -27,6 +27,7 @@ import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.Enums.PerkType;
 import woolbattle.woolbattle.Main;
+import woolbattle.woolbattle.achievements.AchievementUI;
 import woolbattle.woolbattle.itemsystem.ItemSystem;
 import woolbattle.woolbattle.perks.ActivePerk;
 import woolbattle.woolbattle.stats.StatsSystem;
@@ -269,6 +270,9 @@ public class LobbySystem implements Listener {
         String displayName = event.getItem().getItemMeta().getDisplayName();
 
         switch (displayName) {
+            case "§lAchievements":
+                AchievementUI.showAchievementGUI(player);
+                break;
             case "§c§lLeave":
                 player.kickPlayer("§c§lYou left the game.");
                 break;
