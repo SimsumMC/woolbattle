@@ -29,12 +29,15 @@ import woolbattle.woolbattle.Enums.PerkType;
 import woolbattle.woolbattle.Main;
 import woolbattle.woolbattle.itemsystem.ItemSystem;
 import woolbattle.woolbattle.perks.ActivePerk;
+import woolbattle.woolbattle.stats.StatsSystem;
 import woolbattle.woolbattle.team.TeamSystem;
 
 import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 import static woolbattle.woolbattle.lives.LivesSystem.setPlayerSpawnProtection;
+import static woolbattle.woolbattle.stats.StatsSystem.addDefaultStats;
+
 public class LobbySystem implements Listener {
 
     public static boolean gameStarted = false;
@@ -463,6 +466,8 @@ public class LobbySystem implements Listener {
 
         }
 
+        addDefaultStats();
+
         Cache.setTeamLives(teamLives);
 
         return true;
@@ -485,6 +490,8 @@ public class LobbySystem implements Listener {
         gameStarted = false;
 
         cooldown = 60;
+
+        StatsSystem.saveAllPlayerStats(winnerTeam);
 
         Cache.clear();
 

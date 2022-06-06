@@ -19,7 +19,8 @@ public class StartGameCommand implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if(!player.isOp()){
-                return false;
+                player.sendMessage(ChatColor.RED + "You need OP to use this command!");
+                return true;
             }
             if (startGame()){
                 player.sendMessage(ChatColor.GREEN + "Started the game.");

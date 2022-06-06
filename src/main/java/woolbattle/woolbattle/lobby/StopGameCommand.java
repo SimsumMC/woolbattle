@@ -19,9 +19,10 @@ public class StopGameCommand implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if(!player.isOp()){
-                return false;
+                player.sendMessage(ChatColor.RED + "You need OP to use this command!");
+                return true;
             }
-            if(endGame(ChatColor.RED + "Unknown")){
+            if(endGame(ChatColor.YELLOW + "Yellow")){
                 player.sendMessage("§aStopped the game successfully.");
             } else{
                 player.sendMessage(ChatColor.RED + "There is no running game!");

@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 import woolbattle.woolbattle.Cache;
+import woolbattle.woolbattle.stats.StatsSystem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,6 +81,7 @@ public class AllActivePerks implements Listener {
             else{
                 if(cooldown != 0) {
                     setItemCooldown(player, perkSlot, itemStack, cooldown);
+                    StatsSystem.addActivePerkUsage(player);
                 }
             }
         }
@@ -140,6 +142,8 @@ public class AllActivePerks implements Listener {
 
                     player.sendMessage(ChatColor.GOLD + "You are now in a duel with " + damagedPlayerName + ChatColor.GOLD + "!");
                     damagedPlayer.sendMessage(ChatColor.GOLD + "You are now in a duel with " + playerName + ChatColor.GOLD + "!");
+
+                    StatsSystem.addActivePerkUsage(player);
                 }
 
             }
@@ -176,12 +180,6 @@ public class AllActivePerks implements Listener {
 
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerItemBreak(PlayerItemBreakEvent event) {
-        System.out.println("PlayerItemBreakEvent");
-        event.getBrokenItem().setAmount(1);
-    }
-
     @EventHandler
     public void onPlayerFish(PlayerFishEvent event) {
         Player player = event.getPlayer();
@@ -213,6 +211,8 @@ public class AllActivePerks implements Listener {
             Location hookLocation = hook.getLocation();
             Vector vector = new Vector(hookLocation.getX() - playerLocation.getX(), 1.0, hookLocation.getZ() - playerLocation.getZ());
             player.setVelocity(vector);
+
+            StatsSystem.addActivePerkUsage(player);
         }
     }
 
