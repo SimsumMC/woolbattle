@@ -501,6 +501,7 @@ public class LobbySystem implements Listener {
             if(player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.CREATIVE){
                 player.setGameMode(GameMode.SURVIVAL);
             }
+            player.sendTitle(winnerTeam + ChatColor.GRAY + " won!", " ");
         }
 
         updateScoreBoard();
