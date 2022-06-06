@@ -10,6 +10,7 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import woolbattle.woolbattle.achievements.AchievementSystem;
 import woolbattle.woolbattle.base.Base;
 import woolbattle.woolbattle.lives.LivesSystem;
 import woolbattle.woolbattle.lobby.LobbySystem;
@@ -60,6 +61,7 @@ public final class Main extends JavaPlugin {
         // Beelzebub's Stuff
         Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);
         Bukkit.getPluginManager().registerEvents(new LivesSystem(), this);
+        Bukkit.getPluginManager().registerEvents(new AchievementSystem(), this);
 
         //Servaturus' belongings
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
