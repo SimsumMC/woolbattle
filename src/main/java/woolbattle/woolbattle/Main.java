@@ -20,29 +20,30 @@ import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
 import woolbattle.woolbattle.woolsystem.MapBlocksCommand;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import static com.mongodb.client.model.Filters.eq;
 
 public final class Main extends JavaPlugin {
 
     private static Main instance;
-    private static final ConnectionString connectionString = new ConnectionString(Config.connectionString);
-    private static final MongoClientSettings settings = MongoClientSettings.builder()
-            .applyConnectionString(connectionString)
-            .build();
-    private static final MongoClient mongoClient = MongoClients.create(settings);
-    private static final MongoDatabase db = mongoClient.getDatabase("woolbattle");
+
+    private static MongoClient mongoClient;
+    private static MongoDatabase db;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         instance = this;
+
+        System.out.println(Config.mongoDatabase);
+
+        ConnectionString connectionString = new ConnectionString(Config.mongoDatabase);
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .build();
+        mongoClient = MongoClients.create(settings);
+        db = mongoClient.getDatabase("woolbattle");
 
         // SimsumMC's Things
         Bukkit.getPluginManager().registerEvents(new LobbySystem(), this);
@@ -68,37 +69,11 @@ public final class Main extends JavaPlugin {
             db.getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
         }
 
-        Bukkit.getPluginManager().registerEvents(new Listener(), this);
-        getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
-        getCommand("mapblocks").setExecutor(new MapBlocksCommand());
         BlockBreakingSystem.setCollectBrokenBlocks(false);
         BlockBreakingSystem.fetchMapBlocks();
+
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.setAllowFlight(true);
-        }
-        File file = new File("config.json");
-        if(!file.exists()){
-            try {
-                file.createNewFile();
-                Files.write(Paths.get(file.toURI()), Collections.singleton("{" +
-                        "\"mapName\": \"Vimo\",\n" +
-                        "\"mapSpawn\": [0, 71, 28],\n" +
-                        "\"lobbySpawn\": [1000, 100, 1000],\n" +
-                        "\"defaultLives\": 10,\n" +
-                        "\"startCooldown\": 60,\n" +
-                        "\"deathCooldown\": 20,\n" +
-                        "\"maxHeight\": 100,\n" +
-                        "\"minHeight\": 0,\n" +
-                        "\"teamSize\": 1,\n" +
-                        "\"teamSpawns\": [[0, 66, 57], [0, 66, 0], [-29, 66, 28], [28, 66, 28]],\n" +
-                        "\"givenWoolAmount\": 1,\n" +
-                        "\"maxStacks\": 3,\n" +
-                        "\"jumpCooldown\": 10,\n" +
-                        "\"woolReplaceDelay\" : 10\n" +
-                        "}"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
