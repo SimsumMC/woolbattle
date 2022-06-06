@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Config;
+import woolbattle.woolbattle.achievements.AchievementSystem;
 import woolbattle.woolbattle.team.TeamSystem;
 import woolbattle.woolbattle.lobby.LobbySystem;
 
@@ -173,6 +174,9 @@ public class LivesSystem implements Listener {
                 HashMap<Player, HashMap<String, Integer>> playerStats = Cache.getPlayerStats();
 
                 if(amKills == 5){
+
+                    AchievementSystem.giveKillstreak5((Player) damager);
+
                     String streakMessage = ChatColor.GRAY + "The player " + damagerTeamColour +
                             ((Player) damager).getDisplayName() + ChatColor.GRAY + " has a 5er kill streak!";
                     Bukkit.broadcastMessage(streakMessage);
