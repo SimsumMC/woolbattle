@@ -647,6 +647,13 @@ public class LobbySystem implements Listener {
         inv.setChestplate(null);
         inv.setHelmet(null);
 
+        // Achievement Item
+        ItemStack achievementStack = new ItemStack(Material.DIAMOND);
+        ItemMeta achievementMeta = achievementStack.getItemMeta();
+        achievementMeta.setDisplayName("§lAchievements");
+        achievementStack.setItemMeta(achievementMeta);
+        inv.setItem(1, achievementStack);
+
         // Team Selecting Item
         ItemStack teamStack = new ItemStack(Material.BED);
         ItemMeta teamMeta = teamStack.getItemMeta();

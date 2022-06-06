@@ -26,7 +26,6 @@ public class AchievementUI {
         MongoDatabase db = Main.getMongoDatabase();
         MongoCollection<Document> collection = db.getCollection("playerAchievements");
         ArrayList<String> arrayList = (ArrayList<String>) collection.find(eq("_id", player.getUniqueId().toString())).first().get("achievements");
-        System.out.println(arrayList);
         Inventory achievements = Bukkit.createInventory(null, 27, ChatColor.GOLD + "Achievements");
 
         //adding glass

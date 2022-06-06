@@ -39,7 +39,6 @@ public class AchievementSystem implements Listener {
             player.sendMessage(ChatColor.GREEN + "You just received the 'Strategist' Achievement!");
 
             Bson updates = Updates.push("achievements", "fullwool");
-
             collection.updateOne(query, updates);
         }
     }
