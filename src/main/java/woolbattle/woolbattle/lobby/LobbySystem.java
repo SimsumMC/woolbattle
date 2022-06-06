@@ -269,6 +269,9 @@ public class LobbySystem implements Listener {
         String displayName = event.getItem().getItemMeta().getDisplayName();
 
         switch (displayName) {
+            case "§lAchievements":
+                AchievementGUI.showAchievementGUI(player);
+                break;
             case "§c§lLeave":
                 player.kickPlayer("§c§lYou left the game.");
                 break;
@@ -513,7 +516,11 @@ public class LobbySystem implements Listener {
 
         updateScoreBoard();
 
+<<<<<<< Updated upstream
         AchievementSystem.carried(winnerTeam.substring(2));
+=======
+        AchievementSystem.closeCall(winnerTeam.substring(2));
+>>>>>>> Stashed changes
         return true;
     }
 

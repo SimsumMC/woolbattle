@@ -6,12 +6,18 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+<<<<<<< Updated upstream
 import org.bukkit.enchantments.Enchantment;
+=======
+>>>>>>> Stashed changes
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+<<<<<<< Updated upstream
 import woolbattle.woolbattle.Cache;
+=======
+>>>>>>> Stashed changes
 import woolbattle.woolbattle.Main;
 
 import java.util.ArrayList;
@@ -28,7 +34,10 @@ public class AchievementGUI {
         MongoDatabase db = Main.getMongoDatabase();
         MongoCollection<Document> collection = db.getCollection("playerAchievements");
         ArrayList<String> arrayList = (ArrayList<String>) collection.find(eq("_id", player.getUniqueId().toString())).first().get("achievements");
+<<<<<<< Updated upstream
         System.out.println(arrayList);
+=======
+>>>>>>> Stashed changes
         Inventory achievements = Bukkit.createInventory(null, 27, ChatColor.GOLD + "Achievements");
 
         //adding glass
@@ -143,4 +152,8 @@ public class AchievementGUI {
 
         player.openInventory(achievements);
     }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes

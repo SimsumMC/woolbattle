@@ -73,15 +73,24 @@ public class AchievementSystem implements Listener {
     }
 
     /**
+<<<<<<< Updated upstream
+=======
+     * (UNFINISHED)
+>>>>>>> Stashed changes
      * A method which, upon being called, gives the Player the British Way achievement
      * (No separate check needed as method is only called when the player is qualified)
      * @param winner - The team which has won the game
      * @author Beelzebub
      */
+<<<<<<< Updated upstream
     public static void carried(String winner) {
         /* MongoDatabase db = Main.getMongoDatabase();
 
 
+=======
+    /*public static void carried(String winner) {
+        MongoDatabase db = Main.getMongoDatabase();
+>>>>>>> Stashed changes
         for (int i = 0; i<= Cache.getTeamMembers().get(winner).size(); i++) {
             Player player = Cache.getTeamMembers().get(winner).get(i);
             if (Cache.getAchievements().get(player.getUniqueId()).contains("carried")){
@@ -93,17 +102,33 @@ public class AchievementSystem implements Listener {
                 Cache.setAchievements(currentAchievements);
                 player.sendMessage(ChatColor.GREEN + "You just received the 'British way' Achievement!");
             }
+<<<<<<< Updated upstream
         } */
     }
      /**
+=======
+        }
+    } */
+
+    /**
+>>>>>>> Stashed changes
      * A method which, upon being called, gives the Player the British Way achievement
      * (No separate check needed as method is only called when the player is qualified)
      * @param winner - The team which has won the game
      * @author Beelzebub
      */
+<<<<<<< Updated upstream
         public static void closeCall(String winner) {
             MongoDatabase db = Main.getMongoDatabase();
             MongoCollection<Document> collection = db.getCollection("playerAchievements");
+=======
+    public static void closeCall(String winner) {
+        MongoDatabase db = Main.getMongoDatabase();
+        MongoCollection<Document> collection = db.getCollection("playerAchievements");
+
+        System.out.println(winner);
+        if (!winner.equals("Unknown")) {
+>>>>>>> Stashed changes
             for (int i = 0; i <= Cache.getTeamMembers().get(winner).size(); i++){
                 Document query = new Document().append("_id",  Cache.getTeamMembers().get(winner).get(i).getUniqueId().toString());
                 ArrayList<String> arrayList = (ArrayList<String>) collection.find(eq("_id", Cache.getTeamMembers().get(winner).get(i).getUniqueId().toString())).first().get("achievements");
@@ -123,6 +148,10 @@ public class AchievementSystem implements Listener {
                 }
             }
             Bukkit.broadcastMessage(winner);
+<<<<<<< Updated upstream
+=======
+        }
+>>>>>>> Stashed changes
     }
 
     /**
@@ -147,5 +176,9 @@ public class AchievementSystem implements Listener {
             collection.insertOne(document);
         }
     }
+<<<<<<< Updated upstream
 }
 
+=======
+}
+>>>>>>> Stashed changes
