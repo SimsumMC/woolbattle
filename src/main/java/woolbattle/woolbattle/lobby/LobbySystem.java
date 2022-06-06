@@ -429,8 +429,6 @@ public class LobbySystem implements Listener {
 
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 
-        long unixTime = (System.currentTimeMillis() / 1000L) + Config.spawnProtectionLengthAtGameStart;
-
         for(Player player: players){
             String team = TeamSystem.getPlayerTeam(player, true);
             teamLives.put(team, topVotedLifeAmount);

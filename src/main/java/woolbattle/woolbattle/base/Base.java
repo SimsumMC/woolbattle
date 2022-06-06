@@ -2,6 +2,7 @@ package woolbattle.woolbattle.base;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,26 +26,12 @@ public class Base implements Listener {
      */
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-        if(!(event.getEntity() instanceof Player)){
-            return;
-        }
-        //disable fall damage
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE) {
             event.setCancelled(true);
         }
-        Player player = (Player) event.getEntity();
-        player.setHealth(20);
-    }
-
-    /**
-     * An event that gets executed whenever an entity damages another entity to prevent damaging each other.
-     * @param event - the EntityDamageByEntityEvent
-     * @author SimsumMC
-     */
-    @EventHandler
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent event){
-        Player player = (Player) event.getEntity();
-        player.setHealth(20);
+        else{
+            event.setDamage(0);
+        }
     }
 
     /**
