@@ -66,7 +66,7 @@ public class BlockBreakingSystem {
         //Iterates over the mapBlocks, present in the db, converts the into valid locations and ultimately add them to a previously created array.
 
 
-        for(ArrayList<Double> argArray: (ArrayList<ArrayList<Double>>) Main.getWrapper().get("map", "mapBlocks").get("mapBlocks")/*db.getCollection("map").find(eq("_id", "mapBlocks")).first().get("mapBlocks")*/){
+        for(ArrayList<Double> argArray: (ArrayList<ArrayList<Double>>) Main.getMongoDatabase().getCollection("map").find(eq("_id", "mapBlocks")).first().get("mapBlocks")/*db.getCollection("map").find(eq("_id", "mapBlocks")).first().get("mapBlocks")*/){
             if(argArray.size() == 0){
                 break;
             }else {
@@ -105,9 +105,8 @@ public class BlockBreakingSystem {
 
 
         //Fetches the stored mapBlocks from the db into a new array (update).
-        MongoDbWrapper wrapper = Main.getWrapper();
         try{
-            ArrayList<ArrayList<Double>> update = (ArrayList<ArrayList<Double>>) wrapper.get(collectionString, objectIdString).get(key);
+            ArrayList<ArrayList<Double>> update = (ArrayList<ArrayList<Double>>) Main.getMongoDatabase().getCollection("map").find(eq("_id", "mapBlocks")).first().get("mapBlocks");
 
             //Adds the cached blocks to the updated array, in case they are not already present in said collection.
 
@@ -136,7 +135,7 @@ public class BlockBreakingSystem {
             }
 
             //Replaces the mapBlocksArray in the db with the previously-prepared one (update).
-            wrapper.get(collectionString, objectIdString).replace(key, new Document("_id", objectIdString).append(key, update));
+            Main.getMongoDatabase().getCollection("map").find(eq("_id", "mapBlocks")).first().replace(key, new Document("_id", objectIdString).append(key, update));
         }catch(NullPointerException e){
             System.out.println("Error, whilst finding a collection");
         }
