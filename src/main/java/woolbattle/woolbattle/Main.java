@@ -27,11 +27,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-<<<<<<< Updated upstream
-import java.util.Collection;
 import java.util.Collections;
-=======
->>>>>>> Stashed changes
 import java.util.HashMap;
 
 import static com.mongodb.client.model.Filters.eq;
