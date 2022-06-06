@@ -160,8 +160,6 @@ public class LivesSystem implements Listener {
 
                 killStreaks.put(team, new HashMap<Player, Integer>(){{put(player, 0);}});
 
-                System.out.println(killStreaks);
-
                 int amKills;
                 if(kills.containsKey(damager)){
                     amKills = kills.get(damager) + 1;
@@ -174,7 +172,6 @@ public class LivesSystem implements Listener {
 
                 HashMap<Player, HashMap<String, Integer>> playerStats = Cache.getPlayerStats();
 
-                System.out.println(amKills);
                 if(amKills == 5){
                     String streakMessage = ChatColor.GRAY + "The player " + damagerTeamColour +
                             ((Player) damager).getDisplayName() + ChatColor.GRAY + " has a 5er kill streak!";
