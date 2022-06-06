@@ -36,8 +36,6 @@ public final class Main extends JavaPlugin {
         // Plugin startup logic
         instance = this;
 
-        System.out.println(Config.mongoDatabase);
-
         ConnectionString connectionString = new ConnectionString(Config.mongoDatabase);
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
@@ -54,6 +52,10 @@ public final class Main extends JavaPlugin {
         this.getCommand("gstop").setExecutor(new StopGameCommand());
 
         AllActivePerks.load();
+
+        for(Player player : Bukkit.getOnlinePlayers()){
+            LobbySystem.setTabList(player);
+        }
 
         // Beelzebub's Stuff
         Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);

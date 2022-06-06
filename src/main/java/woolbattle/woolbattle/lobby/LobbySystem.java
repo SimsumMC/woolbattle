@@ -72,6 +72,8 @@ public class LobbySystem implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
+        setTabList(player);
+
         event.setJoinMessage(ChatColor.GRAY + "The player " + ChatColor.GREEN + player.getDisplayName()
                 + ChatColor.GRAY + " joined the game.");
 
@@ -216,6 +218,8 @@ public class LobbySystem implements Listener {
                 }
 
                 TeamSystem.showTeamSelectionInventory((Player) event.getWhoClicked());
+
+                setTabList(player);
 
                 break;
             case "Choose Perks":
@@ -424,6 +428,10 @@ public class LobbySystem implements Listener {
 
         TeamSystem.teamsOnStart();
 
+        for(Player player : Bukkit.getOnlinePlayers()){
+            LobbySystem.setTabList(player);
+        }
+
         int topVotedLifeAmount = getTopVotedLifeAmount();
         HashMap<String, Integer> teamLives = Cache.getTeamLives();
 
@@ -491,6 +499,10 @@ public class LobbySystem implements Listener {
         Bukkit.broadcastMessage(
                 ChatColor.GRAY + "The team " + ChatColor.BOLD + winnerTeam + ChatColor.RESET + ChatColor.GRAY + " won!"
         );
+
+        for(Player player : Bukkit.getOnlinePlayers()){
+            LobbySystem.setTabList(player);
+        }
 
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 
@@ -1024,6 +1036,68 @@ public class LobbySystem implements Listener {
         }.runTaskTimer(Main.getInstance(), 0, 20);
 
     }
+
+    /**
+     * A Method that changes the "tablist" for the given player.
+     * @param player the player that gets the "tablist" modified
+     * @author SimsumMC
+     */
+    public static void setTabList(Player player) {
+        Scoreboard scoreboard = player.getScoreboard();
+
+        Team red = scoreboard.getTeam("0000Red");
+        Team blue = scoreboard.getTeam("0001Blue");
+        Team green = scoreboard.getTeam("0002Green");
+        Team yellow = scoreboard.getTeam("0003Yellow");
+        Team none = scoreboard.getTeam("0004None");
+
+        if(red == null){
+            red = scoreboard.registerNewTeam("0000Red");
+            red.setPrefix(ChatColor.DARK_RED.toString());
+        }
+
+        if(blue == null){
+            blue = scoreboard.registerNewTeam("0001Blue");
+            blue.setPrefix(ChatColor.BLUE.toString());
+        }
+
+        if(green == null){
+            green = scoreboard.registerNewTeam("0002Green");
+            green.setPrefix(ChatColor.GREEN.toString());
+        }
+
+        if(yellow == null){
+            yellow = scoreboard.registerNewTeam("0003Yellow");
+            yellow.setPrefix(ChatColor.YELLOW.toString());
+        }
+
+        if(none == null){
+            none = scoreboard.registerNewTeam("0004None");
+            none.setPrefix(ChatColor.WHITE.toString());
+        }
+
+        String playerTeam = TeamSystem.getPlayerTeam(player, true);
+
+        switch(playerTeam){
+            case "Red":
+                red.addEntry(player.getName());
+                break;
+            case "Blue":
+                blue.addEntry(player.getName());
+                break;
+            case "Green":
+                green.addEntry(player.getName());
+                break;
+            case "Yellow":
+                yellow.addEntry(player.getName());
+                break;
+            default:
+                none.addEntry(player.getName());
+                break;
+        }
+
+    }
+
 
     /**
      * A Method that changes the scoreboard for the given player to the lobby scoreboard.
