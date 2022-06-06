@@ -114,83 +114,108 @@ public class LivesSystem implements Listener {
             HashMap<String, Integer> teamLives = Cache.getTeamLives();
 
             int lives = teamLives.get(team);
-            if (lives == 0) {
-                TeamSystem.removePlayerTeam(player);
-                LobbySystem.setPlayerSpectator(player);
-            } else {
-                EntityDamageEvent lastDamageEvent = event.getPlayer().getLastDamageCause();
 
-                Entity damager;
+            EntityDamageEvent lastDamageEvent = event.getPlayer().getLastDamageCause();
 
-                if(lastDamageEvent instanceof EntityDamageByEntityEvent){
-                    damager = ((EntityDamageByEntityEvent) lastDamageEvent).getDamager();
+            Entity damager;
+
+            if(lastDamageEvent instanceof EntityDamageByEntityEvent){
+                damager = ((EntityDamageByEntityEvent) lastDamageEvent).getDamager();
+            }
+            else{
+                damager = null;
+            }
+
+            if(damager == null){
+                teleportPlayerTeamSpawn(player);
+                setPlayerSpawnProtection(player, Config.spawnProtectionLengthAfterDeath);
+            }
+
+            if(damager instanceof Arrow){
+                Arrow arrow = (Arrow) damager;
+                damager = (Entity) arrow.getShooter();
+
+            }
+
+            if (damager instanceof Player) {
+                if(lives != 0){
+                    lives -= 1;
+                }
+                teamLives.put(team, lives);
+                Cache.setTeamLives(teamLives);
+
+                lastDamage.remove(damager);
+                Cache.setLastDamage(lastDamage);
+
+                String damagerTeam = TeamSystem.getPlayerTeam((Player) damager, true);
+                ChatColor damagerTeamColour = TeamSystem.getTeamColour(damagerTeam) ;
+                String killMessage = ChatColor.GRAY + "The player " + TeamSystem.getTeamColour(team)
+                        + player.getDisplayName() + ChatColor.GRAY + " was killed by " +
+                        damagerTeamColour + ((Player) damager).getDisplayName() + ChatColor.GRAY + ".";
+
+                Bukkit.broadcastMessage(killMessage);
+                HashMap<String, HashMap<Player, Integer>> killStreaks = Cache.getKillStreaks();
+
+                HashMap<Player, Integer> kills = killStreaks.get(damagerTeam);
+
+                killStreaks.put(team, new HashMap<Player, Integer>(){{put(player, 0);}});
+
+                System.out.println(killStreaks);
+
+                int amKills;
+                if(kills.containsKey(damager)){
+                    amKills = kills.get(damager) + 1;
                 }
                 else{
-                    damager = null;
+                    amKills = 1;
                 }
 
-                if(damager == null){
-                    teleportPlayerTeamSpawn(player);
-                    setPlayerSpawnProtection(player, Config.spawnProtectionLengthAfterDeath);
-                }
+                kills.put((Player) damager, amKills);
 
-                if(damager instanceof Arrow){
-                    Arrow arrow = (Arrow) damager;
-                    damager = (Entity) arrow.getShooter();
+                HashMap<Player, HashMap<String, Integer>> playerStats = Cache.getPlayerStats();
 
-                }
+                System.out.println(amKills);
+                if(amKills == 5){
+                    String streakMessage = ChatColor.GRAY + "The player " + damagerTeamColour +
+                            ((Player) damager).getDisplayName() + ChatColor.GRAY + " has a 5er kill streak!";
+                    Bukkit.broadcastMessage(streakMessage);
 
-                if (damager instanceof Player) {
-                    lives -= 1;
-                    teamLives.put(team, lives);
+                    kills.put((Player) damager, 0);
+
+
+                    teamLives = Cache.getTeamLives();
+                    teamLives.put(damagerTeam, (teamLives.get(damagerTeam) + 1));
                     Cache.setTeamLives(teamLives);
 
-                    lastDamage.remove(damager);
-                    Cache.setLastDamage(lastDamage);
+                    HashMap<String, Integer> damagerStatsNew = playerStats.get(damager);
+                    damagerStatsNew.put("streaks", (damagerStatsNew.get("streaks") + 1));
+                    playerStats.put((Player) damager, damagerStatsNew);
+                }
 
-                    String damagerTeam = TeamSystem.getPlayerTeam((Player) damager, true);
-                    ChatColor damagerTeamColour = TeamSystem.getTeamColour(damagerTeam) ;
-                    String killMessage = ChatColor.GRAY + "The player " + TeamSystem.getTeamColour(team)
-                            + player.getDisplayName() + ChatColor.GRAY + " was killed by " +
-                            damagerTeamColour + ((Player) damager).getDisplayName() + ChatColor.GRAY + ".";
+                killStreaks.put(damagerTeam, kills);
+                Cache.setKillStreaks(killStreaks);
 
-                    Bukkit.broadcastMessage(killMessage);
-                    HashMap<String, HashMap<Player, Integer>> killStreaks = Cache.getKillStreaks();
-
-                    HashMap<Player, Integer> kills = killStreaks.get(damagerTeam);
-
-                    killStreaks.put(team, new HashMap<Player, Integer>(){{put(player, 0);}});
-
-                    int amKills;
-                    if(kills.containsKey(damager)){
-                        amKills = kills.get(damager) + 1;
-                    }
-                    else{
-                        amKills = 1;
-                    }
-
-                    kills.put((Player) damager, amKills);
-
-                    if(amKills == 5){
-                        String streakMessage = ChatColor.GRAY + "The player " + damagerTeamColour +
-                                ((Player) damager).getDisplayName() + ChatColor.GRAY + " has a 5er kill streak!";
-                        Bukkit.broadcastMessage(streakMessage);
-
-                        kills.put((Player) damager, 0);
-                        killStreaks.put(damagerTeam, kills);
-                        Cache.setKillStreaks(killStreaks);
-
-                        teamLives = Cache.getTeamLives();
-                        teamLives.put(damagerTeam, (teamLives.get(damagerTeam) + 1));
-                        Cache.setTeamLives(teamLives);
-
-                    }
+                if (lives == 0) {
+                    TeamSystem.removePlayerTeam(player);
+                    LobbySystem.setPlayerSpectator(player);
+                }
+                else{
                     teleportPlayerTeamSpawn(player);
                     setPlayerSpawnProtection(player, Config.spawnProtectionLengthAfterDeath);
-
                 }
-                LobbySystem.determinateWinnerTeam();
+
+                HashMap<String, Integer> damagerStats = playerStats.get(damager);
+                damagerStats.put("kills", (damagerStats.get("kills") + 1));
+                playerStats.put((Player) damager, damagerStats);
+
+                HashMap<String, Integer> damagedStats = playerStats.get(player);
+                damagedStats.put("deaths", (damagedStats.get("deaths") + 1));
+                playerStats.put(player, damagedStats);
+
+                Cache.setPlayerStats(playerStats);
+
             }
+            LobbySystem.determinateWinnerTeam();
         }
     }
 }

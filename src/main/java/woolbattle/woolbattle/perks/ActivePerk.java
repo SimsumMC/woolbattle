@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Main;
+import woolbattle.woolbattle.stats.StatsSystem;
 
 import java.util.HashMap;
 
@@ -122,11 +123,14 @@ public class ActivePerk {
             player.playNote(player.getLocation(), Instrument.PIANO, Note.flat(1, Note.Tone.B));
             return;
         }
+
         if(cooldown != 0){
             setItemCooldown(player, slot, itemStack, cooldown);
         }
 
         onExecute(event, player);
+
+        StatsSystem.addActivePerkUsage(player);
     }
 
     public void onExecute(PlayerInteractEvent event, Player player) {}
