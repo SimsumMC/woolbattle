@@ -23,6 +23,8 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
+import woolbattle.woolbattle.AchievementSystem.AchievementGUI;
+import woolbattle.woolbattle.AchievementSystem.AchievementSystem;
 import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.Enums.PerkType;
@@ -218,6 +220,7 @@ public class LobbySystem implements Listener {
                 TeamSystem.showTeamSelectionInventory((Player) event.getWhoClicked());
 
                 break;
+
             case "Choose Perks":
                 switch(rawItemName){
                     case "Active Perk #1":
@@ -271,6 +274,9 @@ public class LobbySystem implements Listener {
                 break;
             case "§a§lAmount of Lives":
                 showLifeAmountVoting(player);
+                break;
+            case "§lAchievements":
+                AchievementGUI.showAchievementGUI(player);
                 break;
             case "§b§lEdit Inventory":
                 showEditInventoryMenu(player);
@@ -507,6 +513,7 @@ public class LobbySystem implements Listener {
 
         updateScoreBoard();
 
+        AchievementSystem.carried(winnerTeam.substring(2));
         return true;
     }
 
@@ -622,7 +629,7 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that gives the lobby items to the given player.
-     * @param player the player that becomes the items in the inventory
+     * @param player the player that is given the items in the inventory
      * @author SimsumMC
      */
     public static void giveLobbyItems(Player player) {
@@ -636,6 +643,13 @@ public class LobbySystem implements Listener {
         inv.setLeggings(null);
         inv.setChestplate(null);
         inv.setHelmet(null);
+
+        // Achievement Item
+        ItemStack achievementStack = new ItemStack(Material.DIAMOND);
+        ItemMeta achievementMeta = achievementStack.getItemMeta();
+        achievementMeta.setDisplayName("§lAchievements");
+        achievementStack.setItemMeta(achievementMeta);
+        inv.setItem(1, achievementStack);
 
         // Team Selecting Item
         ItemStack teamStack = new ItemStack(Material.BED);

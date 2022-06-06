@@ -4,11 +4,13 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import woolbattle.woolbattle.AchievementSystem.AchievementSystem;
 import woolbattle.woolbattle.base.Base;
 import woolbattle.woolbattle.lives.LivesSystem;
 import woolbattle.woolbattle.lobby.LobbySystem;
@@ -25,7 +27,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -46,40 +50,8 @@ public final class Main extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         instance = this;
-
-        // SimsumMC's Things
-        Bukkit.getPluginManager().registerEvents(new LobbySystem(), this);
-        Bukkit.getPluginManager().registerEvents(new Base(), this);
-        Bukkit.getPluginManager().registerEvents(new AllActivePerks(), this);
-
-        this.getCommand("gstart").setExecutor(new StartGameCommand());
-        this.getCommand("gstop").setExecutor(new StopGameCommand());
-
-        AllActivePerks.load();
-
-        // Beelzebub's Stuff
-        Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);
-        Bukkit.getPluginManager().registerEvents(new LivesSystem(), this);
-
-        //Servaturus' belongings
-        Bukkit.getPluginManager().registerEvents(new Listener(), this);
-        getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
-        getCommand("mapblocks").setExecutor(new MapBlocksCommand());
-
-        Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
-        if (found == null) {
-            db.getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
-        }
-
-        Bukkit.getPluginManager().registerEvents(new Listener(), this);
-        getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
-        getCommand("mapblocks").setExecutor(new MapBlocksCommand());
-        BlockBreakingSystem.setCollectBrokenBlocks(false);
-        BlockBreakingSystem.fetchMapBlocks();
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            p.setAllowFlight(true);
-        }
         File file = new File("config.json");
+
         if(!file.exists()){
             try {
                 file.createNewFile();
@@ -101,6 +73,54 @@ public final class Main extends JavaPlugin {
                         "}"));
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+        // SimsumMC's Things
+        Bukkit.getPluginManager().registerEvents(new LobbySystem(), this);
+        Bukkit.getPluginManager().registerEvents(new Base(), this);
+        Bukkit.getPluginManager().registerEvents(new AllActivePerks(), this);
+
+        this.getCommand("gstart").setExecutor(new StartGameCommand());
+        this.getCommand("gstop").setExecutor(new StopGameCommand());
+
+        AllActivePerks.load();
+
+        // Beelzebub's Stuff
+        Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);
+        Bukkit.getPluginManager().registerEvents(new LivesSystem(), this);
+        Bukkit.getPluginManager().registerEvents(new AchievementSystem(), this);
+
+        //Servaturus' belongings
+        Bukkit.getPluginManager().registerEvents(new Listener(), this);
+        getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
+        getCommand("mapblocks").setExecutor(new MapBlocksCommand());
+
+        Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
+        if (found == null) {
+            db.getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
+        }
+
+        Bukkit.getPluginManager().registerEvents(new Listener(), this);
+        getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
+        getCommand("mapblocks").setExecutor(new MapBlocksCommand());
+        BlockBreakingSystem.setCollectBrokenBlocks(false);
+        BlockBreakingSystem.fetchMapBlocks();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.setAllowFlight(true);
+        }
+
+        for (Player player : Bukkit.getOnlinePlayers())
+        {
+            MongoCollection<Document> collection = db.getCollection("playerAchievements");
+
+            Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
+            if(foundDocument == null) {
+                HashMap<String, Object> playerData = new HashMap<String, Object>() {{
+                    put("_id", player.getUniqueId().toString());
+                    put("achievements", new ArrayList<String>());
+                }};
+                Document document = new Document(playerData);
+                collection.insertOne(document);
             }
         }
     }
