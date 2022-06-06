@@ -55,17 +55,6 @@ public class BlockRegistrationCommand implements CommandExecutor {
                     }
                 }
                 break;
-            case "terminatediff":
-
-                if (BlockBreakingSystem.isCollectBlocksTroughDiff()) {
-                    BlockBreakingSystem.setCollectBlocksTroughDiff(false);
-                    Bukkit.broadcastMessage(ChatColor.GREEN + "The block-scanning-process by means of difference was successfully terminated.\n");
-                }
-
-                else {
-                    sender.sendMessage(ChatColor.RED + "The Block-breaking-system is currently not registering new blocks, being placed.\n If you want to begin the registration of newly placed blocks, use the argument " + ChatColor.GREEN + "init");
-                }
-                return false;
 
             //}
         }
