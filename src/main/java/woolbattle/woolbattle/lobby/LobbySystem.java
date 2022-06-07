@@ -270,7 +270,7 @@ public class LobbySystem implements Listener {
         String displayName = event.getItem().getItemMeta().getDisplayName();
 
         switch (displayName) {
-            case "§lAchievements":
+            case "§6§lAchievements":
                 AchievementUI.showAchievementGUI(player);
                 break;
             case "§c§lLeave":
@@ -650,7 +650,7 @@ public class LobbySystem implements Listener {
         // Achievement Item
         ItemStack achievementStack = new ItemStack(Material.DIAMOND);
         ItemMeta achievementMeta = achievementStack.getItemMeta();
-        achievementMeta.setDisplayName("§lAchievements");
+        achievementMeta.setDisplayName("§6§lAchievements");
         achievementStack.setItemMeta(achievementMeta);
         inv.setItem(1, achievementStack);
 
