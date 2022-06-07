@@ -154,17 +154,17 @@ public class StatsSystem {
             int deaths = (int) foundDocument.get("deaths");
             int streaks = (int) foundDocument.get("streaks");
             int usedPerks = (int) foundDocument.get("used_perks");
-            int winProbability;
-            int kd;
+            float winProbability;
+            float kd;
 
             try {
-                winProbability = (wins / games) * 100;
+                winProbability = ((float) wins / (float) games) * 100;
             } catch (ArithmeticException e) {
                 winProbability = 0;
             }
 
             try {
-                kd = kills / deaths;
+                kd = (float) kills / deaths;
             } catch (ArithmeticException e) {
                 kd = kills;
             }
@@ -173,10 +173,10 @@ public class StatsSystem {
                     player.getName() + ChatColor.GRAY + " (Alltime) =-\n"
                     + "Games: " + ChatColor.YELLOW + games + "\n" + ChatColor.GRAY
                     + "Wins: " + ChatColor.YELLOW + wins + "\n" + ChatColor.GRAY
-                    + "Win Probability: " + ChatColor.YELLOW + winProbability + "%" + "\n" + ChatColor.GRAY
+                    + "Win Probability: " + ChatColor.YELLOW + String.format("%.3g", winProbability) + "%" + "\n" + ChatColor.GRAY
                     + "Kills: " + ChatColor.YELLOW + kills + "\n" + ChatColor.GRAY
                     + "Deaths: " + ChatColor.YELLOW + deaths + "\n" + ChatColor.GRAY
-                    + "K/D: " + ChatColor.YELLOW + kd + "\n" + ChatColor.GRAY
+                    + "K/D: " + ChatColor.YELLOW + String.format("%.3g", kd) + "\n" + ChatColor.GRAY
                     + "Streaks: " + ChatColor.YELLOW + streaks + "\n" + ChatColor.GRAY
                     + "Used Perks Amount: " + ChatColor.YELLOW + usedPerks + "\n" + ChatColor.GRAY
                     + "---------------------------------";
