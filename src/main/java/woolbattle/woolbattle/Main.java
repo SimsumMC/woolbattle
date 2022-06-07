@@ -4,11 +4,13 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import woolbattle.woolbattle.achievements.AchievementSystem;
 import woolbattle.woolbattle.base.Base;
 import woolbattle.woolbattle.lives.LivesSystem;
 import woolbattle.woolbattle.lobby.LobbySystem;
@@ -22,6 +24,7 @@ import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
 import woolbattle.woolbattle.woolsystem.MapBlocksCommand;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -58,6 +61,7 @@ public final class Main extends JavaPlugin {
         // Beelzebub's Stuff
         Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);
         Bukkit.getPluginManager().registerEvents(new LivesSystem(), this);
+        Bukkit.getPluginManager().registerEvents(new AchievementSystem(), this);
 
         //Servaturus' belongings
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
@@ -74,6 +78,21 @@ public final class Main extends JavaPlugin {
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.setAllowFlight(true);
+        }
+
+        for (Player player : Bukkit.getOnlinePlayers())
+        {
+            MongoCollection<Document> collection = db.getCollection("playerAchievements");
+
+            Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
+            if(foundDocument == null) {
+                HashMap<String, Object> playerData = new HashMap<String, Object>() {{
+                    put("_id", player.getUniqueId().toString());
+                    put("achievements", new ArrayList<String>());
+                }};
+                Document document = new Document(playerData);
+                collection.insertOne(document);
+            }
         }
     }
 
