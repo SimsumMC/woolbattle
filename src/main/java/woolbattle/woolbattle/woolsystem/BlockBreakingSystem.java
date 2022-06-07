@@ -102,6 +102,9 @@ public class BlockBreakingSystem {
 
             return;
         }
+        if(!Main.getMongoDatabase().listCollectionNames().into(new ArrayList<>()).contains("map")){
+            Main.getMongoDatabase().createCollection("map");
+        }
         Document found = Main.getMongoDatabase().getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
         if(found == null){
             Main.getMongoDatabase().getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));
