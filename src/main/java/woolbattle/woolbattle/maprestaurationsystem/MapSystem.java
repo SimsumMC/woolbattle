@@ -54,4 +54,8 @@ public class MapSystem {
         }
         return result;
     }
+
+    public static void clearMapChunks(){
+
+    }
 }

@@ -41,7 +41,11 @@ public class BlockBreakingSystem {
     public static void clearDbMapBlocks(){
 
         MongoDatabase db = Main.getMongoClient().getDatabase("woolbattle");
-        db.getCollection("map").replaceOne(exists("mapBlocks"), new Document("mapBlocks", new ArrayList<ArrayList<Double>>()));
+        db.getCollection("map").
+                replaceOne(
+                eq("_id", "mapBlocks"),
+                new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>())
+        );
     }
 
     /**
@@ -287,7 +291,7 @@ public class BlockBreakingSystem {
      *
      */
     public static void resetMap(){
-        Document doc = Main.getMongoDatabase().getCollection("map").find(eq("_id", "chunks")).first();
+        Document doc = Main.getMongoDatabase().getCollection("map").find(eq("_id", "mapChunks")).first();
         if(doc == null){
             System.out.println("There are no chunks, belonging to the map, specified in the database");
             return;

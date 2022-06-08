@@ -23,10 +23,11 @@ public class MapCommand implements CommandExecutor {
         }
         switch(args[0]){
             case "def":
+                System.out.println("Def is called");
                 World world = null;
                 if(args.length == 6){
                     try{
-                        world = Bukkit.getWorld(UUID.fromString(args[1]));
+                        world = Bukkit.getWorld(UUID.fromString(args[5]));
                     }catch(NullPointerException e){
                         System.out.println(world);
                     }
@@ -45,15 +46,6 @@ public class MapCommand implements CommandExecutor {
                 }
                 ArrayList<ArrayList<Long>> chunks;
                 try{
-
-                    if(args.length == 6){
-                        chunks = MapSystem.getChunksInRange(world,
-                                Long.parseLong(args[2]),
-                                Long.parseLong(args[3]),
-                                Long.parseLong(args[4]),
-                                Long.parseLong(args[5])
-                        );
-                    }else{
                         chunks = MapSystem.getChunksInRange(world,
 
                                 Long.parseLong(args[1]),
@@ -61,12 +53,11 @@ public class MapCommand implements CommandExecutor {
                                 Long.parseLong(args[3]),
                                 Long.parseLong(args[4])
                         );
-                    }
                 }catch(NumberFormatException e){
                     commandSender.sendMessage(ChatColor.RED + "One of the latter 4 arguments does not seem to possess the right format (integer), to be parsed properly.");
                     return false;
                 }
-
+                System.out.println("is called\n\n");
                 MapSystem.defineMapChunks(chunks);
                 break;
             case "reset":
