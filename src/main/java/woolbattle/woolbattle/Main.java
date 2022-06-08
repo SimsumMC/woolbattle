@@ -61,9 +61,11 @@ public final class Main extends JavaPlugin {
 
         //Servaturus' belongings
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
+
         getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
         getCommand("mapblocks").setExecutor(new MapBlocksCommand());
         getCommand("map").setExecutor(new MapCommand());
+
         Document found = db.getCollection("map").find(eq("_id", "mapBlocks")).first();
         if (found == null) {
             db.getCollection("map").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));

@@ -109,9 +109,9 @@ public class BlockBreakingSystem {
         if(!Main.getMongoDatabase().listCollectionNames().into(new ArrayList<>()).contains("map")){
             Main.getMongoDatabase().createCollection("map");
         }
-        Document found = Main.getMongoDatabase().getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
+        Document found = Main.getMongoDatabase().getCollection("map").find(eq("_id", "mapBlocks")).first();
         if(found == null){
-            Main.getMongoDatabase().getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));
+            Main.getMongoDatabase().getCollection("map").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));
         }
 
         //Fetches the stored mapBlocks from the db into a new array (update).
@@ -144,7 +144,7 @@ public class BlockBreakingSystem {
             }
 
             //Replaces the mapBlocksArray in the db with the previously-prepared one (update).
-            Main.getMongoDatabase().getCollection("map").find(eq("_id", "mapBlocks")).first().replace(key, new Document("_id", objectIdString).append(key, update));
+            Main.getMongoDatabase().getCollection("map").replaceOne(eq("_id", "mapBlocks"), new Document("_id", "mapBlocks").append("mapBlocks", update));
     }
 
     /**

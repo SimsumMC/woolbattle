@@ -23,7 +23,6 @@ public class MapCommand implements CommandExecutor {
         }
         switch(args[0]){
             case "def":
-                System.out.println("Def is called");
                 World world = null;
                 if(args.length == 6){
                     try{

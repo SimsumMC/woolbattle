@@ -150,6 +150,7 @@ public class Listener implements org.bukkit.event.Listener {
      */
     @EventHandler
     public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
+        System.out.println("Toggle flight is called");
         long jumpCooldown;
         try{
             jumpCooldown = Config.jumpCooldown;
@@ -157,16 +158,8 @@ public class Listener implements org.bukkit.event.Listener {
             jumpCooldown = 40;
         }
         Player p = event.getPlayer();
-        p.setFlying(false);
-        event.setCancelled(true);
 
         if(p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR || p.isFlying()){
-
-            event.setCancelled(false);
-
-            p.setFlying(!p.isFlying());
-
-            p.setAllowFlight(true);
             return;
         }
 
@@ -178,6 +171,7 @@ public class Listener implements org.bukkit.event.Listener {
             @Override
             public void run() {
                 p.setAllowFlight(true);
+                System.out.println(p.getAllowFlight());
             }
         }.runTaskLater(Main.getInstance(), jumpCooldown);
     }
@@ -201,10 +195,17 @@ public class Listener implements org.bukkit.event.Listener {
     @EventHandler
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
         Player p = event.getPlayer();
-        if(event.getNewGameMode().equals(GameMode.SURVIVAL) || event.getNewGameMode().equals(GameMode.ADVENTURE)){
-            p.setAllowFlight(true);
-            p.setFlying(false);
-        }
-    }
+        System.out.println("Gamemode change before: " + p.getAllowFlight());
+        if(!p.getAllowFlight()) {
+            new BukkitRunnable(){
+                @Override
+                public void run(){
+                    p.setAllowFlight(true);
+                    System.out.println(p.getAllowFlight());
+                }
 
+            }.runTaskLater(Main.getInstance(), 60);
+        }
+        System.out.println("Gamemode change afterwards: " + p.getAllowFlight());
+    }
 }
