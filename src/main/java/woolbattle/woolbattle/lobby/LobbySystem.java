@@ -429,6 +429,8 @@ public class LobbySystem implements Listener {
             return false;
         }
 
+        ActivePerk.loadActivePerkSlots();
+
         TeamSystem.teamsOnStart();
 
         int topVotedLifeAmount = getTopVotedLifeAmount();
