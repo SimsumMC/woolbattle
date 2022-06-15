@@ -60,13 +60,7 @@ public class AllActivePerks implements Listener {
 
             int woolCost = perk.getWoolCost();
             int cooldown = perk.getCooldown();
-            int perkSlot = 0;
-
-            if(!(projectile.getType() == EntityType.ARROW)){
-                player.getInventory().addItem(itemStack);
-                perkSlot = player.getInventory().first(perk.getItemStack());
-                player.getInventory().removeItem(itemStack);
-            }
+            int perkSlot = perk.getSlotCache(player);;
 
             if(!(projectile.getType() == EntityType.ARROW)) {
                 player.getInventory().setItem(perkSlot, itemStack);
@@ -101,7 +95,7 @@ public class AllActivePerks implements Listener {
 
                 ItemStack itemStack = perk.getItemStack();
                 itemStack.setAmount(1);
-                int perkSlot = perk.getSlot(player);
+                int perkSlot = perk.getSlotCache(player);
                 player.getInventory().setItem(perkSlot, itemStack);
 
                 HashMap<Player, Player> playerDuels = Cache.getPlayerDuels();
@@ -192,7 +186,7 @@ public class AllActivePerks implements Listener {
             int cooldown = perk.getCooldown();
             int perkSlot;
 
-            perkSlot = perk.getSlot(player);
+            perkSlot = perk.getSlotCache(player);
 
             if(!subtractWool(player, woolCost)){
                 event.setCancelled(true);

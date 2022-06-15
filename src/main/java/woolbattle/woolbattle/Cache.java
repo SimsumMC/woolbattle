@@ -24,6 +24,8 @@ public class Cache {
 
     private static HashMap<Player, ArrayList<ArrayList<Block>>> jumpPlatformBlocks = new HashMap<>();
 
+    private static HashMap<Player, HashMap<String, Integer>> activePerkSlots = new HashMap<>();
+
     private static HashMap<String, HashMap<Player, Integer>> killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
         put("Blue", new HashMap<>());
         put("Red", new HashMap<>());
@@ -83,6 +85,9 @@ public class Cache {
     public static HashMap<Player, HashMap<String, Integer>> getPlayerStats() {return playerStats;}
     public static void setPlayerStats(HashMap<Player, HashMap<String, Integer>> playerStats) {Cache.playerStats = playerStats;}
 
+    public static HashMap<Player, HashMap<String, Integer>> getActivePerkSlots() {return activePerkSlots;}
+    public static void setActivePerkSlots(HashMap<Player, HashMap<String, Integer>> activePerkSlots) {Cache.activePerkSlots = activePerkSlots;};
+
     public static void clear(){
         playerDuels = new HashMap<>();
 
@@ -120,5 +125,8 @@ public class Cache {
             put(10, new ArrayList<>());
             put(15, new ArrayList<>());
         }};
+
+        activePerkSlots = new HashMap<>();
+
     }
 }
