@@ -8,7 +8,6 @@ import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.Main;
 import java.util.ArrayList;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.exists;
 import static java.lang.String.format;
 
 public class BlockBreakingSystem {
@@ -99,9 +98,6 @@ public class BlockBreakingSystem {
     public static void pushMapBlocks(){
 
         //Pushes the currently present cached blocks into the database.
-        String collectionString = "map";
-        String objectIdString = "mapBlocks";
-        String key = "mapBlocks";
         if(mapBlocks.size() == 0){
 
             return;

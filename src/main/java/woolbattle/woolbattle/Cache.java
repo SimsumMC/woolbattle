@@ -93,7 +93,7 @@ public class Cache {
     public static void setPlayerStats(HashMap<Player, HashMap<String, Integer>> playerStats) {Cache.playerStats = playerStats;}
 
     public static HashMap<Player, HashMap<String, Integer>> getActivePerkSlots() {return activePerkSlots;}
-    public static void setActivePerkSlots(HashMap<Player, HashMap<String, Integer>> activePerkSlots) {Cache.activePerkSlots = activePerkSlots;};
+    public static void setActivePerkSlots(HashMap<Player, HashMap<String, Integer>> activePerkSlots) {Cache.activePerkSlots = activePerkSlots;}
 
     public static void clear(){
         playerDuels = new HashMap<>();

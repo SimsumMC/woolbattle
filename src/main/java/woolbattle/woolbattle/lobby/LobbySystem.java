@@ -39,7 +39,6 @@ import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
-import static java.lang.String.format;
 import static woolbattle.woolbattle.lives.LivesSystem.setPlayerSpawnProtection;
 import static woolbattle.woolbattle.stats.StatsSystem.addDefaultStats;
 

@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -48,7 +47,7 @@ public abstract class PassivePerk<G extends Event, E extends G> implements Liste
         this.description = description;
 
         MongoDatabase db = Main.getMongoDatabase();
-        MongoCollection collection = db.getCollection("playerPerks");
+        MongoCollection<Document> collection = db.getCollection("playerPerks");
         collection.listIndexes().forEach((Consumer) document -> {
             assert document instanceof Document;
 
@@ -58,7 +57,7 @@ public abstract class PassivePerk<G extends Event, E extends G> implements Liste
         });
     }
 
-    public PassivePerk (ItemStack item, String name, boolean overwriteEventm, String description){
+    public PassivePerk (ItemStack item, String name, boolean overwriteEvent, String description){
         this.name = name;
         this.item = item;
         ItemMeta meta = item.getItemMeta();
@@ -82,10 +81,7 @@ public abstract class PassivePerk<G extends Event, E extends G> implements Liste
 
     }
 
-    @EventHandler
-    public  <H extends Event, S extends H> void functionality(S event){
-
-    }
+    public  <H extends Event, S extends H> void functionality(S event){}
 
     public final void loop(){
         if(delay == 0){

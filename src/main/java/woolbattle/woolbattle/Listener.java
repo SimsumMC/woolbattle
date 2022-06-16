@@ -92,13 +92,14 @@ public class Listener implements org.bukkit.event.Listener {
                 if(itemAmount < maxStacks*64){
                     itemStack.setAmount(givenWoolAmount);
                     inventory.addItem(itemStack);
-                }
-                Cache.getPassivePerks().values().forEach(perk -> {
+                    Cache.getPassivePerks().values().forEach(perk -> {
 
-                    if(perk.hasPlayer(p)){
-                        perk.functionality(event);
-                    }
-                });
+                        if(perk.hasPlayer(p)){
+                            perk.functionality(event);
+                        }
+                    });
+                }
+
                 Colorable data = (Colorable) block.getState().getData();
                 block.setType(Material.AIR);
 

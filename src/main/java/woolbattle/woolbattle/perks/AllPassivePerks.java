@@ -11,11 +11,9 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Config;
@@ -35,22 +33,24 @@ public class AllPassivePerks {
             false,
             "A perk, increasing the amount of wool, it's player gathers"
     ){
-        int factor = (4)-1; //TODO: Implement in the config (one nth of the amount to give to the receiving player has already been given)
+        final int factor = (4)-1; //TODO: Implement in the config (one nth of the amount to give to the receiving player has already been given)
 
-        final ItemStack temp = new ItemStack(Material.WOOL, Config.givenWoolAmount*(factor));
         @Override
-        @EventHandler
         public <S extends Event, H extends S> void functionality(H event) {
             assert event instanceof BlockBreakEvent;
             Player p = ((BlockBreakEvent) event).getPlayer();
-            ItemStack wool = temp;
-            wool.setData(new MaterialData(findTeamDyeColor(p).getWoolData()));
+            ItemStack wool = new ItemStack(Material.WOOL, Config.givenWoolAmount*factor, findTeamDyeColor(p).getWoolData());
             AtomicInteger amount = new AtomicInteger();
 
             p.getInventory().spliterator().tryAdvance(itemStack -> amount.addAndGet(itemStack.getAmount()));
-            if ((amount.get() + Config.givenWoolAmount * (factor) >= Config.maxStacks * 64)) {
-                wool.setAmount((Config.maxStacks * 64 - amount.get()));
+
+            if(amount.get() == (Config.maxStacks * 64)){
+                return;
             }
+            else if (amount.get() + (Config.givenWoolAmount * (factor)) >(Config.maxStacks * 64)) {
+                wool.setAmount(((Config.maxStacks * 64)-amount.get()));
+            }
+
             p.getInventory().addItem(wool);
         }
     };
