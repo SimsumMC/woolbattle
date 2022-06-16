@@ -25,9 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
-import static java.lang.String.format;
 import static woolbattle.woolbattle.team.TeamSystem.findTeamDyeColor;
 
 public class AllPassivePerks {
@@ -37,9 +35,9 @@ public class AllPassivePerks {
             false,
             "A perk, increasing the amount of wool, it's player gathers"
     ){
-        int factor = (4)-1; //TODO: Implement in the config (one nth of the amount to give to the receiving player has allready been given)
+        int factor = (4)-1; //TODO: Implement in the config (one nth of the amount to give to the receiving player has already been given)
 
-        ItemStack temp = new ItemStack(Material.WOOL, Config.givenWoolAmount*(factor));
+        final ItemStack temp = new ItemStack(Material.WOOL, Config.givenWoolAmount*(factor));
         @Override
         @EventHandler
         public <S extends Event, H extends S> void functionality(H event) {

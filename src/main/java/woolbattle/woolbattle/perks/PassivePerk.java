@@ -108,7 +108,6 @@ public abstract class PassivePerk<G extends Event, E extends G> implements Liste
         }
         passivePerks.put(this.name.substring(2), this);
         Cache.setPassivePerks(passivePerks);
-        System.out.println(Cache.getPassivePerks().size());
     }
 
 

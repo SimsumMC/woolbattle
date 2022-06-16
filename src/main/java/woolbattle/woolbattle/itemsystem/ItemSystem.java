@@ -255,13 +255,13 @@ public class ItemSystem {
     }
 
     /**
-     * Method that replaces the specified itemSlot with a gunpowder-itemstack, lowering it's amount every second by one,
-     * until the specified cooldown has run out, which makes it replace said slot with the original item, illustrated by
+     * Method that replaces the specified itemSlot with a gunpowder item-stack, lowering its amount every second by one,
+     * until the specified cool-down has run out, which makes it replace said slot with the original item, illustrated by
      * itemStack passed in.
-     * @param p The player, to add a cooldown to one of their items.
-     * @param slot The slot, to condone the cooldown in.
-     * @param cooldownInSeconds The cooldown's duration.
-     * @param item The item, to replace the specified slot with after the cooldown.
+     * @param p The player, to add a cool-down to one of their items.
+     * @param slot The slot, to condone the cool-down in.
+     * @param cooldownInSeconds The cool-down's duration.
+     * @param item The item, to replace the specified slot with after the cool-down.
      * @author Servaturus & SimsumMC
      */
     public static void setItemCooldown(Player p, int slot, ItemStack item, int cooldownInSeconds){
