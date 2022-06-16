@@ -26,10 +26,6 @@ public class Config {
 
     public static final String mongoDatabase = (String) getValue("mongodb");
 
-    static{
-        System.out.println(Config.mongoDatabase);
-    }
-
     public static final String defaultMap = (String) getValue("mapName");
     public static final int defaultLives = (int) (long) getValue("defaultLives");
     public static final int spawnProtectionLengthAfterDeath = (int) (long) getValue("spawnProtectionAfterDeath");

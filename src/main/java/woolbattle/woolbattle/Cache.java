@@ -28,6 +28,8 @@ public class Cache {
 
     private static HashMap<Player, ArrayList<ArrayList<Block>>> jumpPlatformBlocks = new HashMap<>();
 
+    private static HashMap<Player, HashMap<String, Integer>> activePerkSlots = new HashMap<>();
+
     private static HashMap<String, HashMap<Player, Integer>> killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
         put("Blue", new HashMap<>());
         put("Red", new HashMap<>());
@@ -54,6 +56,8 @@ public class Cache {
         put(10, new ArrayList<>());
         put(15, new ArrayList<>());
     }};
+
+    private static HashMap<Player, HashMap<String, Integer>> playerStats = new HashMap<>();
 
     public static HashMap<String, ActivePerk> getActivePerks() {return activePerks;}
     public static void setActivePerks(HashMap<String, ActivePerk> activePerks) {Cache.activePerks = activePerks;}
@@ -85,6 +89,12 @@ public class Cache {
     public static HashMap<Integer, ArrayList<Player>> getLifeVoting() {return lifeVoting;}
     public static void setLifeVoting(HashMap<Integer, ArrayList<Player>> lifeVoting) {Cache.lifeVoting = lifeVoting;}
 
+    public static HashMap<Player, HashMap<String, Integer>> getPlayerStats() {return playerStats;}
+    public static void setPlayerStats(HashMap<Player, HashMap<String, Integer>> playerStats) {Cache.playerStats = playerStats;}
+
+    public static HashMap<Player, HashMap<String, Integer>> getActivePerkSlots() {return activePerkSlots;}
+    public static void setActivePerkSlots(HashMap<Player, HashMap<String, Integer>> activePerkSlots) {Cache.activePerkSlots = activePerkSlots;};
+
     public static void clear(){
         playerDuels = new HashMap<>();
 
@@ -93,6 +103,8 @@ public class Cache {
         spawnProtection = new HashMap<>();
 
         jumpPlatformBlocks = new HashMap<>();
+
+        playerStats = new HashMap<>();
 
         killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
             put("Blue", new HashMap<>());
@@ -120,5 +132,8 @@ public class Cache {
             put(10, new ArrayList<>());
             put(15, new ArrayList<>());
         }};
+
+        activePerkSlots = new HashMap<>();
+
     }
 }

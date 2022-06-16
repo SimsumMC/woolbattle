@@ -10,6 +10,9 @@ commands:
   gstop:
     description: Stop the game instantly.
     usage: /gstop
+  stats:
+    description: Look up your stats or from another player.
+    usage: /stats <Player>
   mapblocks:
     aliases: [ mb ]
   blockregistration:

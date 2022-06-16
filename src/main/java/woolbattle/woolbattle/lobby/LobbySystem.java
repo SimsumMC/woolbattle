@@ -28,9 +28,11 @@ import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.Enums.PerkType;
 import woolbattle.woolbattle.Main;
+import woolbattle.woolbattle.achievements.AchievementUI;
 import woolbattle.woolbattle.itemsystem.ItemSystem;
 import woolbattle.woolbattle.perks.ActivePerk;
 import woolbattle.woolbattle.perks.PassivePerk;
+import woolbattle.woolbattle.stats.StatsSystem;
 import woolbattle.woolbattle.team.TeamSystem;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 
@@ -39,6 +41,8 @@ import java.util.*;
 import static com.mongodb.client.model.Filters.eq;
 import static java.lang.String.format;
 import static woolbattle.woolbattle.lives.LivesSystem.setPlayerSpawnProtection;
+import static woolbattle.woolbattle.stats.StatsSystem.addDefaultStats;
+
 public class LobbySystem implements Listener {
 
     public static boolean gameStarted = false;
@@ -309,6 +313,9 @@ public class LobbySystem implements Listener {
         String displayName = event.getItem().getItemMeta().getDisplayName();
 
         switch (displayName) {
+            case "§6§lAchievements":
+                AchievementUI.showAchievementGUI(player);
+                break;
             case "§c§lLeave":
                 player.kickPlayer("§c§lYou left the game.");
                 break;
@@ -465,6 +472,8 @@ public class LobbySystem implements Listener {
             return false;
         }
 
+        ActivePerk.loadActivePerkSlots();
+
         TeamSystem.teamsOnStart();
 
         int topVotedLifeAmount = getTopVotedLifeAmount();
@@ -506,6 +515,8 @@ public class LobbySystem implements Listener {
 
         }
 
+        addDefaultStats();
+
         Cache.setTeamLives(teamLives);
 
         return true;
@@ -528,6 +539,8 @@ public class LobbySystem implements Listener {
         gameStarted = false;
 
         cooldown = 60;
+
+        StatsSystem.saveAllPlayerStats(winnerTeam);
 
         Cache.clear();
 
@@ -679,6 +692,13 @@ public class LobbySystem implements Listener {
         inv.setLeggings(null);
         inv.setChestplate(null);
         inv.setHelmet(null);
+
+        // Achievement Item
+        ItemStack achievementStack = new ItemStack(Material.DIAMOND);
+        ItemMeta achievementMeta = achievementStack.getItemMeta();
+        achievementMeta.setDisplayName("§6§lAchievements");
+        achievementStack.setItemMeta(achievementMeta);
+        inv.setItem(1, achievementStack);
 
         // Team Selecting Item
         ItemStack teamStack = new ItemStack(Material.BED);

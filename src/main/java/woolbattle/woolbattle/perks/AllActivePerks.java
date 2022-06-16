@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 import woolbattle.woolbattle.Cache;
+import woolbattle.woolbattle.stats.StatsSystem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,13 +60,7 @@ public class AllActivePerks implements Listener {
 
             int woolCost = perk.getWoolCost();
             int cooldown = perk.getCooldown();
-            int perkSlot = 0;
-
-            if(!(projectile.getType() == EntityType.ARROW)){
-                player.getInventory().addItem(itemStack);
-                perkSlot = player.getInventory().first(perk.getItemStack());
-                player.getInventory().removeItem(itemStack);
-            }
+            int perkSlot = perk.getSlotCache(player);;
 
             if(!(projectile.getType() == EntityType.ARROW)) {
                 player.getInventory().setItem(perkSlot, itemStack);
@@ -80,6 +75,7 @@ public class AllActivePerks implements Listener {
             else{
                 if(cooldown != 0) {
                     setItemCooldown(player, perkSlot, itemStack, cooldown);
+                    StatsSystem.addActivePerkUsage(player);
                 }
             }
         }
@@ -99,7 +95,7 @@ public class AllActivePerks implements Listener {
 
                 ItemStack itemStack = perk.getItemStack();
                 itemStack.setAmount(1);
-                int perkSlot = perk.getSlot(player);
+                int perkSlot = perk.getSlotCache(player);
                 player.getInventory().setItem(perkSlot, itemStack);
 
                 HashMap<Player, Player> playerDuels = Cache.getPlayerDuels();
@@ -140,6 +136,8 @@ public class AllActivePerks implements Listener {
 
                     player.sendMessage(ChatColor.GOLD + "You are now in a duel with " + damagedPlayerName + ChatColor.GOLD + "!");
                     damagedPlayer.sendMessage(ChatColor.GOLD + "You are now in a duel with " + playerName + ChatColor.GOLD + "!");
+
+                    StatsSystem.addActivePerkUsage(player);
                 }
 
             }
@@ -176,12 +174,6 @@ public class AllActivePerks implements Listener {
 
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerItemBreak(PlayerItemBreakEvent event) {
-        System.out.println("PlayerItemBreakEvent");
-        event.getBrokenItem().setAmount(1);
-    }
-
     @EventHandler
     public void onPlayerFish(PlayerFishEvent event) {
         Player player = event.getPlayer();
@@ -194,7 +186,7 @@ public class AllActivePerks implements Listener {
             int cooldown = perk.getCooldown();
             int perkSlot;
 
-            perkSlot = perk.getSlot(player);
+            perkSlot = perk.getSlotCache(player);
 
             if(!subtractWool(player, woolCost)){
                 event.setCancelled(true);
@@ -213,6 +205,8 @@ public class AllActivePerks implements Listener {
             Location hookLocation = hook.getLocation();
             Vector vector = new Vector(hookLocation.getX() - playerLocation.getX(), 1.0, hookLocation.getZ() - playerLocation.getZ());
             player.setVelocity(vector);
+
+            StatsSystem.addActivePerkUsage(player);
         }
     }
 

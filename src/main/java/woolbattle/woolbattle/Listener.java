@@ -14,6 +14,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
 import org.bukkit.scheduler.BukkitRunnable;
+import woolbattle.woolbattle.achievements.AchievementSystem;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 
 import java.util.ArrayList;
@@ -35,6 +36,8 @@ public class Listener implements org.bukkit.event.Listener {
         if(p.getGameMode().equals(GameMode.CREATIVE) || p.getGameMode().equals(GameMode.SPECTATOR)){
             return;
         }
+
+        AchievementSystem.giveFullwool(p);
 
         //Internal variables of the plugin, not meant to be modifiable by the end-user
 
