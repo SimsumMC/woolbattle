@@ -16,6 +16,7 @@ import woolbattle.woolbattle.lobby.StartGameCommand;
 import woolbattle.woolbattle.lobby.StopGameCommand;
 import woolbattle.woolbattle.maprestaurationsystem.MapCommand;
 import woolbattle.woolbattle.perks.AllActivePerks;
+import woolbattle.woolbattle.perks.AllPassivePerks;
 import woolbattle.woolbattle.team.TeamSystem;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
@@ -55,6 +56,7 @@ public final class Main extends JavaPlugin {
         this.getCommand("gstop").setExecutor(new StopGameCommand());
 
         AllActivePerks.load();
+        AllPassivePerks.load();
         // Beelzebub's Stuff
         Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);
         Bukkit.getPluginManager().registerEvents(new LivesSystem(), this);
@@ -95,6 +97,4 @@ public final class Main extends JavaPlugin {
     public static MongoClient getMongoClient() {
         return mongoClient;
     }
-
 }
-
