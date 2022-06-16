@@ -297,9 +297,6 @@ public class BlockBreakingSystem {
             return;
         }
 
-        System.out.println(doc);
-
-
         ArrayList<ArrayList<Long>> mapChunks = (ArrayList<ArrayList<Long>>) doc.get("chunks");
         if(mapChunks == null){
             System.out.println("Couldn't reset map as there were no chunks, belonging to the map defined in the db.\nConsult /map def, in order to specify said ones.");

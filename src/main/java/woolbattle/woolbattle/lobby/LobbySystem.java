@@ -37,6 +37,7 @@ import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
+import static java.lang.String.format;
 import static woolbattle.woolbattle.lives.LivesSystem.setPlayerSpawnProtection;
 public class LobbySystem implements Listener {
 
@@ -173,6 +174,9 @@ public class LobbySystem implements Listener {
         String rawInventoryName = event.getClickedInventory().getName().substring(2);
         String rawItemName = event.getCurrentItem().getItemMeta().getDisplayName().substring(2);
 
+        if(rawItemName == null){
+            return;
+        }
         switch(rawInventoryName) {
             case "Voting for the Amount of Lives":
                 HashMap<Integer, ArrayList<Player>> votingData = Cache.getLifeVoting();
@@ -230,7 +234,7 @@ public class LobbySystem implements Listener {
                         showActivePerkMenu(player, PerkType.SECOND_ACTIVE);
                         break;
                     case "Passive Perk":
-
+                        showPassivePerkMenu(player);
                         break;
                 }
 
@@ -251,6 +255,41 @@ public class LobbySystem implements Listener {
                 else {
                     savePerkSelection(player, rawItemName, PerkType.SECOND_ACTIVE);
                     showActivePerkMenu(player, PerkType.SECOND_ACTIVE);
+                }
+                break;
+            case "Passive Perk":
+                if(rawItemName.equals("Go Back")){
+                    showPerkMenu(player);
+                }
+                else {
+                    MongoDatabase db = Main.getMongoDatabase();
+                    MongoCollection<Document> collection = db.getCollection("playerPerks");
+                    String previousPerkName = null;
+
+                    try{
+                        previousPerkName = (String) collection.find(eq("_id", player.getUniqueId().toString())).first().get("passive");
+                    }catch(NullPointerException ignore){
+
+                    }
+
+                    if(previousPerkName == null || !previousPerkName.equals(rawItemName)){
+                        HashMap<String, PassivePerk<? extends Event, ?>> perks = Cache.getPassivePerks();
+                        PassivePerk<? extends Event, ?> current = perks.get(rawItemName);
+
+                        if(previousPerkName != null){
+                            PassivePerk<? extends Event, ?> previous =perks.get(previousPerkName);
+                            previous.removePlayer(player);
+                            perks.replace(previousPerkName, previous);
+                        }
+
+                        current.addPlayer(player);
+                        perks.replace(rawItemName, current);
+
+                        Cache.setPassivePerks(perks);
+                    }
+                    savePerkSelection(player, rawItemName, PerkType.PASSIVE);
+
+                    showPassivePerkMenu(player);
                 }
                 break;
         }
@@ -614,6 +653,7 @@ public class LobbySystem implements Listener {
                     return;
                 }
             }
+
             Document query = new Document().append("_id",  player.getUniqueId().toString());
 
             Bson updates = Updates.set(perkTypeString, perkName);
@@ -925,7 +965,7 @@ public class LobbySystem implements Listener {
         player.openInventory(inv);
     }
 
-    /*private static void showPassivePerkMenu(Player player) {
+    private static void showPassivePerkMenu(Player player) {
 
         String selectedPerk = null;
 
@@ -934,15 +974,15 @@ public class LobbySystem implements Listener {
 
         Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
         if(foundDocument != null){
-                selectedPerk = (String) foundDocument.get("passive");
+            selectedPerk = (String) foundDocument.get("passive");
         }
 
-        Inventory inv = Bukkit.createInventory(null, 3*9, "§dPassive Perk #");
+        Inventory inv = Bukkit.createInventory(null, 3*9, "§dPassive Perk");
 
         ArrayList<String> newLore;
 
-        HashMap<String, PassivePerk<?, ? extends Event>> activePerks = Cache.getPassivePerks();
-        for(PassivePerk<?, ? extends Event> perk : activePerks.values()){
+        HashMap<String, PassivePerk<? extends Event, ?>> passivePerks = Cache.getPassivePerks();
+        for(PassivePerk<? extends Event, ?> perk : passivePerks.values()){
 
             ItemStack itemStack = perk.getItem().clone();
             ItemMeta itemMeta = itemStack.getItemMeta();
@@ -963,8 +1003,6 @@ public class LobbySystem implements Listener {
             newLore = new ArrayList<>();
 
             newLore.add(ChatColor.WHITE + perk.getDescription());
-            newLore.add(ChatColor.GOLD + "WoolCost: " + ChatColor.DARK_PURPLE + perk.getWoolCost());
-            newLore.add(ChatColor.GOLD + "Cooldown: " + ChatColor.DARK_PURPLE + perk.getCooldown());
 
             itemMeta.setLore(newLore);
 
@@ -981,7 +1019,7 @@ public class LobbySystem implements Listener {
         inv.setItem(26, backStack);
 
         player.openInventory(inv);
-    }*/
+    }
 
 
 

@@ -1,23 +1,32 @@
 package woolbattle.woolbattle.perks;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Main;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 public abstract class PassivePerk<G extends Event, E extends G> implements Listener {
     private int delay = 0;
     private final ItemStack item;
     private final String name;
     private boolean overwriteEvent = false;
+    private final String description;
     G g = (G) new Event() {
         @Override
         public HandlerList getHandlers() {
@@ -27,20 +36,46 @@ public abstract class PassivePerk<G extends Event, E extends G> implements Liste
     E e = (E) g;
     private final Class<E> type =  (Class<E>) e.getClass();
 
-    private ArrayList<Player> players = new ArrayList<>();
+    private ArrayList<OfflinePlayer> players = new ArrayList<OfflinePlayer>();
 
-
-
-    public PassivePerk(ItemStack item, String name, int delayInTicks){
+    public PassivePerk(ItemStack item, String name, int delayInTicks, String description){
         this.delay = delayInTicks;
-        this.item = item;
         this.name = name;
+        this.item = item;
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(name);
+        item.setItemMeta(meta);
+        this.description = description;
+
+        MongoDatabase db = Main.getMongoDatabase();
+        MongoCollection collection = db.getCollection("playerPerks");
+        collection.listIndexes().forEach((Consumer) document -> {
+            assert document instanceof Document;
+
+            if(((Document) document).get("passive").equals(name)){
+                players.add(Bukkit.getPlayer((UUID) ((Document) document).get("_id")));
+            }
+        });
     }
 
-    public PassivePerk (ItemStack item, String name, boolean overwriteEvent){
+    public PassivePerk (ItemStack item, String name, boolean overwriteEventm, String description){
         this.name = name;
         this.item = item;
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(name);
+        item.setItemMeta(meta);
         this.overwriteEvent = overwriteEvent;
+        this.description = description;
+
+        MongoDatabase db = Main.getMongoDatabase();
+        MongoCollection<Document> collection = db.getCollection("playerPerks");
+        collection.listIndexes().forEach((Consumer) document -> {
+            assert document instanceof Document;
+
+            if(((Document) document).get("passive") != null && ((Document) document).get("passive").equals(name)){
+                players.add(Bukkit.getPlayer((UUID) ((Document) document).get("_id")));
+            }
+        });
     }
 
     public void functionality(){
@@ -65,15 +100,16 @@ public abstract class PassivePerk<G extends Event, E extends G> implements Liste
         }.runTaskTimer(Main.getInstance(), delay, 0);
     }
 
-    public final void register(){
-        ArrayList<PassivePerk<? extends Event, ?>> passivePerks = AllPassivePerks.getPassivePerks();
-        if(passivePerks.contains(this)){
+    public final void register() {
+        HashMap<String, PassivePerk<? extends Event, ?>> passivePerks = Cache.getPassivePerks();
+        if (passivePerks.containsKey(this.name)) {
+            passivePerks.replace(this.name.substring(2), this);
             return;
         }
-        passivePerks.add(this);
-        AllPassivePerks.setPassivePerks(passivePerks);
+        passivePerks.put(this.name.substring(2), this);
+        Cache.setPassivePerks(passivePerks);
+        System.out.println(Cache.getPassivePerks().size());
     }
-
 
 
     public Class<E> getType() {
@@ -85,8 +121,14 @@ public abstract class PassivePerk<G extends Event, E extends G> implements Liste
     public int getDelay() {return delay;}
     public boolean isOverwriteEvent() {return overwriteEvent;}
 
-    public ArrayList<Player> getPlayers(){return players;}
+    public ArrayList<OfflinePlayer> getPlayers(){return players;}
+    public void setPlayers(ArrayList<OfflinePlayer> players) {this.players = players;}
+
     public void addPlayer(Player p){players.add(p);}
     public void removePlayer(Player p){players.remove(p);}
     public boolean hasPlayer(Player p){return players.contains(p);}
+
+    public String getDescription(){
+        return description;
+    }
 }
