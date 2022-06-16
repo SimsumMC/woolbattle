@@ -136,7 +136,7 @@ public class BlockBreakingSystem {
 
             //Searches for blocks in the array, about to replace the mapBlocks-array in the db, that are present in the removed-blocks-array and deletes them.
 
-            for(ArrayList<Double> locArray : update/*((ArrayList<ArrayList<Double>>)db.getCollection("map").find(exists("mapBlocks")).first().get("mapBlocks"))*/){
+            for(ArrayList<Double> locArray : update){
                 Location loc = new Location(Bukkit.getWorlds().get(0), locArray.get(0), locArray.get(1), locArray.get(2));
                 if(removedBlocks.contains(loc)){
                     update.remove(locArray);
@@ -255,7 +255,7 @@ public class BlockBreakingSystem {
                 ys.add(i);
             }
         }
-        //Another repetition on regard of zdiff and zs.
+        //Another repetition in regard of zdiff and zs.
         if(Integer.signum(zdiff) == 0){
             zs.add((int) b.getZ());
         }else{
@@ -297,7 +297,7 @@ public class BlockBreakingSystem {
             return;
         }
 
-        System.out.println(doc.toString());
+        System.out.println(doc);
 
 
         ArrayList<ArrayList<Long>> mapChunks = (ArrayList<ArrayList<Long>>) doc.get("chunks");
