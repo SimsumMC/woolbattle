@@ -33,7 +33,7 @@ public class AllPassivePerks {
             false,
             "A perk, increasing the amount of wool, it's player gathers"
     ){
-        final int factor = (4)-1; //TODO: Implement in the config (one nth of the amount to give to the receiving player has already been given)
+        final int factor = (2)-1;
 
         @Override
         public <S extends Event, H extends S> void functionality(H event) {
