@@ -30,7 +30,7 @@ public class AllPassivePerks {
             new ItemStack(Material.EMERALD),
             ChatColor.AQUA + "Wool Duplication",
             false,
-            "A perk, increasing the amount of wool, it's player gathers"
+            "Increases the amount of wool you get"
     ){
         final int factor = (2)-1;
 
