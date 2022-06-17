@@ -57,6 +57,9 @@ public class BlockRegistrationCommand implements CommandExecutor {
                         Location end = new Location(Bukkit.getWorlds().get(0), Double.parseDouble(args[4].toLowerCase()), Double.parseDouble(args[5].toLowerCase()), Double.parseDouble(args[6].toLowerCase()));
 
                         BlockBreakingSystem.addBlocksByRange(start, end);
+
+                        sender.sendMessage(ChatColor.GREEN + "Successfully registered all blocks in the given range. [Only Local - use /mapblocks push to put it in the database]");
+
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
