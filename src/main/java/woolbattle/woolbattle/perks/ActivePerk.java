@@ -140,7 +140,6 @@ public class ActivePerk {
      * @author SimsumMC
      */
     public int getSlotCache(Player player) {
-        System.out.println("getSlotCache");
         String activePerkName = this.itemName.substring(2);
 
         HashMap<Player, HashMap<String, Integer>> activePerkSlots = Cache.getActivePerkSlots();
