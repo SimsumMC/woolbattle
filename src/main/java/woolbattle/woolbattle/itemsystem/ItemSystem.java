@@ -105,7 +105,7 @@ public class ItemSystem {
         Document perksDocument = perksCollection.find(eq("_id", player.getUniqueId().toString())).first();
 
         if(perksDocument != null) {
-            
+
             String activePerk1String = null;
             String activePerk2String = null;
             String passivePerkString = null;
