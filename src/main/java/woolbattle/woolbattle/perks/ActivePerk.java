@@ -157,8 +157,6 @@ public class ActivePerk {
      * @author SimsumMC
      */
     private int getSlotDB(Player player){
-        System.out.println("getSlotDB");
-
         String activePerkName = this.itemName.substring(2);
 
         MongoDatabase database = Main.getMongoDatabase();
