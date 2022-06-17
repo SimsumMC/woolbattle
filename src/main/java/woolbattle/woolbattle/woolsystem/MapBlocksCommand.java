@@ -57,16 +57,22 @@ public class MapBlocksCommand implements CommandExecutor {
                 case "push":
                     int previousSizeCached = BlockBreakingSystem.getMapBlocks().size();
                     int previousSizeDb;
-                    if(!Main.getMongoClient().listDatabaseNames().into(new ArrayList<String>()).contains("woolbattle")||
+
+                    Document found = Main.getMongoDatabase().getCollection("map").find(eq("_id", "mapBlocks")).first();
+                    if(found == null){
+                        previousSizeDb = 0;
+                        Main.getMongoDatabase().getCollection("map").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<>()));
+                    }
+                    /*if(!Main.getMongoClient().listDatabaseNames().into(new ArrayList<String>()).contains("woolbattle")||
                             !Main.getMongoClient().getDatabase("woolbattle").listCollectionNames().into(new ArrayList<String>()).contains("blockBreaking") ||
                             !Main.getMongoClient().getDatabase("woolbattle").getCollection("blockBreaking").listIndexes().into(new ArrayList<Document>()).contains(new Document("_id", "mapBlocks")
                             )){
                         previousSizeDb = 0;
-                    }
+
+                    }*/
                     else{
-                        previousSizeDb = ((ArrayList<BsonValue>) Main.getMongoClient().
-                                getDatabase("woolbattle").
-                                getCollection("blockBreaking").
+                        previousSizeDb = ((ArrayList<BsonValue>) Main.getMongoDatabase().
+                                getCollection("map").
                                 find(eq("_id", "mapBlocks")).
                                 first().
                                 get("mapBlocks"))
@@ -75,9 +81,8 @@ public class MapBlocksCommand implements CommandExecutor {
 
                     BlockBreakingSystem.pushMapBlocks();
 
-                    int currentSize= ((ArrayList<ArrayList<Double>>) Main.getMongoClient().
-                            getDatabase("woolbattle").
-                            getCollection("blockBreaking").
+                    int currentSize= ((ArrayList<BsonValue>) Main.getMongoDatabase().
+                            getCollection("map").
                             find(eq("_id", "mapBlocks")).
                             first().
                             get("mapBlocks")).size();
@@ -109,7 +114,7 @@ public class MapBlocksCommand implements CommandExecutor {
                                     BlockBreakingSystem.doubleArrArrToString((ArrayList<ArrayList<Double>>) Main.
                                             getMongoClient().
                                             getDatabase("woolbattle").
-                                            getCollection("blockBreaking").
+                                            getCollection("map").
                                             find(eq(
                                                     "_id",
                                                     "mapBlocks")

@@ -8,6 +8,7 @@ import org.bson.conversions.Bson;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -30,8 +31,11 @@ import woolbattle.woolbattle.Main;
 import woolbattle.woolbattle.achievements.AchievementUI;
 import woolbattle.woolbattle.itemsystem.ItemSystem;
 import woolbattle.woolbattle.perks.ActivePerk;
+import woolbattle.woolbattle.perks.AllPassivePerks;
+import woolbattle.woolbattle.perks.PassivePerk;
 import woolbattle.woolbattle.stats.StatsSystem;
 import woolbattle.woolbattle.team.TeamSystem;
+import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 
 import java.util.*;
 
@@ -174,6 +178,9 @@ public class LobbySystem implements Listener {
         String rawInventoryName = event.getClickedInventory().getName().substring(2);
         String rawItemName = event.getCurrentItem().getItemMeta().getDisplayName().substring(2);
 
+        if(rawItemName == null){
+            return;
+        }
         switch(rawInventoryName) {
             case "Voting for the Amount of Lives":
                 HashMap<Integer, ArrayList<Player>> votingData = Cache.getLifeVoting();
@@ -231,6 +238,7 @@ public class LobbySystem implements Listener {
                         showActivePerkMenu(player, PerkType.SECOND_ACTIVE);
                         break;
                     case "Passive Perk":
+                        showPassivePerkMenu(player);
                         break;
                 }
 
@@ -251,6 +259,15 @@ public class LobbySystem implements Listener {
                 else {
                     savePerkSelection(player, rawItemName, PerkType.SECOND_ACTIVE);
                     showActivePerkMenu(player, PerkType.SECOND_ACTIVE);
+                }
+                break;
+            case "Passive Perk":
+                if(rawItemName.equals("Go Back")){
+                    showPerkMenu(player);
+                }
+                else {
+                    savePerkSelection(player, rawItemName, PerkType.PASSIVE);
+                    showPassivePerkMenu(player);
                 }
                 break;
         }
@@ -431,6 +448,8 @@ public class LobbySystem implements Listener {
 
         ActivePerk.loadActivePerkSlots();
 
+        AllPassivePerks.assignPlayersToPerks();
+
         TeamSystem.teamsOnStart();
 
         int topVotedLifeAmount = getTopVotedLifeAmount();
@@ -518,7 +537,7 @@ public class LobbySystem implements Listener {
         }
 
         updateScoreBoard();
-
+        BlockBreakingSystem.resetMap();
         return true;
     }
 
@@ -623,6 +642,7 @@ public class LobbySystem implements Listener {
                     return;
                 }
             }
+
             Document query = new Document().append("_id",  player.getUniqueId().toString());
 
             Bson updates = Updates.set(perkTypeString, perkName);
@@ -941,6 +961,62 @@ public class LobbySystem implements Listener {
         player.openInventory(inv);
     }
 
+    private static void showPassivePerkMenu(Player player) {
+
+        String selectedPerk = null;
+
+        MongoDatabase db = Main.getMongoDatabase();
+        MongoCollection<Document> collection = db.getCollection("playerPerks");
+
+        Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
+        if(foundDocument != null){
+            selectedPerk = (String) foundDocument.get("passive");
+        }
+
+        Inventory inv = Bukkit.createInventory(null, 3*9, "§dPassive Perk");
+
+        ArrayList<String> newLore;
+
+        HashMap<String, PassivePerk<? extends Event, ?>> passivePerks = Cache.getPassivePerks();
+        for(PassivePerk<? extends Event, ?> perk : passivePerks.values()){
+
+            ItemStack itemStack = perk.getItem().clone();
+            ItemMeta itemMeta = itemStack.getItemMeta();
+
+            if(selectedPerk != null && itemMeta.getDisplayName().substring(2).equals(selectedPerk)){
+                itemMeta.addEnchant(Enchantment.KNOCKBACK, 1, true);
+                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            }
+            else{
+                if (itemMeta.hasEnchants()){
+                    for(Enchantment enchantment : itemMeta.getEnchants().keySet()){
+                        itemMeta.removeEnchant(enchantment);
+                    }
+                }
+            }
+
+
+            newLore = new ArrayList<>();
+
+            newLore.add(ChatColor.WHITE + perk.getDescription());
+
+            itemMeta.setLore(newLore);
+
+            itemStack.setItemMeta(itemMeta);
+
+            inv.addItem(itemStack);
+        }
+
+        // Back Item
+        ItemStack backStack = new ItemStack(Material.WOOD_DOOR);
+        ItemMeta backMeta = backStack.getItemMeta();
+        backMeta.setDisplayName(ChatColor.RED + "Go Back");
+        backStack.setItemMeta(backMeta);
+        inv.setItem(26, backStack);
+
+        player.openInventory(inv);
+    }
+
 
 
     /**
@@ -1231,6 +1307,5 @@ public class LobbySystem implements Listener {
         blueTeam.setPrefix(ChatColor.BLUE + "❤ " + blueLives);
         greenTeam.setPrefix("§2❤ " + greenLives);
         yellowTeam.setPrefix("§e❤ " + yellowLives);
-
     }
 }

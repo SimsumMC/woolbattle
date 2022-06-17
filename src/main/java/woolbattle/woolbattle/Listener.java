@@ -92,6 +92,12 @@ public class Listener implements org.bukkit.event.Listener {
                 if(itemAmount < maxStacks*64){
                     itemStack.setAmount(givenWoolAmount);
                     inventory.addItem(itemStack);
+                    Cache.getPassivePerks().values().forEach(perk -> {
+
+                        if(perk.hasPlayer(p)){
+                            perk.functionality(event);
+                        }
+                    });
                 }
 
                 Colorable data = (Colorable) block.getState().getData();
@@ -109,7 +115,6 @@ public class Listener implements org.bukkit.event.Listener {
                 }
             }
         }
-
     }
 
     @EventHandler
@@ -153,30 +158,26 @@ public class Listener implements org.bukkit.event.Listener {
      */
     @EventHandler
     public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
+        Player p = event.getPlayer();
+
+        if(p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR || p.isFlying()){
+            return;
+        }
+
+        event.setCancelled(true);
+
+        p.setFlying(false);
+        p.setAllowFlight(false);
+        p.setVelocity(event.getPlayer().getLocation().getDirection().multiply(1.1).setY(1));
+
         long jumpCooldown;
+
         try{
             jumpCooldown = Config.jumpCooldown;
         }catch(ExceptionInInitializerError e){
             jumpCooldown = 40;
         }
-        Player p = event.getPlayer();
-        p.setFlying(false);
-        event.setCancelled(true);
 
-        if(p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR || p.isFlying()){
-
-            event.setCancelled(false);
-
-            p.setFlying(!p.isFlying());
-
-            p.setAllowFlight(true);
-            return;
-        }
-
-        event.setCancelled(true);
-        p.setFlying(false);
-        p.setAllowFlight(false);
-        p.setVelocity(event.getPlayer().getLocation().getDirection().multiply(1.1).setY(1));
         new BukkitRunnable(){
             @Override
             public void run() {
@@ -187,8 +188,8 @@ public class Listener implements org.bukkit.event.Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        event.getPlayer().setAllowFlight(true);
         event.getPlayer().setFlying(false);
+        event.getPlayer().setAllowFlight(true);
     }
 
     /**
@@ -204,10 +205,16 @@ public class Listener implements org.bukkit.event.Listener {
     @EventHandler
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
         Player p = event.getPlayer();
-        if(event.getNewGameMode().equals(GameMode.SURVIVAL) || event.getNewGameMode().equals(GameMode.ADVENTURE)){
-            p.setAllowFlight(true);
-            p.setFlying(false);
-        }
-    }
+        int delay = 5; //TODO: Introduce customizability to the delay value.
 
+        p.setAllowFlight(true);
+
+        new BukkitRunnable(){
+            @Override
+            public void run(){
+                p.setAllowFlight(true);
+            }
+
+        }.runTaskLater(Main.getInstance(), delay);
+    }
 }

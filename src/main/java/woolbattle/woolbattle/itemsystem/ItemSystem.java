@@ -8,6 +8,7 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -18,6 +19,7 @@ import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Main;
 import woolbattle.woolbattle.lobby.LobbySystem;
 import woolbattle.woolbattle.perks.ActivePerk;
+import woolbattle.woolbattle.perks.PassivePerk;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,6 +67,7 @@ public class ItemSystem {
         int enderPearlSlot;
         int perk1Slot;
         int perk2Slot;
+        int passivePerkSlot = 27;
 
         MongoDatabase db = Main.getMongoDatabase();
         MongoCollection<Document> collection = db.getCollection("playerInventories");
@@ -105,7 +108,7 @@ public class ItemSystem {
 
             String activePerk1String = null;
             String activePerk2String = null;
-
+            String passivePerkString = null;
 
             if (perksDocument.get("first_active") != null){
                 activePerk1String = (String) perksDocument.get("first_active");
@@ -113,6 +116,10 @@ public class ItemSystem {
 
             if (perksDocument.get("second_active") != null){
                 activePerk2String = (String) perksDocument.get("second_active");
+            }
+
+            if (perksDocument.get("passive") != null){
+                passivePerkString = (String) perksDocument.get("passive");
             }
 
             if(activePerk1String != null) {
@@ -130,6 +137,12 @@ public class ItemSystem {
                 }
             }
 
+            if(passivePerkString != null) {
+                PassivePerk<? extends Event,?> passivePerk = Cache.getPassivePerks().get(passivePerkString);
+                if (passivePerk != null) {
+                    inventory.setItem(passivePerkSlot, passivePerk.getItem());
+                }
+            }
 
         }
 
@@ -255,13 +268,13 @@ public class ItemSystem {
     }
 
     /**
-     * Method that replaces the specified itemSlot with a gunpowder-itemstack, lowering it's amount every second by one,
-     * until the specified cooldown has run out, which makes it replace said slot with the original item, illustrated by
+     * Method that replaces the specified itemSlot with a gunpowder item-stack, lowering its amount every second by one,
+     * until the specified cool-down has run out, which makes it replace said slot with the original item, illustrated by
      * itemStack passed in.
-     * @param p The player, to add a cooldown to one of their items.
-     * @param slot The slot, to condone the cooldown in.
-     * @param cooldownInSeconds The cooldown's duration.
-     * @param item The item, to replace the specified slot with after the cooldown.
+     * @param p The player, to add a cool-down to one of their items.
+     * @param slot The slot, to condone the cool-down in.
+     * @param cooldownInSeconds The cool-down's duration.
+     * @param item The item, to replace the specified slot with after the cool-down.
      * @author Servaturus & SimsumMC
      */
     public static void setItemCooldown(Player p, int slot, ItemStack item, int cooldownInSeconds){
@@ -305,5 +318,4 @@ public class ItemSystem {
             }
         }.runTaskAsynchronously(Main.getInstance());
     }
-
 }

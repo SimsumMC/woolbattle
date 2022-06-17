@@ -16,7 +16,9 @@ import woolbattle.woolbattle.lives.LivesSystem;
 import woolbattle.woolbattle.lobby.LobbySystem;
 import woolbattle.woolbattle.lobby.StartGameCommand;
 import woolbattle.woolbattle.lobby.StopGameCommand;
+import woolbattle.woolbattle.maprestaurationsystem.MapCommand;
 import woolbattle.woolbattle.perks.AllActivePerks;
+import woolbattle.woolbattle.perks.AllPassivePerks;
 import woolbattle.woolbattle.stats.StatsCommand;
 import woolbattle.woolbattle.team.TeamSystem;
 import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
@@ -57,7 +59,7 @@ public final class Main extends JavaPlugin {
         this.getCommand("stats").setExecutor(new StatsCommand());
 
         AllActivePerks.load();
-
+        AllPassivePerks.load();
         // Beelzebub's Stuff
         Bukkit.getPluginManager().registerEvents(new TeamSystem(), this);
         Bukkit.getPluginManager().registerEvents(new LivesSystem(), this);
@@ -65,23 +67,22 @@ public final class Main extends JavaPlugin {
 
         //Servaturus' belongings
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
+
         getCommand("blockregistration").setExecutor(new BlockRegistrationCommand());
         getCommand("mapblocks").setExecutor(new MapBlocksCommand());
+        getCommand("map").setExecutor(new MapCommand());
 
-        Document found = db.getCollection("blockBreaking").find(eq("_id", "mapBlocks")).first();
+        Document found = db.getCollection("map").find(eq("_id", "mapBlocks")).first();
         if (found == null) {
-            db.getCollection("blockBreaking").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
+            db.getCollection("map").insertOne(new Document("_id", "mapBlocks").append("mapBlocks", new ArrayList<ArrayList<Double>>()));//append("_id", "mapBlocks"));
         }
 
         BlockBreakingSystem.setCollectBrokenBlocks(false);
         BlockBreakingSystem.fetchMapBlocks();
 
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            p.setAllowFlight(true);
-        }
-
         for (Player player : Bukkit.getOnlinePlayers())
         {
+            player.setAllowFlight(true);
             MongoCollection<Document> collection = db.getCollection("playerAchievements");
 
             Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
@@ -112,6 +113,4 @@ public final class Main extends JavaPlugin {
     public static MongoClient getMongoClient() {
         return mongoClient;
     }
-
 }
-

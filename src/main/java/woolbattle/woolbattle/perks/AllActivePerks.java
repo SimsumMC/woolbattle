@@ -60,7 +60,7 @@ public class AllActivePerks implements Listener {
 
             int woolCost = perk.getWoolCost();
             int cooldown = perk.getCooldown();
-            int perkSlot = perk.getSlotCache(player);;
+            int perkSlot = perk.getSlotCache(player);
 
             if(!(projectile.getType() == EntityType.ARROW)) {
                 player.getInventory().setItem(perkSlot, itemStack);

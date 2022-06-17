@@ -2,7 +2,9 @@ package woolbattle.woolbattle;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import woolbattle.woolbattle.perks.ActivePerk;
+import woolbattle.woolbattle.perks.PassivePerk;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +17,8 @@ public class Cache {
      */
 
     private static HashMap<String, ActivePerk> activePerks = new HashMap<>();
+
+    private static HashMap<String, PassivePerk<? extends Event, ?>> passivePerks = new HashMap<>();
 
     private static HashMap<Player, Player> playerDuels = new HashMap<>();
 
@@ -58,6 +62,9 @@ public class Cache {
     public static HashMap<String, ActivePerk> getActivePerks() {return activePerks;}
     public static void setActivePerks(HashMap<String, ActivePerk> activePerks) {Cache.activePerks = activePerks;}
 
+    public static HashMap<String, PassivePerk<? extends Event,?>> getPassivePerks() {return passivePerks;}
+    public static void setPassivePerks(HashMap<String, PassivePerk<? extends Event,?>> passivePerks) {Cache.passivePerks = passivePerks;}
+
     public static HashMap<Player, Player> getPlayerDuels() {return playerDuels;}
     public static void setPlayerDuels(HashMap<Player, Player> playerDuels) {Cache.playerDuels = playerDuels;}
 
@@ -86,7 +93,7 @@ public class Cache {
     public static void setPlayerStats(HashMap<Player, HashMap<String, Integer>> playerStats) {Cache.playerStats = playerStats;}
 
     public static HashMap<Player, HashMap<String, Integer>> getActivePerkSlots() {return activePerkSlots;}
-    public static void setActivePerkSlots(HashMap<Player, HashMap<String, Integer>> activePerkSlots) {Cache.activePerkSlots = activePerkSlots;};
+    public static void setActivePerkSlots(HashMap<Player, HashMap<String, Integer>> activePerkSlots) {Cache.activePerkSlots = activePerkSlots;}
 
     public static void clear(){
         playerDuels = new HashMap<>();
@@ -127,6 +134,5 @@ public class Cache {
         }};
 
         activePerkSlots = new HashMap<>();
-
     }
 }
