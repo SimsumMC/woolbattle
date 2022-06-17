@@ -11,16 +11,16 @@ import org.bukkit.command.CommandSender;
 import static java.lang.String.format;
 
 public class BlockRegistrationCommand implements CommandExecutor {
-    private String syntax = ChatColor.GREEN + "\nProper syntax: <blockregistration> <<init/terminate>||range> < || 6*<int> ";
+    private final String syntax = ChatColor.GREEN + "\nProper syntax: <blockregistration> <<init/terminate>||range> < || 6*<int> ";
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 1) {
             sender.sendMessage("§cThe specified number of arguments is too little, than it would be necessary for the" +
-                    "command to work properly. " + syntax
+                    "command to work properly." + syntax
             );
             return false;
         }
-        switch (args[0].toLowerCase(Locale.ROOT)) {
+        switch (args[0].toLowerCase()) {
             case "init":
                 if (!BlockBreakingSystem.isCollectBrokenBlocks()) {
                     BlockBreakingSystem.setCollectBrokenBlocks(true);
@@ -53,8 +53,8 @@ public class BlockRegistrationCommand implements CommandExecutor {
                 }else {
                     try {
 
-                        Location start = new Location(Bukkit.getWorlds().get(0), Double.parseDouble(args[1].toLowerCase(Locale.ROOT)), Double.parseDouble(args[2].toLowerCase(Locale.ROOT)), Double.parseDouble(args[3].toLowerCase(Locale.ROOT)));
-                        Location end = new Location(Bukkit.getWorlds().get(0), Double.parseDouble(args[4].toLowerCase(Locale.ROOT)), Double.parseDouble(args[5].toLowerCase(Locale.ROOT)), Double.parseDouble(args[6].toLowerCase(Locale.ROOT)));
+                        Location start = new Location(Bukkit.getWorlds().get(0), Double.parseDouble(args[1].toLowerCase()), Double.parseDouble(args[2].toLowerCase()), Double.parseDouble(args[3].toLowerCase()));
+                        Location end = new Location(Bukkit.getWorlds().get(0), Double.parseDouble(args[4].toLowerCase()), Double.parseDouble(args[5].toLowerCase()), Double.parseDouble(args[6].toLowerCase()));
 
                         BlockBreakingSystem.addBlocksByRange(start, end);
                     } catch (NumberFormatException e) {

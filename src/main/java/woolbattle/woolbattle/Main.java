@@ -80,12 +80,9 @@ public final class Main extends JavaPlugin {
         BlockBreakingSystem.setCollectBrokenBlocks(false);
         BlockBreakingSystem.fetchMapBlocks();
 
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            p.setAllowFlight(true);
-        }
-
         for (Player player : Bukkit.getOnlinePlayers())
         {
+            player.setAllowFlight(true);
             MongoCollection<Document> collection = db.getCollection("playerAchievements");
 
             Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();

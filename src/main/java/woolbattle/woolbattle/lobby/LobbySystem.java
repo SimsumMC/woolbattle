@@ -31,6 +31,7 @@ import woolbattle.woolbattle.Main;
 import woolbattle.woolbattle.achievements.AchievementUI;
 import woolbattle.woolbattle.itemsystem.ItemSystem;
 import woolbattle.woolbattle.perks.ActivePerk;
+import woolbattle.woolbattle.perks.AllPassivePerks;
 import woolbattle.woolbattle.perks.PassivePerk;
 import woolbattle.woolbattle.stats.StatsSystem;
 import woolbattle.woolbattle.team.TeamSystem;
@@ -472,7 +473,7 @@ public class LobbySystem implements Listener {
         }
 
         ActivePerk.loadActivePerkSlots();
-
+        AllPassivePerks.assignPlayersToPerks();
         TeamSystem.teamsOnStart();
 
         int topVotedLifeAmount = getTopVotedLifeAmount();

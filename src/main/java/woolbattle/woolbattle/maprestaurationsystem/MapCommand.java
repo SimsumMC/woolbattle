@@ -16,7 +16,7 @@ public class MapCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
-        final String usage = "/mapdefine <reset/def> <uuid> <beginning[x,y]> <end[x,y]>";
+        final String usage = "/map <reset/def> <uuid> <beginning[x,y]> <end[x,y]>";
         if(!(args.length > 0)){
 
             return false;

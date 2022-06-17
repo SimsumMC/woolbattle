@@ -64,7 +64,9 @@ public class AllPassivePerks {
     public static void load(){
 
         woolMultiplication.register();
-
+        assignPlayersToPerks();
+    }
+    public static void assignPlayersToPerks(){
         MongoDatabase db = Main.getMongoDatabase();
         MongoCollection<Document> collection = db.getCollection("playerPerks");
         HashMap<String, PassivePerk<? extends Event, ?>> passivePerks = Cache.getPassivePerks();
