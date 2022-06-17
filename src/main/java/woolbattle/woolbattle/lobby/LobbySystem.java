@@ -266,33 +266,7 @@ public class LobbySystem implements Listener {
                     showPerkMenu(player);
                 }
                 else {
-                    MongoDatabase db = Main.getMongoDatabase();
-                    MongoCollection<Document> collection = db.getCollection("playerPerks");
-                    String previousPerkName = null;
-
-                    try{
-                        previousPerkName = (String) collection.find(eq("_id", player.getUniqueId().toString())).first().get("passive");
-                    }catch(NullPointerException ignore){
-
-                    }
-
-                    if(previousPerkName == null || !previousPerkName.equals(rawItemName)){
-                        HashMap<String, PassivePerk<? extends Event, ?>> perks = Cache.getPassivePerks();
-                        PassivePerk<? extends Event, ?> current = perks.get(rawItemName);
-
-                        if(previousPerkName != null){
-                            PassivePerk<? extends Event, ?> previous =perks.get(previousPerkName);
-                            previous.removePlayer(player);
-                            perks.replace(previousPerkName, previous);
-                        }
-
-                        current.addPlayer(player);
-                        perks.replace(rawItemName, current);
-
-                        Cache.setPassivePerks(perks);
-                    }
                     savePerkSelection(player, rawItemName, PerkType.PASSIVE);
-
                     showPassivePerkMenu(player);
                 }
                 break;
@@ -473,7 +447,9 @@ public class LobbySystem implements Listener {
         }
 
         ActivePerk.loadActivePerkSlots();
+
         AllPassivePerks.assignPlayersToPerks();
+
         TeamSystem.teamsOnStart();
 
         int topVotedLifeAmount = getTopVotedLifeAmount();

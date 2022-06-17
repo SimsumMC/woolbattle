@@ -62,18 +62,17 @@ public class AllPassivePerks {
      */
 
     public static void load(){
-
         woolMultiplication.register();
         assignPlayersToPerks();
     }
+
     public static void assignPlayersToPerks(){
         MongoDatabase db = Main.getMongoDatabase();
         MongoCollection<Document> collection = db.getCollection("playerPerks");
         HashMap<String, PassivePerk<? extends Event, ?>> passivePerks = Cache.getPassivePerks();
         FindIterable<Document> iterable = collection.find();
         MongoCursor<Document> curs  = iterable.iterator();
-
-
+        
         for(PassivePerk<? extends Event, ?> perk : passivePerks.values()){
             ArrayList<OfflinePlayer> players = new ArrayList<>();
             //iterates over the elements of the fetched document, creates a Player object through the stored information
@@ -96,12 +95,8 @@ public class AllPassivePerks {
 
             perk.setPlayers(players);
 
-            if(passivePerks.containsKey(perk.getName().substring(2))){
-                passivePerks.replace(perk.getName().substring(2), perk);
-            }
-            else{
-                passivePerks.put(perk.getName().substring(2), perk);
-            }
+            passivePerks.put(perk.getName().substring(2), perk);
+
             if(perk.isOverwriteEvent()){
                 try{
                     Bukkit.getPluginManager().registerEvents(perk, Main.getInstance());
