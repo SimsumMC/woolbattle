@@ -44,7 +44,7 @@ public class AchievementUI {
         ItemMeta fullwoolmeta = fullwool.getItemMeta();
         ArrayList<String> fullwoolLore = new ArrayList<>();
 
-        fullwoolLore.add(ChatColor.GRAY + "Have the maximum amount of wool in your inventory");
+        fullwoolLore.add(ChatColor.WHITE + "Have the maximum amount of wool in your inventory");
         fullwoolLore.add(" ");
         if (fullwoolMat == Material.COAL) {
             fullwoolLore.add(ChatColor.RED + "Not Completed");
@@ -52,7 +52,7 @@ public class AchievementUI {
         else {
             fullwoolLore.add(ChatColor.GREEN + "Completed");
         }
-        fullwoolmeta.setDisplayName("§f§lStrategist");
+        fullwoolmeta.setDisplayName("§6Strategist");
         fullwoolmeta.setLore(fullwoolLore);
         fullwool.setItemMeta(fullwoolmeta);
         achievements.setItem(13, fullwool);
@@ -64,7 +64,7 @@ public class AchievementUI {
         ItemMeta Killstreak5meta = Killstreak5.getItemMeta();
         ArrayList<String> Killstreak5Lore = new ArrayList<>();
 
-        Killstreak5Lore.add(ChatColor.GRAY + "Get a Killstreak of 5 in one game");
+        Killstreak5Lore.add(ChatColor.WHITE + "Get a Killstreak of 5 in one game");
         Killstreak5Lore.add(" ");
         if (killstreak5Mat == Material.COAL) {
             Killstreak5Lore.add(ChatColor.RED + "Not Completed");
@@ -72,7 +72,7 @@ public class AchievementUI {
         else {
             Killstreak5Lore.add(ChatColor.GREEN + "Completed");
         }
-        Killstreak5meta.setDisplayName("§f§lDominator");
+        Killstreak5meta.setDisplayName("§6Dominator");
         Killstreak5meta.setLore(Killstreak5Lore);
         Killstreak5.setItemMeta(Killstreak5meta);
         achievements.setItem(14, Killstreak5);
@@ -84,7 +84,7 @@ public class AchievementUI {
         ItemMeta closeCallMeta = closeCall.getItemMeta();
         ArrayList<String> closeCallLore = new ArrayList<>();
 
-        closeCallLore.add(ChatColor.GRAY + "Win a game of Woolbattle while only having a single life left");
+        closeCallLore.add(ChatColor.WHITE + "Win a game of Woolbattle while only having a single life left");
         closeCallLore.add(" ");
         if (closeCallMat == Material.COAL) {
             closeCallLore.add(ChatColor.RED + "Not Completed");
@@ -92,7 +92,7 @@ public class AchievementUI {
         else {
             closeCallLore.add(ChatColor.GREEN + "Completed");
         }
-        closeCallMeta.setDisplayName("§f§lClose Call");
+        closeCallMeta.setDisplayName("§6Close Call");
         closeCallMeta.setLore(closeCallLore);
         closeCall.setItemMeta(closeCallMeta);
         achievements.setItem(12, closeCall);
@@ -104,7 +104,7 @@ public class AchievementUI {
         ItemMeta losingMeta = losing.getItemMeta();
         ArrayList<String> losingLore = new ArrayList<>();
 
-        losingLore.add(ChatColor.GRAY + "Lose a game of Woolbattle without having a single Kill");
+        losingLore.add(ChatColor.WHITE + "Lose a game of Woolbattle without having a single Kill");
         losingLore.add(" ");
         if (losingMat == Material.COAL) {
             losingLore.add(ChatColor.RED + "Not Completed");
@@ -112,7 +112,7 @@ public class AchievementUI {
         else {
             losingLore.add(ChatColor.GREEN + "Completed");
         }
-        losingMeta.setDisplayName("§f§lLosing is the new winning");
+        losingMeta.setDisplayName("§6Losing is the new winning");
         losingMeta.setLore(losingLore);
         losing.setItemMeta(losingMeta);
         achievements.setItem(15, losing);
@@ -124,8 +124,8 @@ public class AchievementUI {
         ItemMeta carriedMeta = carried.getItemMeta();
         ArrayList<String> carriedLore = new ArrayList<>();
 
-        carriedLore.add(ChatColor.GRAY + "Have someone else fight the battle for you - in other words,");
-        carriedLore.add(ChatColor.GRAY + "win a game of Woolbattle without having a single kill");
+        carriedLore.add(ChatColor.WHITE + "Have someone else fight the battle for you - in other words,");
+        carriedLore.add(ChatColor.WHITE + "win a game of Woolbattle without having a single kill");
         carriedLore.add(" ");
         if (carriedMat == Material.COAL) {
             carriedLore.add(ChatColor.RED + "Not Completed");
@@ -133,7 +133,7 @@ public class AchievementUI {
         else {
             carriedLore.add(ChatColor.GREEN + "Completed");
         }
-        carriedMeta.setDisplayName("§f§lThe British way");
+        carriedMeta.setDisplayName("§6The British way");
         carriedMeta.setLore(carriedLore);
         carried.setItemMeta(carriedMeta);
         achievements.setItem(11, carried);
