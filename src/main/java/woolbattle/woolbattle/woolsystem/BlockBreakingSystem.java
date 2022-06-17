@@ -272,10 +272,8 @@ public class BlockBreakingSystem {
         }
         //Adds locations, constituted by the former created value pairs (of xs, ys, and zs), to the global mapBlocks array.
         for(Location l : locs){
-            System.out.println(l);
             if(!mapBlocks.contains(l)){
                 mapBlocks.add(l);
-                System.out.println(l);
             }
         }
     }
