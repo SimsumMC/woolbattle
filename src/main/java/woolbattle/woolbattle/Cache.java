@@ -134,6 +134,5 @@ public class Cache {
         }};
 
         activePerkSlots = new HashMap<>();
-
     }
 }

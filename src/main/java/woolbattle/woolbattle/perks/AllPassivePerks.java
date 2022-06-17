@@ -8,7 +8,6 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -69,33 +68,36 @@ public class AllPassivePerks {
     public static void assignPlayersToPerks(){
         MongoDatabase db = Main.getMongoDatabase();
         MongoCollection<Document> collection = db.getCollection("playerPerks");
-        HashMap<String, PassivePerk<? extends Event, ?>> passivePerks = Cache.getPassivePerks();
+        HashMap<String, PassivePerk<? extends Event, ?>> passivePerks = Cache.getPassivePerks();;
+        HashMap<String, PassivePerk<? extends Event, ?>> newPassivePerks = new HashMap<>();
         FindIterable<Document> iterable = collection.find();
-        MongoCursor<Document> curs  = iterable.iterator();
-        
+        MongoCursor<Document> cursor  = iterable.iterator();
+
         for(PassivePerk<? extends Event, ?> perk : passivePerks.values()){
-            ArrayList<OfflinePlayer> players = new ArrayList<>();
+            ArrayList<Player> players = new ArrayList<>();
             //iterates over the elements of the fetched document, creates a Player object through the stored information
             //, additionally to that stores players in possession of the perk to its respective instance's array of players.
             try{
-                while(curs.hasNext()){
-                    Document document = curs.next();
+                while(cursor.hasNext()){
+                    Document document = cursor.next();
 
-                    if(document.get("passive") == null){
-                        return;
+                    if(document.get("passive") == null || !document.get("passive").equals(perk.getName().substring(2))){
+                        continue;
                     }
 
-                    if(document.get("passive").equals(perk.getName().substring(2))){
-                        players.add(Bukkit.getOfflinePlayer(UUID.fromString((String) document.get("_id"))));
+                    Player player = Bukkit.getPlayer(UUID.fromString((String) document.get("_id")));
+
+                    if(document.get("passive").equals(perk.getName().substring(2)) && player != null){
+                        players.add(player);
                     }
                 }
             }finally{
-                curs.close();
+                cursor.close();
             }
 
             perk.setPlayers(players);
 
-            passivePerks.put(perk.getName().substring(2), perk);
+            newPassivePerks.put(perk.getName().substring(2), perk);
 
             if(perk.isOverwriteEvent()){
                 try{
@@ -105,6 +107,6 @@ public class AllPassivePerks {
             }
         }
 
-        Cache.setPassivePerks(passivePerks);
+        Cache.setPassivePerks(newPassivePerks);
     }
 }

@@ -35,7 +35,7 @@ public abstract class PassivePerk<G extends Event, E extends G> implements Liste
     E e = (E) g;
     private final Class<E> type =  (Class<E>) e.getClass();
 
-    private ArrayList<OfflinePlayer> players = new ArrayList<OfflinePlayer>();
+    private ArrayList<Player> players = new ArrayList<>();
 
     public PassivePerk(ItemStack item, String name, int delayInTicks, String description){
         this.delay = delayInTicks;
@@ -116,11 +116,9 @@ public abstract class PassivePerk<G extends Event, E extends G> implements Liste
     public int getDelay() {return delay;}
     public boolean isOverwriteEvent() {return overwriteEvent;}
 
-    public ArrayList<OfflinePlayer> getPlayers(){return players;}
-    public void setPlayers(ArrayList<OfflinePlayer> players) {this.players = players;}
+    public ArrayList<Player> getPlayers(){return players;}
+    public void setPlayers(ArrayList<Player> players) {this.players = players;}
 
-    public void addPlayer(Player p){players.add(p);}
-    public void removePlayer(Player p){players.remove(p);}
     public boolean hasPlayer(Player p){return players.contains(p);}
 
     public String getDescription(){
