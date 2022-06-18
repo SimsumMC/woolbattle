@@ -19,6 +19,7 @@ import woolbattle.woolbattle.lobby.LobbySystem;
 
 import java.util.HashMap;
 
+import static woolbattle.woolbattle.base.Base.resetEnderPearls;
 import static woolbattle.woolbattle.team.TeamSystem.getPlayerTeam;
 import static woolbattle.woolbattle.team.TeamSystem.getTeamColour;
 
@@ -87,6 +88,7 @@ public class LivesSystem implements Listener {
         long unixTime = System.currentTimeMillis() / 1000L;
 
         if (player.getLocation().getY() <= Config.minHeight) {
+            resetEnderPearls(player);
             if (lastDamage.containsKey(player)) {
                 long realLastDamage = lastDamage.get(player);
                 if (unixTime - realLastDamage >= Config.deathCooldown) {
