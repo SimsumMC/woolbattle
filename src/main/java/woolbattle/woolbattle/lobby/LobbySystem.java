@@ -182,7 +182,7 @@ public class LobbySystem implements Listener {
             return;
         }
         switch(rawInventoryName) {
-            case "Voting for the Amount of Lives":
+            case "Amount of Lives Voting":
                 HashMap<Integer, ArrayList<Player>> votingData = Cache.getLifeVoting();
                 ItemMeta clickedItemMeta = event.getCurrentItem().getItemMeta();
                 int lifeAmount = Integer.parseInt(clickedItemMeta.getDisplayName().substring(2).split(" ")[0]);
@@ -371,12 +371,15 @@ public class LobbySystem implements Listener {
             add(finalBowPosition);
             add(finalEnderPearlPosition);
         }};
+
         int notDefined = 0;
+
         for(Integer value: values){
             if(value==0){
                 notDefined +=1;
             }
         }
+
         if(notDefined >= 2){
             new BukkitRunnable(){
 
@@ -432,7 +435,6 @@ public class LobbySystem implements Listener {
             }
 
         }.runTaskLaterAsynchronously(Main.getInstance(), 10);
-
     }
 
     /**
@@ -669,19 +671,19 @@ public class LobbySystem implements Listener {
         inv.setChestplate(null);
         inv.setHelmet(null);
 
-        // Achievement Item
-        ItemStack achievementStack = new ItemStack(Material.DIAMOND);
-        ItemMeta achievementMeta = achievementStack.getItemMeta();
-        achievementMeta.setDisplayName("§6§lAchievements");
-        achievementStack.setItemMeta(achievementMeta);
-        inv.setItem(1, achievementStack);
-
         // Team Selecting Item
         ItemStack teamStack = new ItemStack(Material.BED);
         ItemMeta teamMeta = teamStack.getItemMeta();
         teamMeta.setDisplayName("§e§lTeam Selecting");
         teamStack.setItemMeta(teamMeta);
         inv.setItem(0, teamStack);
+
+        // Achievement Item
+        ItemStack achievementStack = new ItemStack(Material.DIAMOND);
+        ItemMeta achievementMeta = achievementStack.getItemMeta();
+        achievementMeta.setDisplayName("§6§lAchievements");
+        achievementStack.setItemMeta(achievementMeta);
+        inv.setItem(1, achievementStack);
 
         // Vote Life Count Item
         ItemStack livesStack = new ItemStack(Material.FEATHER);
@@ -721,7 +723,7 @@ public class LobbySystem implements Listener {
      * @author SimsumMC
      */
     private static void showLifeAmountVoting(Player player) {
-        Inventory inv = Bukkit.createInventory(null, 3*9, "§aVoting for the Amount of Lives");
+        Inventory inv = Bukkit.createInventory(null, 3*9, "§aAmount of Lives Voting");
 
         // Glass Background
         ItemStack glassStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15);
