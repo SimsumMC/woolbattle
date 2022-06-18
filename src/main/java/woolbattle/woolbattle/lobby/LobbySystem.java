@@ -1092,7 +1092,6 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that sets a player to a spectator -> game mode & position changes
-     *
      * @param player the player that gets into spectator mode
      * @author SimsumMC
      */
