@@ -3,10 +3,7 @@ package woolbattle.woolbattle.perks;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FishHook;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -22,6 +19,7 @@ import woolbattle.woolbattle.stats.StatsSystem;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static woolbattle.woolbattle.base.Base.addEnderPearl;
 import static woolbattle.woolbattle.itemsystem.ItemSystem.setItemCooldown;
 import static woolbattle.woolbattle.itemsystem.ItemSystem.subtractWool;
 import static woolbattle.woolbattle.lives.LivesSystem.teleportPlayerTeamSpawn;
@@ -76,6 +74,10 @@ public class AllActivePerks implements Listener {
                 if(cooldown != 0) {
                     setItemCooldown(player, perkSlot, itemStack, cooldown);
                     StatsSystem.addActivePerkUsage(player);
+                }
+
+                if(perkName.equals("Ender Pearl")){
+                    addEnderPearl((EnderPearl) projectile);
                 }
             }
         }
