@@ -132,7 +132,13 @@ public class Base implements Listener {
         ProjectileSource source = enderPearl.getShooter();
         if(source instanceof Player){
             HashMap<Player, ArrayList<EnderPearl>> enderPearls = Cache.getEnderPearls();
-            ArrayList<EnderPearl> playerPearls = enderPearls.get((Player) source);
+            ArrayList<EnderPearl> playerPearls;
+            if(!enderPearls.containsKey((Player) source)){
+                playerPearls = new ArrayList<>();
+            }
+            else{
+                playerPearls = enderPearls.get((Player) source);
+            }
 
             playerPearls.add(enderPearl);
             enderPearls.put((Player) source, playerPearls);
@@ -148,6 +154,10 @@ public class Base implements Listener {
      */
     public static void resetEnderPearls(Player player){
         HashMap<Player, ArrayList<EnderPearl>> enderPearls = Cache.getEnderPearls();
+
+        if(!enderPearls.containsKey(player)){
+            return;
+        }
 
         for(EnderPearl enderPearl : enderPearls.get(player)){
             enderPearl.remove();
