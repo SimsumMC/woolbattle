@@ -1,6 +1,7 @@
 package woolbattle.woolbattle;
 
 import org.bukkit.block.Block;
+import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import woolbattle.woolbattle.perks.ActivePerk;
@@ -25,6 +26,8 @@ public class Cache {
     private static HashMap<Player, Long> lastDamage = new HashMap<>();
 
     private static HashMap<Player, Long> spawnProtection = new HashMap<>();
+
+    private static HashMap<Player, ArrayList<EnderPearl>> enderPearls = new HashMap<>();
 
     private static HashMap<Player, ArrayList<ArrayList<Block>>> jumpPlatformBlocks = new HashMap<>();
 
@@ -74,6 +77,9 @@ public class Cache {
     public static HashMap<Player, Long> getSpawnProtection() {return spawnProtection;}
     public static void setSpawnProtection(HashMap<Player, Long> spawnProtection) {Cache.spawnProtection = spawnProtection;}
 
+    public static HashMap<Player, ArrayList<EnderPearl>> getEnderPearls() {return enderPearls;}
+    public static void setEnderPearls(HashMap<Player, ArrayList<EnderPearl>> enderPearls) {Cache.enderPearls = enderPearls;}
+
     public static HashMap<Player, ArrayList<ArrayList<Block>>> getJumpPlatformBlocks() {return jumpPlatformBlocks;}
     public static void setJumpPlatformBlocks(HashMap<Player, ArrayList<ArrayList<Block>>> jumpPlatformBlocks) {Cache.jumpPlatformBlocks = jumpPlatformBlocks;}
 
@@ -104,7 +110,11 @@ public class Cache {
 
         jumpPlatformBlocks = new HashMap<>();
 
+        enderPearls = new HashMap<>();
+
         playerStats = new HashMap<>();
+
+        activePerkSlots = new HashMap<>();
 
         killStreaks = new HashMap<String, HashMap<Player, Integer>>(){{
             put("Blue", new HashMap<>());
@@ -132,7 +142,5 @@ public class Cache {
             put(10, new ArrayList<>());
             put(15, new ArrayList<>());
         }};
-
-        activePerkSlots = new HashMap<>();
     }
 }

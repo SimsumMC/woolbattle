@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,10 +14,16 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
+import org.bukkit.projectiles.ProjectileSource;
+import woolbattle.woolbattle.Cache;
 import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.lobby.LobbySystem;
 import woolbattle.woolbattle.team.TeamSystem;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Base implements Listener {
 
@@ -116,4 +123,47 @@ public class Base implements Listener {
         event.setCancelled(true);
     }
 
+    /**
+     * A Method that adds the given Ender Pearl Entity to the Cache.
+     * @param enderPearl the Ender Pearl Entity
+     * @author SimsumMC
+     */
+    public static void addEnderPearl(EnderPearl enderPearl){
+        ProjectileSource source = enderPearl.getShooter();
+        if(source instanceof Player){
+            HashMap<Player, ArrayList<EnderPearl>> enderPearls = Cache.getEnderPearls();
+            ArrayList<EnderPearl> playerPearls;
+            if(!enderPearls.containsKey((Player) source)){
+                playerPearls = new ArrayList<>();
+            }
+            else{
+                playerPearls = enderPearls.get((Player) source);
+            }
+
+            playerPearls.add(enderPearl);
+            enderPearls.put((Player) source, playerPearls);
+
+            Cache.setEnderPearls(enderPearls);
+        }
+    }
+
+    /**
+     * A Method that removes all ender pearls from a given player from the hashmap & from the world.
+     * @param player the player that ender pearls get removed
+     * @author SimsumMC
+     */
+    public static void resetEnderPearls(Player player){
+        HashMap<Player, ArrayList<EnderPearl>> enderPearls = Cache.getEnderPearls();
+
+        if(!enderPearls.containsKey(player)){
+            return;
+        }
+
+        for(EnderPearl enderPearl : enderPearls.get(player)){
+            enderPearl.remove();
+        }
+
+        enderPearls.put(player, new ArrayList<>());
+        Cache.setEnderPearls(enderPearls);
+    }
 }
