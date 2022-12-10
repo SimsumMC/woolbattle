@@ -54,7 +54,7 @@ _The Power-Ups in form of items spawn at random locations on the map - if you pi
 for a limited period of time._
 
 
-Just try it out with your friends, it's a hilarious game: _Join the Minecraft Server with the IP:_ **mc.almanbot.de**
+Just try it out with your friends, it's a hilarious game: _Join the Minecraft Server with the IP:_ **mc.almanbot.xyz**
 
 **Features:**
 
