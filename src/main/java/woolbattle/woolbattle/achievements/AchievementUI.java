@@ -18,7 +18,9 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class AchievementUI {
 
-    /** A function which creates the GUI which contains the Achievements.
+    /**
+     * A function which creates the GUI which contains the Achievements.
+     *
      * @param player - A handle to the player object which is passed by a function in LobbySystem. The parameter is the player which has clicked the item in order to open the GUI.
      * @author Beelzebub
      */
@@ -39,7 +41,9 @@ public class AchievementUI {
 
         //adding fullwool achievement
         Material fullwoolMat = Material.COAL;
-        if (arrayList.contains("fullwool")) {fullwoolMat = Material.DIAMOND;}
+        if (arrayList.contains("fullwool")) {
+            fullwoolMat = Material.DIAMOND;
+        }
         ItemStack fullwool = new ItemStack(fullwoolMat);
         ItemMeta fullwoolmeta = fullwool.getItemMeta();
         ArrayList<String> fullwoolLore = new ArrayList<>();
@@ -48,8 +52,7 @@ public class AchievementUI {
         fullwoolLore.add(" ");
         if (fullwoolMat == Material.COAL) {
             fullwoolLore.add(ChatColor.RED + "Not Completed");
-        }
-        else {
+        } else {
             fullwoolLore.add(ChatColor.GREEN + "Completed");
         }
         fullwoolmeta.setDisplayName("§6Strategist");
@@ -59,8 +62,10 @@ public class AchievementUI {
 
         //adding Killstreak 5 achievement
         Material killstreak5Mat = Material.COAL;
-        if (arrayList.contains("killstreak5")) {killstreak5Mat = Material.DIAMOND;}
-        ItemStack Killstreak5 = new ItemStack(killstreak5Mat, 1, (byte)1);
+        if (arrayList.contains("killstreak5")) {
+            killstreak5Mat = Material.DIAMOND;
+        }
+        ItemStack Killstreak5 = new ItemStack(killstreak5Mat, 1, (byte) 1);
         ItemMeta Killstreak5meta = Killstreak5.getItemMeta();
         ArrayList<String> Killstreak5Lore = new ArrayList<>();
 
@@ -68,8 +73,7 @@ public class AchievementUI {
         Killstreak5Lore.add(" ");
         if (killstreak5Mat == Material.COAL) {
             Killstreak5Lore.add(ChatColor.RED + "Not Completed");
-        }
-        else {
+        } else {
             Killstreak5Lore.add(ChatColor.GREEN + "Completed");
         }
         Killstreak5meta.setDisplayName("§6Dominator");
@@ -79,8 +83,10 @@ public class AchievementUI {
 
         //adding closeCall achievement
         Material closeCallMat = Material.COAL;
-        if (arrayList.contains("closeCall")) {closeCallMat = Material.DIAMOND;}
-        ItemStack closeCall = new ItemStack(closeCallMat, 1, (byte)1);
+        if (arrayList.contains("closeCall")) {
+            closeCallMat = Material.DIAMOND;
+        }
+        ItemStack closeCall = new ItemStack(closeCallMat, 1, (byte) 1);
         ItemMeta closeCallMeta = closeCall.getItemMeta();
         ArrayList<String> closeCallLore = new ArrayList<>();
 
@@ -88,8 +94,7 @@ public class AchievementUI {
         closeCallLore.add(" ");
         if (closeCallMat == Material.COAL) {
             closeCallLore.add(ChatColor.RED + "Not Completed");
-        }
-        else {
+        } else {
             closeCallLore.add(ChatColor.GREEN + "Completed");
         }
         closeCallMeta.setDisplayName("§6Close Call");
@@ -99,8 +104,10 @@ public class AchievementUI {
 
         //adding losing achievement
         Material losingMat = Material.COAL;
-        if (arrayList.contains("losing")) {losingMat = Material.DIAMOND;}
-        ItemStack losing = new ItemStack(losingMat, 1, (byte)1);
+        if (arrayList.contains("losing")) {
+            losingMat = Material.DIAMOND;
+        }
+        ItemStack losing = new ItemStack(losingMat, 1, (byte) 1);
         ItemMeta losingMeta = losing.getItemMeta();
         ArrayList<String> losingLore = new ArrayList<>();
 
@@ -108,8 +115,7 @@ public class AchievementUI {
         losingLore.add(" ");
         if (losingMat == Material.COAL) {
             losingLore.add(ChatColor.RED + "Not Completed");
-        }
-        else {
+        } else {
             losingLore.add(ChatColor.GREEN + "Completed");
         }
         losingMeta.setDisplayName("§6Losing is the new winning");
@@ -119,8 +125,10 @@ public class AchievementUI {
 
         //adding carried achievement
         Material carriedMat = Material.COAL;
-        if (arrayList.contains("carried")) {carriedMat = Material.DIAMOND;}
-        ItemStack carried = new ItemStack(carriedMat, 1, (byte)1);
+        if (arrayList.contains("carried")) {
+            carriedMat = Material.DIAMOND;
+        }
+        ItemStack carried = new ItemStack(carriedMat, 1, (byte) 1);
         ItemMeta carriedMeta = carried.getItemMeta();
         ArrayList<String> carriedLore = new ArrayList<>();
 
@@ -129,8 +137,7 @@ public class AchievementUI {
         carriedLore.add(" ");
         if (carriedMat == Material.COAL) {
             carriedLore.add(ChatColor.RED + "Not Completed");
-        }
-        else {
+        } else {
             carriedLore.add(ChatColor.GREEN + "Completed");
         }
         carriedMeta.setDisplayName("§6The British way");

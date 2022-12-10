@@ -19,6 +19,7 @@ public class Config {
 
     /**
      * A Config class that contains all default values from the config.json as variables.
+     *
      * @author SimsumMC & Servaturus
      */
 
@@ -95,10 +96,11 @@ public class Config {
 
     /**
      * Returns the value of the given key from the config.json.
+     *
      * @param key the JSON key as a String<br>
      * @author SimsumMC & Servaturus
      */
-    public static  Object getValue(String key) {
+    public static Object getValue(String key) {
         if (!fileExisting) {
 
             // make sure that the directory exists
@@ -146,5 +148,5 @@ public class Config {
             e.printStackTrace();
         }
         return jsonObject.get(key);
-        }
+    }
 }

@@ -23,6 +23,7 @@ public class TeamSystem implements Listener {
 
     /**
      * A method that handles the team division.
+     *
      * @author Beelzebub
      */
     public static void teamsOnStart() {
@@ -31,14 +32,14 @@ public class TeamSystem implements Listener {
         ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
         ArrayList<Player> teamLessPlayers = new ArrayList<>();
 
-        for (int i = Bukkit.getOnlinePlayers().size() - 1; i>=0; i--) {
+        for (int i = Bukkit.getOnlinePlayers().size() - 1; i >= 0; i--) {
             Player player = onlinePlayers.get(i);
             if (TeamSystem.getPlayerTeam(player, true).equals("§cNot selected")) {
                 teamLessPlayers.add(player);
             }
         }
 
-        for (int i = teamLessPlayers.size() - 1; i>=0; i--) {
+        for (int i = teamLessPlayers.size() - 1; i >= 0; i--) {
             int[] sizes = {
                     getTeamMembers().get("Red").size(),
                     getTeamMembers().get("Blue").size(),
@@ -47,24 +48,27 @@ public class TeamSystem implements Listener {
             };
             int smallestNumber = 0;
             int temp = sizes[0];
-            for(int a=0;a<sizes.length;a++) {
-                if(sizes[a] <= temp) {
+            for (int a = 0; a < sizes.length; a++) {
+                if (sizes[a] <= temp) {
                     temp = sizes[a];
                     smallestNumber = a;
                 }
             }
-            switch (smallestNumber){
+            switch (smallestNumber) {
                 case 0:
                     (getTeamMembers().get("Red")).add(teamLessPlayers.get(i));
                     teamLessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.RED + "red" + ChatColor.GRAY + "!");
                     break;
-                case 1: (getTeamMembers().get("Blue")).add(teamLessPlayers.get(i));
+                case 1:
+                    (getTeamMembers().get("Blue")).add(teamLessPlayers.get(i));
                     teamLessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.DARK_BLUE + "blue" + ChatColor.GRAY + "!");
                     break;
-                case 2: (getTeamMembers().get("Green")).add(teamLessPlayers.get(i));
+                case 2:
+                    (getTeamMembers().get("Green")).add(teamLessPlayers.get(i));
                     teamLessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.DARK_GREEN + "green" + ChatColor.GRAY + "!");
                     break;
-                case 3: (getTeamMembers().get("Yellow")).add(teamLessPlayers.get(i));
+                case 3:
+                    (getTeamMembers().get("Yellow")).add(teamLessPlayers.get(i));
                     teamLessPlayers.get(i).sendMessage(ChatColor.GRAY + "You didn't enter a team so you were put into team " + ChatColor.YELLOW + "yellow" + ChatColor.GRAY + "!");
                     break;
             }
@@ -79,10 +83,18 @@ public class TeamSystem implements Listener {
         for (int i = 0; i < sizes.length; i++) {
             if (sizes[i] > 0) {
                 switch (i) {
-                    case 0: teamWithMembers = "Red"; break;
-                    case 1: teamWithMembers = "Blue"; break;
-                    case 2: teamWithMembers = "Green"; break;
-                    case 3: teamWithMembers = "Yellow"; break;
+                    case 0:
+                        teamWithMembers = "Red";
+                        break;
+                    case 1:
+                        teamWithMembers = "Blue";
+                        break;
+                    case 2:
+                        teamWithMembers = "Green";
+                        break;
+                    case 3:
+                        teamWithMembers = "Yellow";
+                        break;
                 }
                 numActiveTeams += 1;
             }
@@ -106,8 +118,7 @@ public class TeamSystem implements Listener {
                     members.put(teamWithMembers, member);
 
                     Cache.setTeamMembers(members);
-                }
-                else {
+                } else {
                     HashMap<String, ArrayList<Player>> members = getTeamMembers();
 
                     ArrayList<Player> newMem = new ArrayList<Player>() {{
@@ -127,6 +138,7 @@ public class TeamSystem implements Listener {
 
     /**
      * A method that opens the Inventory for the team selection for the given player.
+     *
      * @param player - the player that gets the inventory "shown" (opened)
      * @author Beelzebub
      */
@@ -200,19 +212,20 @@ public class TeamSystem implements Listener {
 
     /**
      * An event that gets executed whenever an entity damages another entity to prevent hitting team members.
+     *
      * @param event - the EntityDamageByEntityEvent
      * @author Beelzebub & SimsumMC
      */
     @EventHandler
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent event){
-        if(!(event.getEntity() instanceof Player)){
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof Player)) {
             return;
         }
 
-        if(event.getDamager() instanceof Player){
+        if (event.getDamager() instanceof Player) {
             HashMap<Player, Player> playerDuels = Cache.getPlayerDuels();
             Player player = (Player) event.getEntity();
-            if(playerDuels.containsKey(player) && (playerDuels.get(player) != event.getDamager())){
+            if (playerDuels.containsKey(player) && (playerDuels.get(player) != event.getDamager())) {
                 event.setCancelled(true);
                 String duelPlayerName = getTeamColour(getPlayerTeam(playerDuels.get(player), true)) +
                         ((Player) event.getEntity()).getDisplayName();
@@ -221,7 +234,7 @@ public class TeamSystem implements Listener {
                 return;
             }
             player = (Player) event.getDamager();
-            if(playerDuels.containsKey(player) && (playerDuels.get(player) != event.getEntity())){
+            if (playerDuels.containsKey(player) && (playerDuels.get(player) != event.getEntity())) {
                 event.setCancelled(true);
                 String duelPlayerName = getTeamColour(getPlayerTeam(playerDuels.get(player), true)) +
                         ((Player) event.getEntity()).getDisplayName();
@@ -239,13 +252,12 @@ public class TeamSystem implements Listener {
         Player damager;
         Player damaged = (Player) event.getEntity();
 
-        if(event.getDamager() instanceof Arrow){
+        if (event.getDamager() instanceof Arrow) {
             Arrow arrow = (Arrow) event.getDamager();
             damager = (Player) arrow.getShooter();
 
-        }
-        else{
-            if(!(event.getDamager() instanceof Player)){
+        } else {
+            if (!(event.getDamager() instanceof Player)) {
                 return;
             }
             damager = (Player) event.getDamager();
@@ -260,8 +272,8 @@ public class TeamSystem implements Listener {
                 return;
             }
             HashMap<Player, Long> spawnProtection = Cache.getSpawnProtection();
-            if(spawnProtection.containsKey(damaged) && (unixTime < spawnProtection.get(damaged))){
-                if(damager.getUniqueId() != damaged.getUniqueId()){
+            if (spawnProtection.containsKey(damaged) && (unixTime < spawnProtection.get(damaged))) {
+                if (damager.getUniqueId() != damaged.getUniqueId()) {
                     damager.sendMessage("§cThe player has spawn protection!");
                 }
                 event.setCancelled(true);
@@ -271,8 +283,9 @@ public class TeamSystem implements Listener {
 
     /**
      * A Method that returns the team of the player with the colour as a string.
+     *
      * @param player the player which team gets returned
-     * @param raw a boolean whether the method should return a raw string or a colored one
+     * @param raw    a boolean whether the method should return a raw string or a colored one
      * @return the team name as a string if any, else "§cNot selected"
      * @author SimsumMC
      */
@@ -281,13 +294,12 @@ public class TeamSystem implements Listener {
         String teamName = ChatColor.RED + "Not selected";
         HashMap<String, ArrayList<Player>> data = getTeamMembers();
 
-        for(String key : data.keySet()){
+        for (String key : data.keySet()) {
             ArrayList<Player> players = data.get(key);
-            if(players.contains(player)){
-                if(!raw){
+            if (players.contains(player)) {
+                if (!raw) {
                     teamName = getTeamColour(key).toString();
-                }
-                else{
+                } else {
                     teamName = "";
                 }
                 teamName += key;
@@ -300,15 +312,16 @@ public class TeamSystem implements Listener {
 
     /**
      * A Method that removes the player from the current team
+     *
      * @param player which gets removed from his team
      * @author SimsumMC
      */
     public static void removePlayerTeam(Player player) {
         HashMap<String, ArrayList<Player>> teamMembers = getTeamMembers();
 
-        for(String key : teamMembers.keySet()){
+        for (String key : teamMembers.keySet()) {
             ArrayList<Player> players = teamMembers.get(key);
-            if(players.contains(player)){
+            if (players.contains(player)) {
                 players.remove(player);
                 teamMembers.put(key, players);
                 Cache.setTeamMembers(teamMembers);
@@ -319,12 +332,13 @@ public class TeamSystem implements Listener {
 
     /**
      * A Method that returns the team of the player with the colour as a ChatColor Enum.
+     *
      * @param team a S
      * @return the colour of the team
      * @author SimsumMC
      */
     public static ChatColor getTeamColour(String team) {
-        switch(team){
+        switch (team) {
             case "Blue":
                 return ChatColor.DARK_BLUE;
             case "Green":
@@ -338,12 +352,13 @@ public class TeamSystem implements Listener {
 
     /**
      * Method that returns the team-color of the specified player as a DyeColor.
+     *
      * @param p The player to get the team-color of
      * @author Servaturus
      */
-    public static DyeColor findTeamDyeColor(Player p){
+    public static DyeColor findTeamDyeColor(Player p) {
         String team = getPlayerTeam(p, true);
-        switch(team){
+        switch (team) {
             case "Blue":
                 return DyeColor.BLUE;
             case "Red":
@@ -359,12 +374,13 @@ public class TeamSystem implements Listener {
 
     /**
      * Method that returns the team-color of the specified player as a Color.
+     *
      * @param p The player to get the team-color of
      * @author Servaturus
      */
-    public static Color findTeamColor(Player p){
+    public static Color findTeamColor(Player p) {
         String team = getPlayerTeam(p, true);
-        switch(team){
+        switch (team) {
             case "Blue":
                 return Color.BLUE;
             case "Red":

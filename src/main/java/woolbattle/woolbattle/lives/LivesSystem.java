@@ -27,13 +27,14 @@ public class LivesSystem implements Listener {
 
     /**
      * A Method that teleports the player to the team spawn.
+     *
      * @param player the player that gets teleported
      * @author SimsumMC
      */
-    public static void teleportPlayerTeamSpawn(Player player){
+    public static void teleportPlayerTeamSpawn(Player player) {
         String team = TeamSystem.getPlayerTeam(player, true);
 
-        switch(team){
+        switch (team) {
             case "Blue":
                 player.teleport(Config.blueLocation);
                 break;
@@ -54,11 +55,12 @@ public class LivesSystem implements Listener {
 
     /**
      * A Method that updates the spawnProtection HashMap in the Cache with the current unix timestamp.
+     *
      * @param player the player that gets teleported
      * @param length the length of the spawn protection in seconds
      * @author SimsumMC
      */
-    public static void setPlayerSpawnProtection(Player player, int length){
+    public static void setPlayerSpawnProtection(Player player, int length) {
         long unixTime = (System.currentTimeMillis() / 1000L) + length;
 
         HashMap<Player, Long> spawnProtection = Cache.getSpawnProtection();
@@ -77,7 +79,7 @@ public class LivesSystem implements Listener {
      */
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        if(!LobbySystem.gameStarted){
+        if (!LobbySystem.gameStarted) {
             return;
         }
 
@@ -100,7 +102,7 @@ public class LivesSystem implements Listener {
 
             HashMap<Player, Player> playerDuels = Cache.getPlayerDuels();
             Player otherPlayer = playerDuels.get(player);
-            if(otherPlayer != null){
+            if (otherPlayer != null) {
                 playerDuels.remove(player);
                 playerDuels.remove(otherPlayer);
                 Cache.setPlayerDuels(playerDuels);
@@ -122,26 +124,25 @@ public class LivesSystem implements Listener {
 
             Entity damager;
 
-            if(lastDamageEvent instanceof EntityDamageByEntityEvent){
+            if (lastDamageEvent instanceof EntityDamageByEntityEvent) {
                 damager = ((EntityDamageByEntityEvent) lastDamageEvent).getDamager();
-            }
-            else{
+            } else {
                 damager = null;
             }
 
-            if(damager == null){
+            if (damager == null) {
                 teleportPlayerTeamSpawn(player);
                 setPlayerSpawnProtection(player, Config.spawnProtectionLengthAfterDeath);
             }
 
-            if(damager instanceof Arrow){
+            if (damager instanceof Arrow) {
                 Arrow arrow = (Arrow) damager;
                 damager = (Entity) arrow.getShooter();
 
             }
 
             if (damager instanceof Player) {
-                if(lives != 0){
+                if (lives != 0) {
                     lives -= 1;
                 }
                 teamLives.put(team, lives);
@@ -151,7 +152,7 @@ public class LivesSystem implements Listener {
                 Cache.setLastDamage(lastDamage);
 
                 String damagerTeam = TeamSystem.getPlayerTeam((Player) damager, true);
-                ChatColor damagerTeamColour = TeamSystem.getTeamColour(damagerTeam) ;
+                ChatColor damagerTeamColour = TeamSystem.getTeamColour(damagerTeam);
                 String killMessage = ChatColor.GRAY + "The player " + TeamSystem.getTeamColour(team)
                         + player.getDisplayName() + ChatColor.GRAY + " was killed by " +
                         damagerTeamColour + ((Player) damager).getDisplayName() + ChatColor.GRAY + ".";
@@ -161,13 +162,14 @@ public class LivesSystem implements Listener {
 
                 HashMap<Player, Integer> kills = killStreaks.get(damagerTeam);
 
-                killStreaks.put(team, new HashMap<Player, Integer>(){{put(player, 0);}});
+                killStreaks.put(team, new HashMap<Player, Integer>() {{
+                    put(player, 0);
+                }});
 
                 int amKills;
-                if(kills.containsKey(damager)){
+                if (kills.containsKey(damager)) {
                     amKills = kills.get(damager) + 1;
-                }
-                else{
+                } else {
                     amKills = 1;
                 }
 
@@ -175,7 +177,7 @@ public class LivesSystem implements Listener {
 
                 HashMap<Player, HashMap<String, Integer>> playerStats = Cache.getPlayerStats();
 
-                if(amKills == 5){
+                if (amKills == 5) {
 
                     AchievementSystem.giveKillstreak5((Player) damager);
 
@@ -201,8 +203,7 @@ public class LivesSystem implements Listener {
                 if (lives == 0) {
                     TeamSystem.removePlayerTeam(player);
                     LobbySystem.setPlayerSpectator(player);
-                }
-                else{
+                } else {
                     teleportPlayerTeamSpawn(player);
                     setPlayerSpawnProtection(player, Config.spawnProtectionLengthAfterDeath);
                 }

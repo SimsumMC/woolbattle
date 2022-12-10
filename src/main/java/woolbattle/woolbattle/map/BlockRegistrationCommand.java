@@ -1,6 +1,5 @@
-package woolbattle.woolbattle.woolsystem;
+package woolbattle.woolbattle.map;
 
-import java.util.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -50,7 +49,7 @@ public class BlockRegistrationCommand implements CommandExecutor {
                             "command to work properly." + syntax
                     );
                     return false;
-                }else {
+                } else {
                     try {
 
                         Location start = new Location(Bukkit.getWorlds().get(0), Double.parseDouble(args[1].toLowerCase()), Double.parseDouble(args[2].toLowerCase()), Double.parseDouble(args[3].toLowerCase()));

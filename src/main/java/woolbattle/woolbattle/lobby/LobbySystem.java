@@ -29,13 +29,13 @@ import woolbattle.woolbattle.Config;
 import woolbattle.woolbattle.Enums.PerkType;
 import woolbattle.woolbattle.Main;
 import woolbattle.woolbattle.achievements.AchievementUI;
-import woolbattle.woolbattle.itemsystem.ItemSystem;
+import woolbattle.woolbattle.items.ItemSystem;
 import woolbattle.woolbattle.perks.ActivePerk;
 import woolbattle.woolbattle.perks.AllPassivePerks;
 import woolbattle.woolbattle.perks.PassivePerk;
 import woolbattle.woolbattle.stats.StatsSystem;
 import woolbattle.woolbattle.team.TeamSystem;
-import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
+import woolbattle.woolbattle.map.BlockBreakingSystem;
 
 import java.util.*;
 
@@ -63,7 +63,7 @@ public class LobbySystem implements Listener {
         Player player = event.getEntity();
         event.setDeathMessage(ChatColor.GRAY + "The player " + ChatColor.GREEN + player.getDisplayName()
                 + ChatColor.GRAY + " died.");
-        if(!gameStarted){
+        if (!gameStarted) {
             giveLobbyItems(player);
         }
 
@@ -144,11 +144,11 @@ public class LobbySystem implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
-        if(event.getCurrentItem() == null){
+        if (event.getCurrentItem() == null) {
             return;
         }
 
-        if(event.getCurrentItem().getType() == Material.SULPHUR){
+        if (event.getCurrentItem().getType() == Material.SULPHUR) {
             player.sendMessage(ChatColor.RED + "You can't move items that are on cooldown!");
             event.setCancelled(true);
         }
@@ -171,17 +171,17 @@ public class LobbySystem implements Listener {
             }
         }
 
-        if(event.getClickedInventory().getName() == null ||!event.getCurrentItem().hasItemMeta() || event.getCurrentItem().getItemMeta().getDisplayName().equals(" ")) {
+        if (event.getClickedInventory().getName() == null || !event.getCurrentItem().hasItemMeta() || event.getCurrentItem().getItemMeta().getDisplayName().equals(" ")) {
             return;
         }
 
         String rawInventoryName = event.getClickedInventory().getName().substring(2);
         String rawItemName = event.getCurrentItem().getItemMeta().getDisplayName().substring(2);
 
-        if(rawItemName == null){
+        if (rawItemName == null) {
             return;
         }
-        switch(rawInventoryName) {
+        switch (rawInventoryName) {
             case "Amount of Lives Voting":
                 HashMap<Integer, ArrayList<Player>> votingData = Cache.getLifeVoting();
                 ItemMeta clickedItemMeta = event.getCurrentItem().getItemMeta();
@@ -230,7 +230,7 @@ public class LobbySystem implements Listener {
 
                 break;
             case "Choose Perks":
-                switch(rawItemName){
+                switch (rawItemName) {
                     case "Active Perk #1":
                         showActivePerkMenu(player, PerkType.FIRST_ACTIVE);
                         break;
@@ -244,28 +244,25 @@ public class LobbySystem implements Listener {
 
                 break;
             case "Active Perk #1":
-                if(rawItemName.equals("Go Back")){
+                if (rawItemName.equals("Go Back")) {
                     showPerkMenu(player);
-                }
-                else{
+                } else {
                     savePerkSelection(player, rawItemName, PerkType.FIRST_ACTIVE);
                     showActivePerkMenu(player, PerkType.FIRST_ACTIVE);
                 }
                 break;
             case "Active Perk #2":
-                if(rawItemName.equals("Go Back")){
+                if (rawItemName.equals("Go Back")) {
                     showPerkMenu(player);
-                }
-                else {
+                } else {
                     savePerkSelection(player, rawItemName, PerkType.SECOND_ACTIVE);
                     showActivePerkMenu(player, PerkType.SECOND_ACTIVE);
                 }
                 break;
             case "Passive Perk":
-                if(rawItemName.equals("Go Back")){
+                if (rawItemName.equals("Go Back")) {
                     showPerkMenu(player);
-                }
-                else {
+                } else {
                     savePerkSelection(player, rawItemName, PerkType.PASSIVE);
                     showPassivePerkMenu(player);
                 }
@@ -276,12 +273,14 @@ public class LobbySystem implements Listener {
 
     /**
      * An Event that gets executed whenever a player interacts with an item to make the lobby items functional.
+     *
      * @param event the PlayerInteractEvent event
      * @author SimsumMC
      */
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getItem() == null || event.getItem().getItemMeta() == null || event.getItem().getItemMeta().getDisplayName() == null) return;
+        if (event.getItem() == null || event.getItem().getItemMeta() == null || event.getItem().getItemMeta().getDisplayName() == null)
+            return;
 
         Player player = event.getPlayer();
         String displayName = event.getItem().getItemMeta().getDisplayName();
@@ -308,7 +307,7 @@ public class LobbySystem implements Listener {
         }
 
         ActivePerk activePerk = Cache.getActivePerks().get(displayName.substring(2));
-        if(activePerk != null){
+        if (activePerk != null) {
             activePerk.execute(event, player);
         }
 
@@ -317,12 +316,13 @@ public class LobbySystem implements Listener {
     /**
      * An Event that gets executed whenever a player closes the current inventory which is required to save the new
      * inventory of the "Edit Inventory" Item
+     *
      * @param event the InventoryCloseEvent event
      * @author SimsumMC
      */
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        if(event.getInventory().getName() == null || !event.getInventory().getName().equals("§bEdit Inventory")){
+        if (event.getInventory().getName() == null || !event.getInventory().getName().equals("§bEdit Inventory")) {
             return;
         }
 
@@ -337,8 +337,8 @@ public class LobbySystem implements Listener {
         int position = 0;
 
         for (ItemStack itemStack : eventInventory.getContents()) {
-            if(itemStack != null && itemStack.hasItemMeta() && !itemStack.getType().equals(Material.GLASS)){
-                switch(itemStack.getItemMeta().getDisplayName()){
+            if (itemStack != null && itemStack.hasItemMeta() && !itemStack.getType().equals(Material.GLASS)) {
+                switch (itemStack.getItemMeta().getDisplayName()) {
                     case "§bShears":
                         shearsPosition = position - 9;
                         break;
@@ -366,7 +366,7 @@ public class LobbySystem implements Listener {
         int finalActivePerk2Position = activePerk2Position;
 
         //check for mistakes
-        ArrayList<Integer> values= new ArrayList<Integer>(){{
+        ArrayList<Integer> values = new ArrayList<Integer>() {{
             add(finalShearsPosition);
             add(finalBowPosition);
             add(finalEnderPearlPosition);
@@ -374,14 +374,14 @@ public class LobbySystem implements Listener {
 
         int notDefined = 0;
 
-        for(Integer value: values){
-            if(value==0){
-                notDefined +=1;
+        for (Integer value : values) {
+            if (value == 0) {
+                notDefined += 1;
             }
         }
 
-        if(notDefined >= 2){
-            new BukkitRunnable(){
+        if (notDefined >= 2) {
+            new BukkitRunnable() {
 
                 @Override
                 public void run() {
@@ -398,8 +398,8 @@ public class LobbySystem implements Listener {
         MongoCollection<Document> collection = db.getCollection("playerInventories");
 
         Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
-        if(foundDocument == null){
-            HashMap<String, Object> playerData = new HashMap<String, Object>(){{
+        if (foundDocument == null) {
+            HashMap<String, Object> playerData = new HashMap<String, Object>() {{
                 put("_id", player.getUniqueId().toString());
                 put("shears", finalShearsPosition);
                 put("bow", finalBowPosition);
@@ -410,9 +410,8 @@ public class LobbySystem implements Listener {
 
             Document document = new Document(playerData);
             collection.insertOne(document);
-        }
-        else{
-            Document query = new Document().append("_id",  player.getUniqueId().toString());
+        } else {
+            Document query = new Document().append("_id", player.getUniqueId().toString());
 
             Bson updates = Updates.combine(
                     Updates.set("shears", finalShearsPosition),
@@ -427,7 +426,7 @@ public class LobbySystem implements Listener {
 
         player.sendMessage(ChatColor.GREEN + "Your new inventory was successfully saved.");
 
-        new BukkitRunnable(){
+        new BukkitRunnable() {
 
             @Override
             public void run() {
@@ -440,11 +439,12 @@ public class LobbySystem implements Listener {
     /**
      * A Method that starts the game, gives every player the right items, changes the scoreboard, resets the cooldown and
      * teleports the players to the right position.
+     *
      * @return A boolean whether the game could successfully be started
      * @author SimsumMC
      */
     public static boolean startGame() {
-        if(gameStarted){
+        if (gameStarted) {
             return false;
         }
 
@@ -459,11 +459,11 @@ public class LobbySystem implements Listener {
 
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 
-        for(Player player: players){
+        for (Player player : players) {
             String team = TeamSystem.getPlayerTeam(player, true);
             teamLives.put(team, topVotedLifeAmount);
             Location location;
-            switch (team){
+            switch (team) {
                 case "Red":
                     location = Config.redLocation;
                     break;
@@ -487,7 +487,7 @@ public class LobbySystem implements Listener {
 
             setPlayerSpawnProtection(player, Config.spawnProtectionLengthAtGameStart);
 
-            if(player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.CREATIVE){
+            if (player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.CREATIVE) {
                 player.setGameMode(GameMode.SURVIVAL);
             }
 
@@ -503,6 +503,7 @@ public class LobbySystem implements Listener {
     /**
      * A Method that ends the game, gives every player the lobby items, changes the scoreboard, resets the Cache,
      * teleports the players to the lobby and announces the winner team.
+     *
      * @param winnerTeam the winner team as a **COLORED** String
      * @return A boolean whether the game could be successfully ended
      * @author SimsumMC
@@ -510,7 +511,7 @@ public class LobbySystem implements Listener {
     public static boolean endGame(String winnerTeam) {
         runScoreBoardTask = false;
 
-        if(!gameStarted){
+        if (!gameStarted) {
             return false;
         }
 
@@ -528,11 +529,11 @@ public class LobbySystem implements Listener {
 
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 
-        for(Player player: players){
+        for (Player player : players) {
             setLobbyScoreBoard(player);
             giveLobbyItems(player);
             player.teleport(Config.lobbyLocation);
-            if(player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.CREATIVE){
+            if (player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.CREATIVE) {
                 player.setGameMode(GameMode.SURVIVAL);
             }
             player.sendTitle(winnerTeam + ChatColor.GRAY + " won!", " ");
@@ -545,6 +546,7 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that trys to find a winner team and ends the game if a team is found.
+     *
      * @author SimsumMC
      */
     public static void determinateWinnerTeam() {
@@ -554,21 +556,19 @@ public class LobbySystem implements Listener {
         int emptyTeams = 0;
         String existingTeam = null;
 
-        for(String key : teamMembers.keySet()){
+        for (String key : teamMembers.keySet()) {
             ArrayList<Player> players = teamMembers.get(key);
-            if(players.size() == 0){
+            if (players.size() == 0) {
                 emptyTeams += 1;
-            }
-            else{
+            } else {
                 existingTeam = key;
             }
 
         }
-        if(emptyTeams >= 3){
-            if(existingTeam != null){
+        if (emptyTeams >= 3) {
+            if (existingTeam != null) {
                 endGame(TeamSystem.getTeamColour(existingTeam) + existingTeam);
-            }
-            else{
+            } else {
                 endGame("§cUnknown");
             }
             return;
@@ -580,21 +580,19 @@ public class LobbySystem implements Listener {
         int deathTeams = 0;
         existingTeam = null;
 
-        for(String key : teamLives.keySet()){
+        for (String key : teamLives.keySet()) {
             int lives = teamLives.get(key);
-            if(lives == 0){
+            if (lives == 0) {
                 deathTeams += 1;
-            }
-            else{
+            } else {
                 existingTeam = key;
             }
 
         }
-        if(deathTeams >= 3){
-            if(existingTeam != null){
+        if (deathTeams >= 3) {
+            if (existingTeam != null) {
                 endGame(TeamSystem.getTeamColour(existingTeam) + existingTeam);
-            }
-            else{
+            } else {
                 endGame("§cUnknown");
             }
         }
@@ -603,21 +601,22 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that saves the Perk that was selected by a player.
-     * @param player the Player that selected the perk
+     *
+     * @param player   the Player that selected the perk
      * @param perkName the Name of the Perk without colour code
      * @param perkType the Type of the perk as an enum
      * @author SimsumMC
      */
-    public void savePerkSelection(Player player, String perkName, PerkType perkType){
+    public void savePerkSelection(Player player, String perkName, PerkType perkType) {
         String perkTypeString = perkType.toString().toLowerCase();
 
         MongoDatabase db = Main.getMongoDatabase();
         MongoCollection<Document> collection = db.getCollection("playerPerks");
 
         Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
-        if(foundDocument == null){
+        if (foundDocument == null) {
 
-            HashMap<String, Object> playerData = new HashMap<String, Object>(){{
+            HashMap<String, Object> playerData = new HashMap<String, Object>() {{
                 put("_id", player.getUniqueId().toString());
                 put("first_active", null);
                 put("second_active", null);
@@ -628,24 +627,22 @@ public class LobbySystem implements Listener {
 
             Document document = new Document(playerData);
             collection.insertOne(document);
-        }
-        else{
-            if(perkType == PerkType.FIRST_ACTIVE){
+        } else {
+            if (perkType == PerkType.FIRST_ACTIVE) {
                 Object get = foundDocument.get(PerkType.SECOND_ACTIVE.toString().toLowerCase());
-                if(get != null && get.equals(perkName)){
+                if (get != null && get.equals(perkName)) {
                     player.sendMessage(ChatColor.RED + "You can't have the same active perks!");
                     return;
                 }
-            }
-            else if (perkType == PerkType.SECOND_ACTIVE){
+            } else if (perkType == PerkType.SECOND_ACTIVE) {
                 Object get = foundDocument.get(PerkType.FIRST_ACTIVE.toString().toLowerCase());
-                if(get != null && get.equals(perkName)){
+                if (get != null && get.equals(perkName)) {
                     player.sendMessage(ChatColor.RED + "You can't have the same active perks!");
                     return;
                 }
             }
 
-            Document query = new Document().append("_id",  player.getUniqueId().toString());
+            Document query = new Document().append("_id", player.getUniqueId().toString());
 
             Bson updates = Updates.set(perkTypeString, perkName);
 
@@ -656,6 +653,7 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that gives the lobby items to the given player.
+     *
      * @param player the player that becomes the items in the inventory
      * @author SimsumMC
      */
@@ -719,11 +717,12 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that shows / updates the inventar to vote for the life count.
+     *
      * @param player the player that gets the life amount voting inventory opened
      * @author SimsumMC
      */
     private static void showLifeAmountVoting(Player player) {
-        Inventory inv = Bukkit.createInventory(null, 3*9, "§aAmount of Lives Voting");
+        Inventory inv = Bukkit.createInventory(null, 3 * 9, "§aAmount of Lives Voting");
 
         // Glass Background
         ItemStack glassStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15);
@@ -731,7 +730,7 @@ public class LobbySystem implements Listener {
         glassMeta.setDisplayName(" ");
         glassStack.setItemMeta(glassMeta);
 
-        for (int i = 0; i<= 26; i++) {
+        for (int i = 0; i <= 26; i++) {
             inv.setItem(i, glassStack);
         }
 
@@ -740,7 +739,9 @@ public class LobbySystem implements Listener {
         ItemStack fiveLivesStack = new ItemStack(Material.INK_SACK, 5, (short) 0, (byte) 10);
         ItemMeta fiveLivesMeta = fiveLivesStack.getItemMeta();
         fiveLivesMeta.setDisplayName("§a5 Lives");
-        fiveLivesMeta.setLore(new ArrayList<String>(){{add(ChatColor.GRAY + "»Votes: §a" + fiveVoteCount);}});
+        fiveLivesMeta.setLore(new ArrayList<String>() {{
+            add(ChatColor.GRAY + "»Votes: §a" + fiveVoteCount);
+        }});
         fiveLivesStack.setItemMeta(fiveLivesMeta);
         inv.setItem(11, fiveLivesStack);
 
@@ -749,7 +750,9 @@ public class LobbySystem implements Listener {
         ItemStack tenLivesStack = new ItemStack(Material.INK_SACK, 10, (short) 0, (byte) 10);
         ItemMeta tenLivesMeta = tenLivesStack.getItemMeta();
         tenLivesMeta.setDisplayName("§a10 Lives");
-        tenLivesMeta.setLore(new ArrayList<String>(){{add(ChatColor.GRAY + "»Votes: §a" + tenVoteCount);}});
+        tenLivesMeta.setLore(new ArrayList<String>() {{
+            add(ChatColor.GRAY + "»Votes: §a" + tenVoteCount);
+        }});
         tenLivesStack.setItemMeta(tenLivesMeta);
         inv.setItem(13, tenLivesStack);
 
@@ -758,7 +761,9 @@ public class LobbySystem implements Listener {
         ItemStack fifteenLivesStack = new ItemStack(Material.INK_SACK, 15, (short) 0, (byte) 10);
         ItemMeta fifteenLivesMeta = fifteenLivesStack.getItemMeta();
         fifteenLivesMeta.setDisplayName("§a15 Lives");
-        fifteenLivesMeta.setLore(new ArrayList<String>(){{add(ChatColor.GRAY + "»Votes: §a" + fifteenVoteCount);}});
+        fifteenLivesMeta.setLore(new ArrayList<String>() {{
+            add(ChatColor.GRAY + "»Votes: §a" + fifteenVoteCount);
+        }});
         fifteenLivesStack.setItemMeta(fifteenLivesMeta);
         inv.setItem(15, fifteenLivesStack);
 
@@ -767,11 +772,12 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that shows / updates the inventar to change the inventory sort.
+     *
      * @param player - the Player that gets the inventory opened
      * @author SimsumMC
      */
     private static void showEditInventoryMenu(Player player) {
-        Inventory inv = Bukkit.createInventory(null, 3*9, "§bEdit Inventory");
+        Inventory inv = Bukkit.createInventory(null, 3 * 9, "§bEdit Inventory");
 
         // Glass Background
         ItemStack glassStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15);
@@ -779,8 +785,8 @@ public class LobbySystem implements Listener {
         glassMeta.setDisplayName(" ");
         glassStack.setItemMeta(glassMeta);
 
-        for (int i = 0; i<= 26; i++) {
-            if(i >= 9 && i <=17){
+        for (int i = 0; i <= 26; i++) {
+            if (i >= 9 && i <= 17) {
                 continue;
             }
             inv.setItem(i, glassStack);
@@ -796,14 +802,13 @@ public class LobbySystem implements Listener {
         MongoCollection<Document> collection = db.getCollection("playerInventories");
 
         Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
-        if(foundDocument == null){
+        if (foundDocument == null) {
             shearsSlot = 9;
             bowSlot = 10;
             enderPearlSlot = 17;
             activePerk1Slot = 16;
             activePerk2Slot = 11;
-        }
-        else{
+        } else {
             shearsSlot = (int) foundDocument.get("shears") + 9;
             bowSlot = (int) foundDocument.get("bow") + 9;
             enderPearlSlot = (int) foundDocument.get("ender_pearl") + 9;
@@ -854,11 +859,12 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that shows the inventar to choose between the different perk types to change them.
+     *
      * @param player - The player gets an inventory opened to choose the perks.
      * @author SimsumMC
      */
     private static void showPerkMenu(Player player) {
-        Inventory inv = Bukkit.createInventory(null, 3*9, "§dChoose Perks");
+        Inventory inv = Bukkit.createInventory(null, 3 * 9, "§dChoose Perks");
 
         // Glass Background
         ItemStack glassStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15);
@@ -866,7 +872,7 @@ public class LobbySystem implements Listener {
         glassMeta.setDisplayName(" ");
         glassStack.setItemMeta(glassMeta);
 
-        for (int i = 0; i<= 26; i++) {
+        for (int i = 0; i <= 26; i++) {
             inv.setItem(i, glassStack);
         }
 
@@ -896,6 +902,7 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that shows the inventar to choose between the different perk types to change them.
+     *
      * @author SimsumMC
      */
     private static void showActivePerkMenu(Player player, PerkType perkType) {
@@ -907,32 +914,31 @@ public class LobbySystem implements Listener {
         MongoCollection<Document> collection = db.getCollection("playerPerks");
 
         Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
-        if(foundDocument != null){
-            if(foundDocument.get(perkTypeString) != null){
+        if (foundDocument != null) {
+            if (foundDocument.get(perkTypeString) != null) {
                 selectedPerk = (String) foundDocument.get(perkTypeString);
             }
         }
 
-        Inventory inv = Bukkit.createInventory(null, 3*9, "§dActive Perk #" + perkType.value);
+        Inventory inv = Bukkit.createInventory(null, 3 * 9, "§dActive Perk #" + perkType.value);
 
         ArrayList<String> newLore;
 
         HashMap<String, ActivePerk> activePerks = Cache.getActivePerks();
-        for(ActivePerk perk : activePerks.values()){
-            if(!perk.getSelectableStatus()){
+        for (ActivePerk perk : activePerks.values()) {
+            if (!perk.getSelectableStatus()) {
                 continue;
             }
 
             ItemStack itemStack = perk.getItemStack().clone();
             ItemMeta itemMeta = itemStack.getItemMeta();
 
-            if(selectedPerk != null && itemMeta.getDisplayName().substring(2).equals(selectedPerk)){
+            if (selectedPerk != null && itemMeta.getDisplayName().substring(2).equals(selectedPerk)) {
                 itemMeta.addEnchant(Enchantment.KNOCKBACK, 1, true);
                 itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            }
-            else{
-                if (itemMeta.hasEnchants()){
-                    for(Enchantment enchantment : itemMeta.getEnchants().keySet()){
+            } else {
+                if (itemMeta.hasEnchants()) {
+                    for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
                         itemMeta.removeEnchant(enchantment);
                     }
                 }
@@ -971,27 +977,26 @@ public class LobbySystem implements Listener {
         MongoCollection<Document> collection = db.getCollection("playerPerks");
 
         Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
-        if(foundDocument != null){
+        if (foundDocument != null) {
             selectedPerk = (String) foundDocument.get("passive");
         }
 
-        Inventory inv = Bukkit.createInventory(null, 3*9, "§dPassive Perk");
+        Inventory inv = Bukkit.createInventory(null, 3 * 9, "§dPassive Perk");
 
         ArrayList<String> newLore;
 
         HashMap<String, PassivePerk<? extends Event, ?>> passivePerks = Cache.getPassivePerks();
-        for(PassivePerk<? extends Event, ?> perk : passivePerks.values()){
+        for (PassivePerk<? extends Event, ?> perk : passivePerks.values()) {
 
             ItemStack itemStack = perk.getItem().clone();
             ItemMeta itemMeta = itemStack.getItemMeta();
 
-            if(selectedPerk != null && itemMeta.getDisplayName().substring(2).equals(selectedPerk)){
+            if (selectedPerk != null && itemMeta.getDisplayName().substring(2).equals(selectedPerk)) {
                 itemMeta.addEnchant(Enchantment.KNOCKBACK, 1, true);
                 itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            }
-            else{
-                if (itemMeta.hasEnchants()){
-                    for(Enchantment enchantment : itemMeta.getEnchants().keySet()){
+            } else {
+                if (itemMeta.hasEnchants()) {
+                    for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
                         itemMeta.removeEnchant(enchantment);
                     }
                 }
@@ -1020,10 +1025,10 @@ public class LobbySystem implements Listener {
     }
 
 
-
     /**
      * A Method that updates the player cooldown (the number in the XP bar) every 20 ticks depended on the player
      * amount.
+     *
      * @author SimsumMC
      */
     public static void updatePlayerCooldown() {
@@ -1031,8 +1036,8 @@ public class LobbySystem implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if(runScoreBoardTask){
-                    if(!gameStarted) {
+                if (runScoreBoardTask) {
+                    if (!gameStarted) {
                         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
                         int playerAmount = players.size();
                         if (playerAmount >= (Config.teamSize * 2)) {
@@ -1061,11 +1066,12 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that sets the cooldown for the given player.
+     *
      * @param player the player that gets the cooldown modified
      * @author SimsumMC
      */
     public static void setPlayerCooldown(Player player, int level) {
-        float exp = (float) level/60;
+        float exp = (float) level / 60;
         player.setExp(exp);
         player.setLevel(level);
 
@@ -1073,16 +1079,17 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that returns the current top-voted amount of lives.
+     *
      * @return The top voted life amount as an Integer
      * @author SimsumMC
      */
-    public static int getTopVotedLifeAmount(){
+    public static int getTopVotedLifeAmount() {
         int topKey = Config.defaultLives;
         int topVoters = 0;
         HashMap<Integer, ArrayList<Player>> data = Cache.getLifeVoting();
-        for(Integer key: data.keySet()){
+        for (Integer key : data.keySet()) {
             ArrayList<Player> players = data.get(key);
-            if(players.size() > topVoters){
+            if (players.size() > topVoters) {
                 topVoters = players.size();
                 topKey = key;
             }
@@ -1092,6 +1099,7 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that sets a player to a spectator -> game mode & position changes
+     *
      * @param player the player that gets into spectator mode
      * @author SimsumMC
      */
@@ -1102,6 +1110,7 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that updates the scoreboard for every player, depending on the game status.
+     *
      * @author SimsumMC
      */
     public static void updateScoreBoard() {
@@ -1112,19 +1121,21 @@ public class LobbySystem implements Listener {
             public void run() {
                 Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
 
-                for(Player player : players) {
+                for (Player player : players) {
                     if (!gameStarted) {
                         updateLobbyScoreBoard(player);
                     } else {
                         updateGameScoreBoard(player);
                     }
-                }            }
+                }
+            }
         }.runTaskTimer(Main.getInstance(), 0, 20);
 
     }
 
     /**
      * A Method that changes the scoreboard for the given player to the lobby scoreboard.
+     *
      * @param player the player that gets the scoreboard modified
      * @author SimsumMC
      */
@@ -1184,11 +1195,14 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that updates the scoreboard for the given player with the current values.
+     *
      * @param player the player that gets the scoreboard modified
      * @author SimsumMC
      */
     public static void updateLobbyScoreBoard(Player player) {
-        if (!runScoreBoardTask){return;}
+        if (!runScoreBoardTask) {
+            return;
+        }
 
         int maxPlayers = Bukkit.getServer().getMaxPlayers();
         int actualPlayers = Bukkit.getServer().getOnlinePlayers().size();
@@ -1209,6 +1223,7 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that changes the scoreboard for the given player to the game scoreboard.
+     *
      * @param player the player that gets the scoreboard modified
      * @author SimsumMC
      */
@@ -1250,7 +1265,7 @@ public class LobbySystem implements Listener {
         obj.getScore("§e").setScore(0);
 
         team.addEntry("§c");
-        team.setPrefix(TeamSystem.getPlayerTeam(player,false));
+        team.setPrefix(TeamSystem.getPlayerTeam(player, false));
 
         map.addEntry("§d");
         map.setPrefix("§d" + Config.defaultMap);
@@ -1279,11 +1294,14 @@ public class LobbySystem implements Listener {
 
     /**
      * A Method that updates the scoreboard for the given player with the current values.
+     *
      * @param player the player that gets the scoreboard modified
      * @author SimsumMC
      */
     public static void updateGameScoreBoard(Player player) {
-        if (!runScoreBoardTask){return;}
+        if (!runScoreBoardTask) {
+            return;
+        }
 
         Scoreboard board = player.getScoreboard();
 
@@ -1295,7 +1313,7 @@ public class LobbySystem implements Listener {
         Team greenTeam = board.getTeam("greenTeam");
         Team yellowTeam = board.getTeam("yellowTeam");
 
-        team.setPrefix(TeamSystem.getPlayerTeam(player,false));
+        team.setPrefix(TeamSystem.getPlayerTeam(player, false));
         map.setPrefix("§d" + Config.defaultMap);
 
         HashMap<String, Integer> teamLives = Cache.getTeamLives();

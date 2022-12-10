@@ -4,7 +4,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -33,11 +32,11 @@ public abstract class PassivePerk<G extends Event, E extends G> implements Liste
         }
     };
     E e = (E) g;
-    private final Class<E> type =  (Class<E>) e.getClass();
+    private final Class<E> type = (Class<E>) e.getClass();
 
     private ArrayList<Player> players = new ArrayList<>();
 
-    public PassivePerk(ItemStack item, String name, int delayInTicks, String description){
+    public PassivePerk(ItemStack item, String name, int delayInTicks, String description) {
         this.delay = delayInTicks;
         this.name = name;
         this.item = item;
@@ -51,13 +50,13 @@ public abstract class PassivePerk<G extends Event, E extends G> implements Liste
         collection.listIndexes().forEach((Consumer) document -> {
             assert document instanceof Document;
 
-            if(((Document) document).get("passive").equals(name)){
+            if (((Document) document).get("passive").equals(name)) {
                 players.add(Bukkit.getPlayer((UUID) ((Document) document).get("_id")));
             }
         });
     }
 
-    public PassivePerk (ItemStack item, String name, boolean overwriteEvent, String description){
+    public PassivePerk(ItemStack item, String name, boolean overwriteEvent, String description) {
         this.name = name;
         this.item = item;
         ItemMeta meta = item.getItemMeta();
@@ -71,24 +70,25 @@ public abstract class PassivePerk<G extends Event, E extends G> implements Liste
         collection.listIndexes().forEach((Consumer) document -> {
             assert document instanceof Document;
 
-            if(((Document) document).get("passive") != null && ((Document) document).get("passive").equals(name)){
+            if (((Document) document).get("passive") != null && ((Document) document).get("passive").equals(name)) {
                 players.add(Bukkit.getPlayer((UUID) ((Document) document).get("_id")));
             }
         });
     }
 
-    public void functionality(){
+    public void functionality() {
 
     }
 
-    public  <H extends Event, S extends H> void functionality(S event){}
+    public <H extends Event, S extends H> void functionality(S event) {
+    }
 
-    public final void loop(){
-        if(delay == 0){
+    public final void loop() {
+        if (delay == 0) {
             return;
         }
 
-        new BukkitRunnable(){
+        new BukkitRunnable() {
             @Override
             public void run() {
                 functionality();
@@ -111,17 +111,35 @@ public abstract class PassivePerk<G extends Event, E extends G> implements Liste
         return type;
     }
 
-    public String getName() {return name;}
-    public ItemStack getItem() {return item;}
-    public int getDelay() {return delay;}
-    public boolean isOverwriteEvent() {return overwriteEvent;}
+    public String getName() {
+        return name;
+    }
 
-    public ArrayList<Player> getPlayers(){return players;}
-    public void setPlayers(ArrayList<Player> players) {this.players = players;}
+    public ItemStack getItem() {
+        return item;
+    }
 
-    public boolean hasPlayer(Player p){return players.contains(p);}
+    public int getDelay() {
+        return delay;
+    }
 
-    public String getDescription(){
+    public boolean isOverwriteEvent() {
+        return overwriteEvent;
+    }
+
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(ArrayList<Player> players) {
+        this.players = players;
+    }
+
+    public boolean hasPlayer(Player p) {
+        return players.contains(p);
+    }
+
+    public String getDescription() {
         return description;
     }
 }

@@ -12,11 +12,11 @@ public class StatsCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        if(!(commandSender instanceof Player)){
+        if (!(commandSender instanceof Player)) {
             commandSender.sendMessage(ChatColor.RED + "You can only use this command as a normal player!");
             return true;
         }
-        if(strings.length == 0){
+        if (strings.length == 0) {
             commandSender.sendMessage(StatsSystem.getPlayerStatsFormatted((OfflinePlayer) commandSender));
             return true;
         }
