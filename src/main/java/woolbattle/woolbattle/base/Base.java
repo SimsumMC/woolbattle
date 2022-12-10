@@ -38,14 +38,14 @@ public class Base implements Listener {
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE) {
             event.setCancelled(true);
-        }
-        else{
+        } else {
             event.setDamage(0);
         }
     }
 
     /**
      * An event which changes the chat format to one that looks better
+     *
      * @param event the AsyncPlayerChatEvent
      * @author Beelzebub
      */
@@ -105,38 +105,40 @@ public class Base implements Listener {
     /**
      * An Event that gets executed whenever a player drags an item from one spot to another to prevent stealing items
      * from the lobby items.
+     *
      * @param event the InventoryDragEvent event
      * @author SimsumMC
      */
     @EventHandler
-    public void onInventoryDrag(InventoryDragEvent event){
+    public void onInventoryDrag(InventoryDragEvent event) {
         event.setCancelled(true);
     }
 
     /**
      * An Event that gets executed whenever the weather changes to prevent the changing of weather.
+     *
      * @param event the InventoryDragEvent event
      * @author SimsumMC
      */
     @EventHandler
-    public void onWeatherChange(WeatherChangeEvent event){
+    public void onWeatherChange(WeatherChangeEvent event) {
         event.setCancelled(true);
     }
 
     /**
      * A Method that adds the given Ender Pearl Entity to the Cache.
+     *
      * @param enderPearl the Ender Pearl Entity
      * @author SimsumMC
      */
-    public static void addEnderPearl(EnderPearl enderPearl){
+    public static void addEnderPearl(EnderPearl enderPearl) {
         ProjectileSource source = enderPearl.getShooter();
-        if(source instanceof Player){
+        if (source instanceof Player) {
             HashMap<Player, ArrayList<EnderPearl>> enderPearls = Cache.getEnderPearls();
             ArrayList<EnderPearl> playerPearls;
-            if(!enderPearls.containsKey((Player) source)){
+            if (!enderPearls.containsKey((Player) source)) {
                 playerPearls = new ArrayList<>();
-            }
-            else{
+            } else {
                 playerPearls = enderPearls.get((Player) source);
             }
 
@@ -149,17 +151,18 @@ public class Base implements Listener {
 
     /**
      * A Method that removes all ender pearls from a given player from the hashmap & from the world.
+     *
      * @param player the player that ender pearls get removed
      * @author SimsumMC
      */
-    public static void resetEnderPearls(Player player){
+    public static void resetEnderPearls(Player player) {
         HashMap<Player, ArrayList<EnderPearl>> enderPearls = Cache.getEnderPearls();
 
-        if(!enderPearls.containsKey(player)){
+        if (!enderPearls.containsKey(player)) {
             return;
         }
 
-        for(EnderPearl enderPearl : enderPearls.get(player)){
+        for (EnderPearl enderPearl : enderPearls.get(player)) {
             enderPearl.remove();
         }
 

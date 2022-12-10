@@ -20,10 +20,11 @@ public class StatsSystem {
 
     /**
      * A method that adds a perk usage to the cache.
+     *
      * @param player - the player that used the perk
      * @author SimsumMC
      */
-    public static void addActivePerkUsage(Player player){
+    public static void addActivePerkUsage(Player player) {
         HashMap<Player, HashMap<String, Integer>> playerStats = Cache.getPlayerStats();
 
         HashMap<String, Integer> stats = playerStats.get(player);
@@ -37,15 +38,16 @@ public class StatsSystem {
 
     /**
      * A method that adds the default values in the Cache.
+     *
      * @author SimsumMC
      */
-    public static void addDefaultStats(){
+    public static void addDefaultStats() {
         HashMap<Player, HashMap<String, Integer>> playerStats = Cache.getPlayerStats();
 
-        for(Player player : Bukkit.getOnlinePlayers()){
-            HashMap<String, Integer> stats = new HashMap<String, Integer>(){{
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            HashMap<String, Integer> stats = new HashMap<String, Integer>() {{
                 put("games", 1);
-                put("wins",  0);
+                put("wins", 0);
                 put("kills", 0);
                 put("deaths", 0);
                 put("streaks", 0);
@@ -60,29 +62,32 @@ public class StatsSystem {
 
     /**
      * A method that saves the stats (from Cache) from all players of the round in the database.
+     *
+     * @param winnerTeam -
      * @author SimsumMC
      */
-    public static void saveAllPlayerStats(String winnerTeam){
+    public static void saveAllPlayerStats(String winnerTeam) {
         HashMap<Player, HashMap<String, Integer>> playerStats = Cache.getPlayerStats();
 
-        for(Player player : Cache.getTeamMembers().get(winnerTeam.substring(2))){
+        for (Player player : Cache.getTeamMembers().get(winnerTeam.substring(2))) {
             HashMap<String, Integer> stats = playerStats.get(player);
             stats.put("wins", 1);
             playerStats.put(player, stats);
         }
 
-        for(Player player : playerStats.keySet()){
+        for (Player player : playerStats.keySet()) {
             savePlayerStats(player, playerStats.get(player));
         }
     }
 
     /**
      * A method that saves the stats (from Cache) of a given player in the database.
-     * @param player - The player that stats get updated in the database
+     *
+     * @param player      - The player that stats get updated in the database
      * @param playerStats - The stats of the player for the last game
      * @author SimsumMC
      */
-    public static void savePlayerStats(Player player, HashMap<String, Integer> playerStats){
+    public static void savePlayerStats(Player player, HashMap<String, Integer> playerStats) {
 
         int games = playerStats.get("games");
         int wins = playerStats.get("wins");
@@ -96,9 +101,9 @@ public class StatsSystem {
 
         Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
 
-        if(foundDocument == null){
+        if (foundDocument == null) {
 
-            HashMap<String, Object> newPlayerStats = new HashMap<String, Object>(){{
+            HashMap<String, Object> newPlayerStats = new HashMap<String, Object>() {{
                 put("_id", player.getUniqueId().toString());
                 put("games", games);
                 put("wins", wins);
@@ -110,8 +115,7 @@ public class StatsSystem {
 
             Document document = new Document(newPlayerStats);
             collection.insertOne(document);
-        }
-        else{
+        } else {
             int totalGames = (int) foundDocument.get("games") + games;
             int totalWins = (int) foundDocument.get("wins") + wins;
             int totalKills = (int) foundDocument.get("kills") + kills;
@@ -128,7 +132,7 @@ public class StatsSystem {
                     Updates.set("used_perks", totalUsedPerks)
             );
 
-            Document query = new Document().append("_id",  player.getUniqueId().toString());
+            Document query = new Document().append("_id", player.getUniqueId().toString());
 
             collection.updateOne(query, updates);
         }
@@ -136,6 +140,7 @@ public class StatsSystem {
 
     /**
      * A method that fetches the stats from a given player from the database and returns it as a beautiful string.
+     *
      * @param player- The player that stats get returned as a formatted string
      * @author SimsumMC
      */

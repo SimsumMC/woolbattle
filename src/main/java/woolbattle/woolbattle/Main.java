@@ -16,14 +16,15 @@ import woolbattle.woolbattle.lives.LivesSystem;
 import woolbattle.woolbattle.lobby.LobbySystem;
 import woolbattle.woolbattle.lobby.StartGameCommand;
 import woolbattle.woolbattle.lobby.StopGameCommand;
-import woolbattle.woolbattle.maprestaurationsystem.MapCommand;
+import woolbattle.woolbattle.map.MapCommand;
 import woolbattle.woolbattle.perks.AllActivePerks;
 import woolbattle.woolbattle.perks.AllPassivePerks;
 import woolbattle.woolbattle.stats.StatsCommand;
 import woolbattle.woolbattle.team.TeamSystem;
-import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
-import woolbattle.woolbattle.woolsystem.BlockRegistrationCommand;
-import woolbattle.woolbattle.woolsystem.MapBlocksCommand;
+import woolbattle.woolbattle.map.BlockBreakingSystem;
+import woolbattle.woolbattle.map.BlockRegistrationCommand;
+import woolbattle.woolbattle.map.Listener;
+import woolbattle.woolbattle.map.MapBlocksCommand;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,13 +81,12 @@ public final class Main extends JavaPlugin {
         BlockBreakingSystem.setCollectBrokenBlocks(false);
         BlockBreakingSystem.fetchMapBlocks();
 
-        for (Player player : Bukkit.getOnlinePlayers())
-        {
+        for (Player player : Bukkit.getOnlinePlayers()) {
             player.setAllowFlight(true);
             MongoCollection<Document> collection = db.getCollection("playerAchievements");
 
             Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
-            if(foundDocument == null) {
+            if (foundDocument == null) {
                 HashMap<String, Object> playerData = new HashMap<String, Object>() {{
                     put("_id", player.getUniqueId().toString());
                     put("achievements", new ArrayList<String>());
@@ -102,7 +102,7 @@ public final class Main extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-    public static Main getInstance(){
+    public static Main getInstance() {
         return instance;
     }
 

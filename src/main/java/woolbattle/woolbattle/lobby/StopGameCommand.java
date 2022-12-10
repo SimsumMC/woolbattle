@@ -12,19 +12,20 @@ public class StopGameCommand implements CommandExecutor {
 
     /**
      * A Command that calls the endGame() method to stop the game.
+     *
      * @author SimsumMC
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if(!player.isOp()){
+            if (!player.isOp()) {
                 player.sendMessage(ChatColor.RED + "You need OP to use this command!");
                 return true;
             }
-            if(endGame(ChatColor.YELLOW + "Yellow")){
+            if (endGame(ChatColor.YELLOW + "Yellow")) {
                 player.sendMessage("§aStopped the game successfully.");
-            } else{
+            } else {
                 player.sendMessage(ChatColor.RED + "There is no running game!");
             }
             return true;

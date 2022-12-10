@@ -1,4 +1,4 @@
-package woolbattle.woolbattle;
+package woolbattle.woolbattle.map;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -14,8 +14,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
 import org.bukkit.scheduler.BukkitRunnable;
+import woolbattle.woolbattle.Cache;
+import woolbattle.woolbattle.Config;
+import woolbattle.woolbattle.Main;
 import woolbattle.woolbattle.achievements.AchievementSystem;
-import woolbattle.woolbattle.woolsystem.BlockBreakingSystem;
 
 import java.util.ArrayList;
 
@@ -25,7 +27,7 @@ public class Listener implements org.bukkit.event.Listener {
 
     /**
      * @param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
-     * information, concerning these circumstances.
+     *              information, concerning these circumstances.
      */
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
@@ -33,7 +35,7 @@ public class Listener implements org.bukkit.event.Listener {
         Player p = event.getPlayer();
         //Checks, whether the player, having broken the event's block is in the creative, or spectator mode, returns if
         //this is the case
-        if(p.getGameMode().equals(GameMode.CREATIVE) || p.getGameMode().equals(GameMode.SPECTATOR)){
+        if (p.getGameMode().equals(GameMode.CREATIVE) || p.getGameMode().equals(GameMode.SPECTATOR)) {
             return;
         }
 
@@ -44,7 +46,8 @@ public class Listener implements org.bukkit.event.Listener {
         DyeColor teamColor = findTeamDyeColor(p);//Is to be implemented in the team-system, being created
         Inventory inventory = p.getInventory();
         Block block = event.getBlock();
-        ItemStack itemStack = new ItemStack(Material.WOOL, 0, teamColor.getWoolData()){};
+        ItemStack itemStack = new ItemStack(Material.WOOL, 0, teamColor.getWoolData()) {
+        };
         Material type = block.getType();
         boolean blockIsMap = false;
         int itemAmount = 0;
@@ -54,8 +57,8 @@ public class Listener implements org.bukkit.event.Listener {
         int delayInTicks = Config.woolReplaceDelay;
 
         //Checks, whether the event's block is specified in the internal array of map-blocks, writes the value of the operation in the boolean blockIsMap.
-        for(Location iterBlock : BlockBreakingSystem.getMapBlocks()){
-            if(iterBlock.equals(block.getLocation())){
+        for (Location iterBlock : BlockBreakingSystem.getMapBlocks()) {
+            if (iterBlock.equals(block.getLocation())) {
                 blockIsMap = true;
                 break;
             }
@@ -64,11 +67,11 @@ public class Listener implements org.bukkit.event.Listener {
         //Checks, whether a modification of the map's blocks, following the action of breaking a block is to be made.
         // If this is not the case, and if the broken block possesses the wool material as it's type, it is replaced
         // after cooldown and an amount of
-        if(BlockBreakingSystem.isCollectBrokenBlocks()){
+        if (BlockBreakingSystem.isCollectBrokenBlocks()) {
             ArrayList<Location> mapBlocks = BlockBreakingSystem.getMapBlocks();
             ArrayList<Location> removedBlocks = BlockBreakingSystem.getRemovedBlocks();
 
-            if(mapBlocks.contains(block.getLocation())){
+            if (mapBlocks.contains(block.getLocation())) {
                 mapBlocks.remove(block.getLocation());
                 BlockBreakingSystem.setMapBlocks(mapBlocks);
 
@@ -77,24 +80,24 @@ public class Listener implements org.bukkit.event.Listener {
                 Bukkit.broadcastMessage("Removed Blocks: " + BlockBreakingSystem.locArrayToString(BlockBreakingSystem.getRemovedBlocks()));
             }
 
-        }else{
+        } else {
             event.setCancelled(true);
-            if(type.equals(Material.WOOL)){
+            if (type.equals(Material.WOOL)) {
 
-                for(ItemStack is : inventory){
-                    if(is != null){
-                        itemAmount += is.getType().equals(Material.WOOL)? is.getAmount() : 0;
+                for (ItemStack is : inventory) {
+                    if (is != null) {
+                        itemAmount += is.getType().equals(Material.WOOL) ? is.getAmount() : 0;
                     }
                 }
 
                 itemStack.setType(type);
 
-                if(itemAmount < maxStacks*64){
+                if (itemAmount < maxStacks * 64) {
                     itemStack.setAmount(givenWoolAmount);
                     inventory.addItem(itemStack);
                     Cache.getPassivePerks().values().forEach(perk -> {
 
-                        if(perk.hasPlayer(p)){
+                        if (perk.hasPlayer(p)) {
                             perk.functionality(event);
                         }
                     });
@@ -103,9 +106,9 @@ public class Listener implements org.bukkit.event.Listener {
                 Colorable data = (Colorable) block.getState().getData();
                 block.setType(Material.AIR);
 
-                if(blockIsMap){
+                if (blockIsMap) {
 
-                    new BukkitRunnable(){
+                    new BukkitRunnable() {
                         @Override
                         public void run() {
                             block.setType(Material.WOOL);
@@ -123,15 +126,16 @@ public class Listener implements org.bukkit.event.Listener {
     }
 
     /**
-     *  The block, placed, in case a block-scanning-process is occurring, is, if it is contained by either the array of
-     *  map blocks or the array of removed blocks, purged from the latter and added to the first one.
-     *@param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
+     * The block, placed, in case a block-scanning-process is occurring, is, if it is contained by either the array of
+     * map blocks or the array of removed blocks, purged from the latter and added to the first one.
+     *
+     * @param event The spigot-api's event class, specifying, to which occasion the method is called and delivering
      *              information, concerning these circumstances.
      */
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
 
-        if(BlockBreakingSystem.isCollectBrokenBlocks()){
+        if (BlockBreakingSystem.isCollectBrokenBlocks()) {
             ArrayList<Location> mapBlocks = BlockBreakingSystem.getMapBlocks();
             mapBlocks.add(event.getBlockPlaced().getLocation());
 
@@ -160,7 +164,7 @@ public class Listener implements org.bukkit.event.Listener {
     public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
         Player p = event.getPlayer();
 
-        if(p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR || p.isFlying()){
+        if (p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR || p.isFlying()) {
             return;
         }
 
@@ -172,13 +176,13 @@ public class Listener implements org.bukkit.event.Listener {
 
         long jumpCooldown;
 
-        try{
+        try {
             jumpCooldown = Config.jumpCooldown;
-        }catch(ExceptionInInitializerError e){
+        } catch (ExceptionInInitializerError e) {
             jumpCooldown = 40;
         }
 
-        new BukkitRunnable(){
+        new BukkitRunnable() {
             @Override
             public void run() {
                 p.setAllowFlight(true);
@@ -209,9 +213,9 @@ public class Listener implements org.bukkit.event.Listener {
 
         p.setAllowFlight(true);
 
-        new BukkitRunnable(){
+        new BukkitRunnable() {
             @Override
-            public void run(){
+            public void run() {
                 p.setAllowFlight(true);
             }
 

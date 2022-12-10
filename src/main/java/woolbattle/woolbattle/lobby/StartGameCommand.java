@@ -12,19 +12,20 @@ public class StartGameCommand implements CommandExecutor {
 
     /**
      * A Command that calls the startGame() method to start the game.
+     *
      * @author SimsumMC
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if(!player.isOp()){
+            if (!player.isOp()) {
                 player.sendMessage(ChatColor.RED + "You need OP to use this command!");
                 return true;
             }
-            if (startGame()){
+            if (startGame()) {
                 player.sendMessage(ChatColor.GREEN + "Started the game.");
-            } else{
+            } else {
                 player.sendMessage(ChatColor.RED + "The game has already been started!");
             }
             return true;

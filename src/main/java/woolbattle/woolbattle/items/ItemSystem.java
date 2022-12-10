@@ -1,4 +1,4 @@
-package woolbattle.woolbattle.itemsystem;
+package woolbattle.woolbattle.items;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -32,7 +32,7 @@ public class ItemSystem {
 
     //Creates the item-meta-specific values that are known, before a potential player is passed into the giveItems
     // method
-    private static final HashMap<Integer, ItemMeta> armorStacks = new HashMap<Integer, ItemMeta>(){
+    private static final HashMap<Integer, ItemMeta> armorStacks = new HashMap<Integer, ItemMeta>() {
         {
             put(0, new ItemStack(Material.LEATHER_BOOTS).getItemMeta());
             put(1, new ItemStack(Material.LEATHER_LEGGINGS).getItemMeta());
@@ -40,7 +40,7 @@ public class ItemSystem {
             put(3, new ItemStack(Material.LEATHER_HELMET).getItemMeta());
         }
     };
-    public static final HashMap<String, Integer> defaultSlots = new HashMap<String, Integer>(){
+    public static final HashMap<String, Integer> defaultSlots = new HashMap<String, Integer>() {
         {
             put("shears", 0);
             put("bow", 1);
@@ -53,10 +53,11 @@ public class ItemSystem {
     /**
      * Method to add the game's base items, additionally to this the individual player's perk-items into their
      * inventory, colours colour-able fragments of this equipment according to the player's team-colour.
+     *
      * @param player The player to be given the items specified above
      * @author Servaturus
      */
-    public static void giveItems(Player player){
+    public static void giveItems(Player player) {
         Color color = findTeamColor(player);
         PlayerInventory inventory = player.getInventory();
 
@@ -73,14 +74,13 @@ public class ItemSystem {
         MongoCollection<Document> collection = db.getCollection("playerInventories");
 
         Document foundDocument = collection.find(eq("_id", player.getUniqueId().toString())).first();
-        if(foundDocument == null){
+        if (foundDocument == null) {
             shearsSlot = defaultSlots.get("shears");
             bowSlot = defaultSlots.get("bow");
             enderPearlSlot = defaultSlots.get("enderpearl");
             perk1Slot = defaultSlots.get("perk1");
             perk2Slot = defaultSlots.get("perk2");
-        }
-        else{
+        } else {
             shearsSlot = (int) foundDocument.get("shears");
             bowSlot = (int) foundDocument.get("bow");
             enderPearlSlot = (int) foundDocument.get("ender_pearl");
@@ -104,25 +104,25 @@ public class ItemSystem {
 
         Document perksDocument = perksCollection.find(eq("_id", player.getUniqueId().toString())).first();
 
-        if(perksDocument != null) {
+        if (perksDocument != null) {
 
             String activePerk1String = null;
             String activePerk2String = null;
             String passivePerkString = null;
 
-            if (perksDocument.get("first_active") != null){
+            if (perksDocument.get("first_active") != null) {
                 activePerk1String = (String) perksDocument.get("first_active");
             }
 
-            if (perksDocument.get("second_active") != null){
+            if (perksDocument.get("second_active") != null) {
                 activePerk2String = (String) perksDocument.get("second_active");
             }
 
-            if (perksDocument.get("passive") != null){
+            if (perksDocument.get("passive") != null) {
                 passivePerkString = (String) perksDocument.get("passive");
             }
 
-            if(activePerk1String != null) {
+            if (activePerk1String != null) {
 
                 ActivePerk activePerk1 = Cache.getActivePerks().get(activePerk1String);
                 if (activePerk1 != null) {
@@ -130,15 +130,15 @@ public class ItemSystem {
                 }
             }
 
-            if(activePerk2String != null) {
+            if (activePerk2String != null) {
                 ActivePerk activePerk2 = Cache.getActivePerks().get(activePerk2String);
                 if (activePerk2 != null) {
                     inventory.setItem(perk2Slot, activePerk2.getItemStack());
                 }
             }
 
-            if(passivePerkString != null) {
-                PassivePerk<? extends Event,?> passivePerk = Cache.getPassivePerks().get(passivePerkString);
+            if (passivePerkString != null) {
+                PassivePerk<? extends Event, ?> passivePerk = Cache.getPassivePerks().get(passivePerkString);
                 if (passivePerk != null) {
                     inventory.setItem(passivePerkSlot, passivePerk.getItem());
                 }
@@ -146,13 +146,13 @@ public class ItemSystem {
 
         }
 
-        for(Integer index : armorStacks.keySet()){
+        for (Integer index : armorStacks.keySet()) {
             LeatherArmorMeta meta = (LeatherArmorMeta) armorStacks.get(index);
             meta.setColor(color);
 
-            ItemStack armorPiece = new ItemStack(){
+            ItemStack armorPiece = new ItemStack() {
                 {
-                    switch(index){
+                    switch (index) {
                         case 0:
                             this.setType(Material.LEATHER_BOOTS);
                             meta.setDisplayName(ChatColor.AQUA + "Leather Boots");
@@ -179,7 +179,7 @@ public class ItemSystem {
                 }
             };
             armorPiece.setAmount(1);
-            switch(index){
+            switch (index) {
                 case 0:
                     inventory.setBoots(armorPiece);
                     break;
@@ -203,24 +203,25 @@ public class ItemSystem {
 
     /**
      * Method that subtracts wool from a players inventory.
-     * @author Servaturus
-     * @param player The player, to remove the wool from
+     *
+     * @param player       The player, to remove the wool from
      * @param subtractWool The wool subtractWool to subtract
+     * @author Servaturus
      * @author Servaturus & SimsumMC
      */
-    public static boolean subtractWool(Player player, int subtractWool){
+    public static boolean subtractWool(Player player, int subtractWool) {
 
         PlayerInventory inv = player.getInventory();
 
         int existingWoolAmount = 0;
 
-        for(ItemStack iterStack : inv.getContents()){
-            if(iterStack != null && iterStack.getType().equals(Material.WOOL)){
+        for (ItemStack iterStack : inv.getContents()) {
+            if (iterStack != null && iterStack.getType().equals(Material.WOOL)) {
                 existingWoolAmount += iterStack.getAmount();
             }
         }
 
-        if(existingWoolAmount - subtractWool < 0){
+        if (existingWoolAmount - subtractWool < 0) {
             return false;
         }
 
@@ -229,38 +230,38 @@ public class ItemSystem {
         ArrayList<ItemStack> woolStacks = new ArrayList<>();
         DyeColor color = findTeamDyeColor(player);
 
-        for(ItemStack is : inv.getContents()){
-            if(is != null && is.getType().equals(Material.WOOL)){
+        for (ItemStack is : inv.getContents()) {
+            if (is != null && is.getType().equals(Material.WOOL)) {
                 woolAmount += is.getAmount();
             }
         }
-        if(woolAmount - subtractWool ==0){
+        if (woolAmount - subtractWool == 0) {
             player.getInventory().remove(Material.WOOL);
             return true;
         }
         woolAmount = woolAmount - subtractWool;
 
-        int modulo = woolAmount%64;
+        int modulo = woolAmount % 64;
 
         inv.remove(Material.WOOL);
 
-        ItemStack woolInstance =  new Wool(color).toItemStack();
+        ItemStack woolInstance = new Wool(color).toItemStack();
 
-        if(woolAmount%64 !=0){
+        if (woolAmount % 64 != 0) {
             ItemStack wool = new ItemStack(woolInstance);
             wool.setAmount(modulo);
             woolStacks.add(new ItemStack(wool));
-            woolAmount-=(woolAmount%64);
+            woolAmount -= (woolAmount % 64);
 
         }
 
-        for(int i = 0; i<woolAmount/64;i++){
+        for (int i = 0; i < woolAmount / 64; i++) {
             ItemStack wool = new ItemStack(woolInstance);
             wool.setAmount(64);
             woolStacks.add(wool);
         }
 
-        for(ItemStack woolStack : woolStacks){
+        for (ItemStack woolStack : woolStacks) {
             inv.addItem(woolStack);
         }
         return true;
@@ -271,18 +272,19 @@ public class ItemSystem {
      * Method that replaces the specified itemSlot with a gunpowder item-stack, lowering its amount every second by one,
      * until the specified cool-down has run out, which makes it replace said slot with the original item, illustrated by
      * itemStack passed in.
-     * @param p The player, to add a cool-down to one of their items.
-     * @param slot The slot, to condone the cool-down in.
+     *
+     * @param p                 The player, to add a cool-down to one of their items.
+     * @param slot              The slot, to condone the cool-down in.
      * @param cooldownInSeconds The cool-down's duration.
-     * @param item The item, to replace the specified slot with after the cool-down.
+     * @param item              The item, to replace the specified slot with after the cool-down.
      * @author Servaturus & SimsumMC
      */
-    public static void setItemCooldown(Player p, int slot, ItemStack item, int cooldownInSeconds){
-        new BukkitRunnable(){
+    public static void setItemCooldown(Player p, int slot, ItemStack item, int cooldownInSeconds) {
+        new BukkitRunnable() {
             @Override
             public void run() {
 
-                ItemStack expiredItem = new ItemStack(Material.SULPHUR){
+                ItemStack expiredItem = new ItemStack(Material.SULPHUR) {
                     {
                         ItemMeta meta = getItemMeta();
                         meta.setDisplayName(ChatColor.RED + "Item on Cooldown");
@@ -290,26 +292,26 @@ public class ItemSystem {
                     }
                 };
 
-                new BukkitRunnable(){
+                new BukkitRunnable() {
 
                     int loops = 0;
 
                     @Override
                     public void run() {
-                        if(!LobbySystem.gameStarted){
+                        if (!LobbySystem.gameStarted) {
                             this.cancel();
                             return;
                         }
 
-                        if(loops == cooldownInSeconds){
-                            if(item.getAmount() < 1){
+                        if (loops == cooldownInSeconds) {
+                            if (item.getAmount() < 1) {
                                 item.setAmount(item.getAmount() + 1);
                             }
                             p.getInventory().setItem(slot, item);
                             this.cancel();
-                        }else{
+                        } else {
                             expiredItem.setAmount((cooldownInSeconds - loops));
-                            p.getInventory().setItem(slot,expiredItem);
+                            p.getInventory().setItem(slot, expiredItem);
                             loops++;
 
                         }
